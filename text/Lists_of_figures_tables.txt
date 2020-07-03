@@ -1,0 +1,49 @@
+Figures
+
+Figure 1:
+Figure 1a (heatmap of pathway mutations)
+Figure 1b (MCA cutoff)
+Figure 1c (primary UMAP of tumor samples)
+Figure 1d (minimum cluster size)
+Figure 1e (hdbscan clusters)
+Figure 1f (kNN clusters)
+Figure 1g (violin plot; cluster mutation counts)
+Figure 1h (projection of 4 cancer types on umap)
+Figure 1i (projection of breast ca subtypes on umap)
+Figure 1j (projection of BRCA1 & BRCA2 mutations on umap)
+Figure 1k (projection of stage on umap)
+Figure 1l (projection of metastatic tumors on umap)
+
+Figure 2 (oncoprint of pan-cancer pathway disruption)
+
+Figure 3 (class-specific pathway enrichment heatmap)
+
+Figure 4 (class 6&7 genes clustered by pathway membership)
+
+Figure 5:
+Figure 5a (posteriors of cancer type survival)
+Figure 5b (posteriors of class-specific survival by cancer)
+
+Tables
+
+Table 1 (table of top genes by cancer for class 6 & 7?)
+Table 2 (table of cluster-specific metastasis enrichment)
+
+Supplementary Figures
+
+Figure S1 (projection of each individual cancer type on the umap)
+Figure S2 (projection of histological subtypes onto the umap, by cancer type)
+Figure S3 (projection of genome instability mutations onto the umap)
+Figure S4 (projection of 377 pathway lesions onto the umap)
+Figure S5 (baseline survival modeled as a function of age, ethnicity and gender)
+Figure S6 (comparison of baseline risk with modified risk at age 50; 2, 5, and 10 fold?)
+Figuer S7? (factored survival model)
+
+Supplementary Tables
+
+Table ST1 (complete list of pan-cancer disruptions)
+Table ST2 - ST13 (full tables of top genes of enriched pathways by cancer type for each of classes 1-12)
+
+Supplementary Files and Rich Media
+
+File 1 (shiny version of Figure 1g-1k with dropdown menu to select cancer type)
