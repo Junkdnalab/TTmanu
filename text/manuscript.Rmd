@@ -12,6 +12,8 @@ output:
     theme: flatly
     smart: true
 bibliography: references.bib
+editor_options: 
+  chunk_output_type: console
 ---
 
 ###### Institutional affiliations: 1. The Center for Bioinformatics and Functional Genomics, Cedars-Sinai Medical Center, Los Angeles, California. 2. Lakeland Applied Sciences LLC, Los Angeles, CA. 3. Samuel Oschin Comprehensive Cancer Institute, Cedars-Sinai Medical Center, Los Angeles, CA.
@@ -1221,7 +1223,7 @@ Having defined tumors in terms of their pathway disruption profile, we sought to
 understand whether different cancer types segregated into one or more
 predominant classes. To our surprise, most cancer types (with some notable
 exceptions) were not heavily biased in one class, and all well-represented
-cancer types had representative tumors in every class (for example **figure 1g**
+cancer types had representative tumors in every class (for example **figure 1h**
 and full tumor profiles in **supplementary figure S1**, see also interactive
 media from **supplementary file 1 (html)**), suggesting that, in principle at
 least, our novel pathway-disruption classification method identifies molecular
@@ -1323,9 +1325,159 @@ known pathways that are disrupted in cancer, including <mark>PI3K/Akt
 activation, DNA repair etc fix this with top 5 or so quoted pathway
 labels</mark>. The top third of pathways drop off gradually in overall mutation
 frequency, possibly owing to relative diversity among all tumors.
+<div style="text-align: right"> Figure 2 Data </div>
+```{r oncoprint-top100-plus-panel-data-generation, eval = FALSE}
+tumor_clusters <- fread("../data/umap_2d_3d_coors.tsv") ## load in data
+load("../data/gdc_reactome_path_analysis.Rda")
 
-![](../figures/figure2_temp.png)
+######################
+## oncoprint top100 ##
+######################
+onco_color <- c("0" = "grey", "1" = "firebrick3")
 
+top100path <- gdc_reactome_path_analysis %>% rowSums() %>% as.data.frame() %>% rownames_to_column(var = "path_name") %>% arrange(desc(.)) %>% .[1:100,] %>% .[, "path_name"] ## getting the top100 mutated pathways in class
+
+top100path <- gdc_reactome_path_analysis[top100path, ] ## selecting the top 100 paths
+
+top100path[top100path == "1"] <- "MUT" ## categorize boolean values
+top100path[top100path == "0"] <- " "
+  col <- c("MUT" = "firebrick3")
+heatmap_legend <- list(title = "", at = c("MUT"),
+                       labels = c("Mutation"))
+alter_fun = list(
+    background = function(x, y, w, h) {
+        grid.rect(x, y, w-unit(0.5, "mm"), h-unit(0.5, "mm"), 
+            gp = gpar(fill = "#CCCCCC", col = NA))
+    },
+    # bug red
+    MUT = function(x, y, w, h) {
+        grid.rect(x, y, w-unit(0.5, "mm"), h-unit(0.5, "mm"), 
+            gp = gpar(fill = col["MUT"], col = NA))
+    })
+  column_title <- "Top 100 Pathway PanCancer"
+  onco_res <- oncoPrint(top100path,
+    alter_fun = alter_fun, col = col,
+    column_title = column_title, heatmap_legend_param = heatmap_legend,
+    remove_empty_columns = F, remove_empty_rows = F, right_annotation = NULL,
+    top_annotation = NULL
+    )
+  
+clust_col_order <- names(top100path[,onco_res@column_order])
+path_row_order <- rownames(top100path[onco_res@row_order,])
+
+onco_ggplot <- gdc_reactome_path_analysis %>% .[rownames(.) %in% path_row_order,] %>% ## only include the top 10 paths
+  rownames_to_column(var = "path_name") %>% ## path_name to col
+  gather(., key = "sample_id", value = "mutation_status", -path_name) %>% ## wide to long format
+  mutate(path_name = factor(.$path_name, levels = c(rev(path_row_order))), ## factor to force oncoprint order
+         sample_id = factor(.$sample_id, levels = c(clust_col_order)))
+save(onco_ggplot, file = "onco_ggplot.Rda")
+
+
+#####################
+## oncoprint panel ##
+#####################
+clust_col_order <- list()
+path_row_order <- list()
+
+for(n in 1:12) {
+  class_spec_sample_id <- tumor_clusters %>% .[,c("V1", "knn_clust")] %>% filter(knn_clust == n) %>% .[,.$V1] ## get class spec sample ids
+  top10path <- gdc_reactome_path_analysis %>% .[, names(.) %in% class_spec_sample_id] %>% rowSums() %>% as.data.frame() %>% rownames_to_column(var = "path_name") %>% arrange(desc(.)) %>% .[1:10,] %>% .[, "path_name"] ## getting the top10 mutated pathways in class
+  top10path <- gdc_reactome_path_analysis[top10path, class_spec_sample_id]
+  top10path[top10path == "1"] <- "MUT" ## categorize boolean values
+  top10path[top10path == "0"] <- " "
+  col <- c("MUT" = "firebrick3")
+heatmap_legend <- list(title = "", at = c("MUT"),
+                       labels = c("Mutation"))
+alter_fun = list(
+    background = function(x, y, w, h) {
+        grid.rect(x, y, w-unit(0.5, "mm"), h-unit(0.5, "mm"), 
+            gp = gpar(fill = "#CCCCCC", col = NA))
+    },
+    # bug red
+    MUT = function(x, y, w, h) {
+        grid.rect(x, y, w-unit(0.5, "mm"), h-unit(0.5, "mm"), 
+            gp = gpar(fill = col["MUT"], col = NA))
+    })
+  column_title <- "test"
+  onco_res <- oncoPrint(top10path,
+    alter_fun = alter_fun, col = col,
+    column_title = column_title, heatmap_legend_param = heatmap_legend,
+    remove_empty_columns = F, remove_empty_rows = F, right_annotation = NULL,
+    top_annotation = NULL
+    )
+  clust_col_order[[n]] <- names(top10path[,onco_res@column_order])
+  path_row_order[[n]] <- rownames(top10path[onco_res@row_order,])
+}
+
+save(clust_col_order, path_row_order, file = "onco_clust.Rda")
+```
+
+```{r figure-2-plot, fig.width=72, fig.height=48}
+## top100 pathways pancancer oncoprint
+load("../data/onco_ggplot.Rda") ## load data
+onco_color <- c("0" = "grey", "1" = "firebrick3") ## color scheme for oncoprint
+
+fig2A <- ggplot(data = onco_ggplot, aes(x=sample_id, y=path_name)) + 
+  geom_tile(aes(fill = as.character(mutation_status))) +
+  scale_fill_manual(values = onco_color) +
+  xlab(label = "sample_id") +
+  labs(tag = "A") +
+  theme_classic() +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_text(size = 12),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_blank(),
+        axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        legend.position = "none") 
+
+## top10 pathways for each cluster
+load("../data/onco_clust.Rda") ## load in data
+load("../data/gdc_reactome_path_analysis.Rda")
+
+plots_onco <- list() ## creating a list to store all the ggplots in the for loop below
+onco_color <- c("0" = "grey", "1" = "firebrick3") ## color scheme for oncoprint
+figure_labs <- LETTERS[seq(from = 2, to = 13)]
+for(n in 1:12) {
+  onco_ggplot <- gdc_reactome_path_analysis %>% .[rownames(.) %in% path_row_order[[n]],] %>% ## only include the top 10 paths
+  .[,names(.) %in% clust_col_order[[n]]] %>% ## only include specific tumor class
+  rownames_to_column(var = "path_name") %>% ## path_name to col
+  gather(., key = "sample_id", value = "mutation_status", -path_name) %>% ## wide to long format
+  mutate(path_name = factor(.$path_name, levels = c(rev(path_row_order[[n]]))), ## factor to force oncoprint order
+         sample_id = factor(.$sample_id, levels = c(clust_col_order[[n]])))
+  plots_onco[[n]] <- ggplot(data = onco_ggplot, aes(x=sample_id, y=path_name)) + ## ggplot code
+  geom_tile(aes(fill = as.character(mutation_status))) +
+  scale_fill_manual(values = onco_color) +
+  xlab(label = paste0("Class ", n)) +
+  labs(tag = figure_labs[n]) +
+  theme_classic() +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_blank(),
+        axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        legend.position = "none") 
+}
+
+## setting patchwork panel layout
+layout <- '
+AABCD
+AABCD
+AABCD
+AAEFG
+AAEFG
+AAEFG
+AAHIJ
+AAHIJ
+AAHIJ
+AAKLM
+AAKLM
+AAKLM
+'
+
+fig2A + plots_onco[[1]] + plots_onco[[2]] + plots_onco[[3]] + plots_onco[[4]] + plots_onco[[5]] + plots_onco[[6]] + plots_onco[[7]] + plots_onco[[8]] + plots_onco[[9]] + plots_onco[[10]] + plots_onco[[11]] + plots_onco[[12]] + plot_layout(design = layout)
+```
 <p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;"><b>Figure 2:
 Pan-cancer enrichment of pathway disruptions.</b> "Oncoprint" style graphic in
 which each column represents a tumor and each row represents a pathway. The
@@ -1359,8 +1511,212 @@ enrichment levels of the three, having mutations in hedgehog signaling,
 $\beta$-catenin degradation, cellular response to hypoxia, regulation of cell
 cycle and apoptosis among others. As cluster groups 9-12 and 6-7 were the most
 distinct of the 12, we chose to investigate these two groups further.
+<div style="text-align: right"> Figure 3 data </div>
+```{r group-pathway-enrichment-data-generation, eval=FALSE}
+tumor_clusters <- fread("../data/umap_2d_3d_coors.tsv") ## load in data
+tumor_clusters <- tumor_clusters %>% as.data.frame() %>% dplyr::select(V1, knn_clust) ## select the relevant columns
 
-![](../figures/fig2B_short.png)
+## Getting the total number of tumor samples in each cluster
+n_tumor_in_clust <- as.data.frame(table(tumor_clusters$knn_clust)) %>% ## table the number of tumors in each cluster
+  'colnames<-' (c("clust", "tot_n_clust")) %>% ## move cluster number to rownames
+  mutate(clust = as.character(clust)) ## convert factor to character
+
+
+## Organizing rBeta data
+load("../data/gdc_reactome_path_analysis.Rda")
+clust_group <- n_tumor_in_clust$clust
+cluster_path_count <- list()
+for(n in clust_group) {
+  print(n)
+  sample_id <- tumor_clusters %>% filter(knn_clust == n) %>% ## filter for tumor class
+    .[,"V1"] ## get sample_ids
+  path_mutation <- gdc_reactome_path_analysis %>% .[,names(.) %in% sample_id] %>% ## getting the tumor samples from path analysis
+    rowSums() %>% as.data.frame() %>% ## getting the observed mutation count of tumor class
+    'colnames<-' (n) ## change colname to cluster number
+  cluster_path_count[[n]] <- path_mutation
+  rm(path_mutation, sample_id, n)
+  gc()
+}
+cluster_path_count <- do.call(cbind, cluster_path_count) ## Combine the list together
+
+global_path_mut <- cluster_path_count %>% rowSums() %>% as.data.frame() %>% ## global pathway mutation count
+  .[rep(1:ncol(.), each = 12)] %>% ## replicate the column 12 times for the 12 tumor classes
+  'colnames<-' (clust_group) %>% ## rename column with tumor class
+  rownames_to_column(var = "path") %>% ## move rownames to column (pathways) %>%
+  gather(., key = "clust", value = "global_mut", -path)
+
+rbeta_path_analysis <- cluster_path_count %>% rownames_to_column(var="path") %>%
+  gather(key = "clust", value = "clust_mut", -path) %>% ## Wide to long format
+  left_join(., global_path_mut, by = c("path", "clust")) %>% ## add global mutation count 
+  left_join(., n_tumor_in_clust, by = "clust") %>% ## add total number of tumor samples per clust 
+  mutate(global_sample = sum(n_tumor_in_clust$tot_n_clust)) ## add total number of tumor samples
+
+rm(global_path_mut, cluster_path_count, n_tumor_in_clust, clust_group, tumor_clusters, gdc_reactome_path_analysis)
+gc()
+
+enrich_prob_uncertainity_in_bg <- data.frame(path = rbeta_path_analysis$path,
+                                            clust = rbeta_path_analysis$clust,
+                                            fg_mut = rbeta_path_analysis$clust_mut,
+                                            fg_not_mut = rbeta_path_analysis$tot_n_clust - rbeta_path_analysis$clust_mut,
+                                            bg_mut = rbeta_path_analysis$global_mut,
+                                            bg_not_mut = rbeta_path_analysis$global_sample - rbeta_path_analysis$global_mut
+                                            )
+fg_mut_rate <- list()
+bg_mut_rate <- list()
+for(n in 1:max(as.numeric(unique(enrich_prob_uncertainity_in_bg$clust)))) {
+  print(n)
+  df <- subset(enrich_prob_uncertainity_in_bg, clust == n)
+  fg_denominator <- nrow(df) * (df$fg_mut[1] + df$fg_not_mut[1]) ## n_path * tot_n_clust_x
+  fg_numerator <- sum(df$fg_mut)
+  bg_denominator <- nrow(df) * (df$bg_mut[1] + df$bg_not_mut[1])
+  bg_numerator <- sum(df$bg_mut)
+  fg_mut_rate[[n]] <- fg_numerator / fg_denominator
+  bg_mut_rate[[n]] <- bg_numerator / bg_denominator
+  rm(df)
+}
+
+fg_mut_rate <- fg_mut_rate %>% do.call(rbind, .) %>% as.data.frame() %>% ## rbind the mut rates from list
+  'colnames<-' ("fg_mut_rate") %>% ## rebind col names
+  rownames_to_column(var = "clust") ## move rownames to col
+bg_mut_rate <- bg_mut_rate %>% do.call(rbind, .) %>% as.data.frame() %>% ## rbind the mut rates from list
+  'colnames<-' ("bg_mut_rate") %>% ## rebind col names
+  rownames_to_column(var = "clust") ## move rownames to col
+
+enrich_prob_uncertainity_in_bg <- enrich_prob_uncertainity_in_bg %>% left_join(., fg_mut_rate, by = "clust") %>%
+  left_join(., bg_mut_rate, by = "clust") %>%
+  mutate(rel_odds = .$fg_mut_rate / .$bg_mut_rate) %>%
+  mutate(denominator = (.$bg_mut * .$rel_odds) + (.$bg_not_mut / .$rel_odds)) %>%
+  mutate(x_adj =(.$fg_mut + .$fg_not_mut) * (.$bg_mut * .$rel_odds) / .$denominator) %>%
+  mutate(y_adj = (.$fg_mut + .$fg_not_mut) - .$x_adj)
+rm(fg_mut_rate, bg_mut_rate, rbeta_path_analysis)
+gc()
+
+moderate_fg <- apply(enrich_prob_uncertainity_in_bg[,c("fg_mut", "fg_not_mut")], MARGIN = 1, function(x) {
+  rbeta(n = 1e5, shape1=x["fg_mut"], shape2=x["fg_not_mut"])
+})
+
+moderate_bg <- apply(enrich_prob_uncertainity_in_bg[,c("x_adj", "y_adj")], MARGIN = 1, function(x) {
+  rbeta(n = 1e5, shape1=x["x_adj"], shape2=x["y_adj"])
+})
+
+## ModerateEnrichment probability 
+prob <- moderate_fg > moderate_bg ## boolean data
+mean_prob <- apply(prob, MARGIN = 2, function(x) {
+  mean(x)
+})
+rm(prob)
+gc()
+## Moderate Difference
+CI <- 0.025 ## setting a 95% confidence interval
+
+diff_fg_bg <- moderate_fg - moderate_bg ## fg - bg
+rm(moderate_fg, moderate_bg, prob)
+gc()
+
+sig_fg_bg <- as.data.frame(apply(diff_fg_bg, MARGIN = 2, function(x) {
+  sum(x < 0 ) ## out of 1e5 simulations, how many times is fg-bg less than 0
+}))
+quant_diff <- t(apply(diff_fg_bg, MARGIN = 2, function(x) {
+  quantile(x, c(CI, 0.5, 1-CI))
+}))
+
+moderate_enrich_prob <- data.frame(path = enrich_prob_uncertainity_in_bg$path,
+                                   clust = enrich_prob_uncertainity_in_bg$clust,
+                                   probability = mean_prob,
+                                   signif = sig_fg_bg[,1],
+                                   difference = quant_diff[,2],
+                                   lower = quant_diff[,1],
+                                   upper = quant_diff[,3])
+rm(enrich_prob_uncertainity_in_bg, mean_prob, quant_diff, sig_fg_bg, diff_fg_bg)
+gc()
+#save(moderate_enrich_prob, file = "moderate_enrich_prob.Rda")
+load("../data/moderate_enrich_prob.Rda")
+
+diff_heatmap <- moderate_enrich_prob[,c("path", "clust", "difference")]
+diff_heatmap <- spread(diff_heatmap, key = "clust", value = "difference")
+diff_heatmap <- diff_heatmap %>% remove_rownames() %>% column_to_rownames(var="path")
+
+effect_size <- pheatmap(diff_heatmap,
+         show_rownames = F,
+         show_colnames = T,
+         cluster_cols = T,
+         cluster_rows = T,
+         cellwidth = 10,
+         cellheight = 0.76,
+         color = rev(c('#7f3b08','#b35806','#e08214','#fdb863','#fee0b6','white', '#d8daeb','#b2abd2','#8073ac','#542788','#2d004b')),
+         breaks = c(seq(from = -1, -0.2, 0.2), -0.0001, 0.0001, seq(from = 0.2, to = 1, by = 0.2)),
+         clustering_method = "ward.D2")
+
+effect_row_order <- effect_size$tree_row$order
+effect_row_order <- diff_heatmap %>% .[effect_row_order,] %>% rownames() ## getting row order of pheatmap
+
+effect_heatmap <- diff_heatmap %>% rownames_to_column(var = "path_name") %>% 
+  gather(., key = "cluster", value = "effect_size", -path_name) 
+
+effect_heatmap$path_name <- factor(effect_heatmap$path_name, levels = c(rev(effect_row_order)))
+effect_heatmap$cluster <- factor(effect_heatmap$cluster, levels = c(1:12))
+effect_segments <- c(seq(from = -1, -0.2, 0.2), -0.0001, 0.0001, seq(from = 0.2, to = 1, by = 0.2))
+
+effect_heatmap <- effect_heatmap %>% mutate(discrete_color = case_when(
+  effect_size > effect_segments[1] & effect_size <= effect_segments[2] ~ "1",
+  effect_size > effect_segments[2] & effect_size <= effect_segments[3] ~ "2",
+  effect_size > effect_segments[3] & effect_size <= effect_segments[4] ~ "3",
+  effect_size > effect_segments[4] & effect_size <= effect_segments[5] ~ "4",
+  effect_size > effect_segments[5] & effect_size <= effect_segments[6] ~ "5",
+  effect_size > effect_segments[6] & effect_size <= effect_segments[7] ~ "6",
+  effect_size > effect_segments[7] & effect_size <= effect_segments[8] ~ "7",
+  effect_size > effect_segments[8] & effect_size <= effect_segments[9] ~ "8",
+  effect_size > effect_segments[9] & effect_size <= effect_segments[10] ~ "9",
+  effect_size > effect_segments[10] & effect_size <= effect_segments[11] ~ "10",
+  effect_size > effect_segments[11] & effect_size <= effect_segments[12] ~ "11"
+))
+effect_heatmap$discrete_color <- factor(effect_heatmap$discrete_color, levels = c(1:11))
+
+save(effect_heatmap, file = "effect_heatmap.Rda")
+```
+
+```{r group-pathway-enrichment heatmap}
+load("../data/effect_heatmap.Rda") ## load data
+
+effect_colors = c("1" = "#2d004b", "2" = "#542788", "3" = "#8073ac", "4" = "#b2abd2", "5" = "#d8daeb", "6" = "white", "7" = "#fee0b6", "8" = "#fdb863", "9" = "#e08214","10" = "#b35806","11" ="#7f3b08") ## color scheme
+
+fig3 <- ggplot(data = effect_heatmap, aes(x=cluster, y=path_name)) + 
+  geom_tile(size = 0.6, aes(fill = discrete_color)) +
+  scale_fill_manual(values = effect_colors) +
+  theme(axis.text.x = element_text(size = 12),
+        axis.text.y = element_blank(),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
+        axis.ticks = element_blank(),
+        legend.position = "none")
+
+fig3_legend <- ggplot(data = data.frame(x = 1:11, y = 1), aes(x = x, y = y, fill = as.factor(x))) +
+  geom_bar(stat = "identity", width = 1) +
+  theme_classic() +
+  scale_fill_manual(values = effect_colors) + 
+  scale_x_continuous(labels= c("-1", "-0.5","0", "0.5", "1")) +
+  theme(legend.position = "none",
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.line = element_blank())
+
+## setting patchwork panel layout
+layout <- '
+AAAAA
+AAAAA
+AAAAA
+AAAAA
+AAAAA
+AAAAA
+AAAAA
+AAAAA
+#BBB#
+'
+
+fig3 + fig3_legend + plot_layout(design = layout)
+```
 
 <p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Figure 3. Pathway-specific enrichment within clusters.** Heatmap shows relative enrichment of each pathway (rows) within each numbered cluster (columns). The annotation at left indicates the Reactome pathway group at the second level (check this).</p>
 
@@ -1760,13 +2116,116 @@ selection and therefore target them  therapeutically at the same time to prevent
 further adaptation.
  
 ## Supplementary Information
+```{r supplementary-figure-s1, fig.width= 8.5, fig.height= 11}
+umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv") ## load data
+
+umap_bg <- umap_cancertype[,-"project_code"] ## get background data for facet
+  
+ggplot(umap_cancertype, aes(x = x_2d, y = y_2d, colour = project_code)) + 
+  geom_point(data = umap_bg, aes(x = x_2d, y = y_2d), colour = "grey", size = 1) +
+  geom_point(size = 1) +
+  theme_classic() +
+  coord_fixed() +
+  xlab("UMAP 1") + ylab("UMAP 2") +
+  scale_colour_manual(values = rep("firebrick3", 23)) +
+  theme(axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks = element_blank(),
+    axis.line = element_blank(),
+    legend.position = "none") +
+  facet_wrap(~ project_code, ncol = 5) ## facet by cancer_type
+```
+![**Supplementary figure S1. Distribution of cancer type on UMAP clusters.** Each panel shows the identity of individual tumors by one of 23 cancer types projected onto the cluster UMAP identified in **Figure 1 A** of the main text._]
+
+```{r supplementary-figure-s2-data-generation}
+umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv") ## load data
+umap_bg <- umap_cancertype[,-"project_code"] ## get background data for facet
+
+ggplot(umap_cancertype, aes(x = x_2d, y = y_2d, colour = Subtype_Selected)) + 
+  geom_point(data = umap_bg, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.5) +
+  geom_point(size = 0.5) +
+  theme_classic() +
+  coord_fixed() +
+  xlab("UMAP 1") + ylab("UMAP 2") +
+  theme(axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks = element_blank(),
+    axis.line = element_blank(),
+    legend.position = "none") +
+  facet_wrap(~ project_code, ncol = 5) ## facet by cancer type
+```
+
+![**Supplementary Figure S2. Histological subtypes.** _Each panel shows the histological subtypes of one of the 23 cancers projected on to the tumors of the UMAP from **Figure 1A of the main text.**_]
+<div style="text-align: right"> Supplementary Figure S3 Data </div>
+```{r supplementary-figure-s3-data-generation, eval = FALSE}
+load("../data/gdc_tumor_coding_complete.Rdata")
+load("../data/gene_data.Rda")
+
+## Booleanize mutation count for each tumor sample
+missense <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$missense) 
+splice <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$splice)
+frameshdel <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$frameshdel)
+frameshins <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$frameshins)
+utr3 <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$utr3)
+utr5 <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$utr5)
+nonstop <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$nonstop)
+nonsense <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$nonsense)
+
+gdc_mut_count_patient <- missense + splice + frameshdel + frameshins + utr3 + utr5 + nonstop + nonsense ## add up all the mutation count
+rm(missense, splice, frameshdel, frameshins, utr3, utr5, nonstop, nonsense)
+gc()
+gdc_mut_count_patient[gdc_mut_count_patient > 0] <- 1 ## booleanize data, anything greater than 1 is equal to 1
+
+##oncogene
+oncogene <- c("AKT2","BCL2","CTNNB1","ERBB2","KRAS","MDM2","MYC","PIK3CA","TET2","USP6") ## list of selected oncogene
+##tumor_supressor
+tumor_suppressor <- c("APC","BRIP1","CDKN2C","CHEK2","MSH2","PTEN","RB1","SMARCA4","TP53","VHL") ## list of selected tumor suppressor
+
+selected_mut <- gene_data %>% dplyr::select(external_gene_name, ensembl_gene_id) %>% filter(external_gene_name %in% c(oncogene, tumor_suppressor)) ## getting ensembl_id for the oncogenes for filtering gdc data
+
+selected_mut <- gdc_mut_count_patient %>% filter(rownames(.) %in% selected_mut$ensembl_gene_id) %>% ## filter by ensembl ids
+  rownames_to_column(var = "ensembl_gene_id") %>% left_join(., selected_mut, by = "ensembl_gene_id") %>% ## replace ensembl ids with gene name 
+  column_to_rownames(var = "external_gene_name") %>% dplyr::select(-ensembl_gene_id) %>%
+  t() %>% as.data.frame() %>% rownames_to_column(var = "V1")  ## prep for left_join
 
 
-![**Supplementary figure S1. Distribution of cancer type on UMAP clusters.** Each panel shows the identity of individual tumors by one of 23 cancer types projected onto the cluster UMAP identified in **Figure 1 A** of the main text._](../figures/figS2.png)
+selected_mut <- umap_cancertype %>% dplyr::select(V1, x_2d, y_2d) %>% ## select relevant columns
+  left_join(., selected_mut, by = "V1") %>%
+  melt(data = ., id.vars = c("V1", "x_2d", "y_2d"), meausure.vars = tumor_suppressor$external_gene_name) %>%
+  filter(value != 0)
 
-![**Supplementary Figure S2. Histological subtypes.** _Each panel shows the histological subtypes of one of the 23 cancers projected on to the tumors of the UMAP from **Figure 1A of the main text.**_](../figures/figS3.png)
+save(selected_mut, file = "selected_mut.Rda")
+```
 
-![**Supplementary Figure S3. Common oncogenic mutations.** _Each panel shows one of 20 commonly mutated oncogenic genes projected on the UMAP from **Figure 1A of the main text.**_](../figures/figS4.png)
+```{r supplementary-figure-s3}
+load("../data/selected_mut.Rda")
+umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv") ## load data
+umap_bg <- umap_cancertype[,-"project_code"] ## get background data for facet
+
+ggplot(selected_mut, aes(x = x_2d, y = y_2d, colour = as.character(value))) + 
+  geom_point(data = umap_bg, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.5) +
+  geom_point(size = 0.5) +
+  theme_classic() +
+  coord_fixed() +
+  xlab("UMAP 1") + ylab("UMAP 2") +
+  scale_colour_manual(values = rep("firebrick3", 20)) +
+  theme(axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks = element_blank(),
+    axis.line = element_blank(),
+    legend.position = "none") +
+  facet_wrap(~ factor(variable, levels = c("AKT2","BCL2","CTNNB1","ERBB2","KRAS","MDM2","MYC","PIK3CA","TET2","USP6", 
+                                           "APC","BRIP1","CDKN2C","CHEK2","MSH2","PTEN","RB1","SMARCA4","TP53","VHL")),
+                      ncol = 5) ## facet by gene
+```
+
+![**Supplementary Figure S3. Common oncogenic mutations.** _Each panel shows one of 20 commonly mutated oncogenic genes projected on the UMAP from **Figure 1A of the main text.**_]
 ![**Supplemental figure S6. Survival fit independent of disease status.** _The red and blue curves show the survival of people in the US by female and male, respectively. The orange and green curves show the model fits._](../figures/fig6A.png)
 
 
