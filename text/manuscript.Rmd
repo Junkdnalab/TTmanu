@@ -113,7 +113,7 @@ Other studies aim at providing a comprehensive view of mutations, gene
 expression and genomic signatures, with the express goal of understanding the
 common themes of all cancer independent of tissue of origin. Such a view of
 cancer as a malady affecting common cellular processes has long been a goal of
-the field and is perhaps best characterized in an essay by @weinberg2000 (see also
+the field and is perhaps best characterized in essays by @weinberg2000; @hallmarks_II (see also
 Discussion). The first of these studies, (the
 “Pan-Cancer-12” analysis) identified 11 subtypes from 12 cancer types,
 using integrative analysis with co-equal weighting of gene expression,
