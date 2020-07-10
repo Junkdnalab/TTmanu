@@ -37,7 +37,7 @@ Figure S3 (projection of genome instability mutations onto the umap)
 Figure S4 (projection of 377 pathway lesions onto the umap)
 Figure S5 (baseline survival modeled as a function of age, ethnicity and gender)
 Figure S6 (comparison of baseline risk with modified risk at age 50; 2, 5, and 10 fold?)
-Figuer S7? (factored survival model)
+Figure S7? (factored survival model)
 
 Supplementary Tables
 
