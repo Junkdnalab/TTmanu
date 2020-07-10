@@ -27,7 +27,7 @@ editor_options:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(rstan)
+#library(rstan)
 library(foreach)
 library(sqldf)
 library(tidyverse)
@@ -1849,7 +1849,7 @@ for(n in 1:10) {
 path_match_in_set <- path_match_in_set %>% do.call(rbind, .) %>% as.data.frame() ## combine the list together
 
 save(path_match_in_set, file = "path_match_in_set.Rda")
-
+load("../data/path_match_in_set.Rda")
 
 ### getting clustering order from pheatmap
 most_genes <- path_match_in_set %>% .$path_combo %>% table() %>% as.data.frame() %>% arrange(desc(Freq)) %>% ## arranging pathway combination based on most genes involved
@@ -1886,7 +1886,8 @@ rm(gdc_mut_count_patient)
 gc()
 
 save(filtered_mut_data, gene_order, file = "filtered_mut_data.Rda")
-pheatmap(filtered_mut_data[gene_order,],
+
+fig4_pheatmap <- pheatmap(filtered_mut_data[gene_order,],
          show_rownames = T,
          show_colnames = F,
          treeheight_row = 0,
@@ -1894,71 +1895,72 @@ pheatmap(filtered_mut_data[gene_order,],
          cellheight = 5,
          cellwidth = 1,
          cluster_cols = T,
-         cluster_rows = F,
-         #gaps_row = file_dims,
-         #cutree_cols = 6,
+         cluster_rows = F, ## turn off row clustering
          annotation_legend = F,
          legend_breaks = c(0, 0.25, 0.75, 1),
          legend_labels = c("","Not Mut", "Mut", ""),
          color = c("grey", "firebrick3"),
          clustering_method = "ward.D2",
          fontsize = 10,
-         legend = T,
-         filename = "fig4.png")
+         legend = T)
 
+## getting sample orders
+pheatmap_order <- fig4_pheatmap$tree_col$order ## getting sample clustering order
+sample_order <- names(filtered_mut_data) ## getting the sample_id original order 
+sample_order <- sample_order[pheatmap_order] ## reorder cancer by heatmap order
 
 ## stopped here ## ignore bottom using as reference
-path_match_in_set
-cancer_heatmap <- pheatmap(cancer_path[pathway_dendro,], ## using pathway row order 
-                          show_rownames = F,
-                          show_colnames = F,
-                          cellheight = 1,
-                          cellwidth = 0.5,
-                          cluster_cols = T,
-                          cluster_rows = F,
-                          annotation_legend = F,
-                          color = c("grey", "firebrick3"),
-                          clustering_method = "single", ## ordering is single linkage
-                          legend = T)
-  cancer_order <- cancer_heatmap$tree_col$order ## cancer order
-  cancer_path <- names(cancer_path) ## getting the sample_id original order 
-  cancer_dendro[[n]] <- cancer_path[cancer_order] ## reorder cancer by heatmap order
-  rm(cancer_info, cancer_path)
-  gc()
-}
-dev.off()
 
-for(n in cancer_type[1]) { ## getting the order of clustering by cancer type by alphabetical order
-  print(n)
-  cancer_order <- as.data.frame(do.call(cbind, cancer_dendro[n])) ## read in first list
-  names(cancer_order) <- "sample_id"
-  cancer_order$type <- n
-  for(p in cancer_type[-1]) {
-    print(p)
-    df1 <- as.data.frame(do.call(cbind, cancer_dendro[p])) ## read in rest of list in loop
-    names(df1) <- "sample_id"
-    df1$type <- p
-    cancer_order <- rbind(cancer_order, df1) ## combine the two df and repeat the loop until end of cancer_type
-    rm(df1)
-    gc()
-  }
-}
-
-cancer_dendro <- cancer_order %>% .[,"sample_id"] %>% as.character(.) ## sample_id ordering
-
-cancer_disrupt_heatmap <- gdc_reactome_path_analysis %>% rownames_to_column(var = "path_name") %>%  ## move rownames to column
-  gather(., key = "sample_id", value = "membership", -path_name) ## wide to long format
-cancer_disrupt_heatmap$membership <- as.character(cancer_disrupt_heatmap$membership) ## turn boolean values into categories
+class67_gene_2_path_heatmap <- filtered_mut_data %>% rownames_to_column(var = "gene_name") %>%  ## move rownames to column
+  gather(., key = "sample_id", value = "membership", -gene_name) ## wide to long format
+class67_gene_2_path_heatmap$membership <- as.character(class67_gene_2_path_heatmap$membership) ## turn boolean values into categories
 
 ## set levels based on clustering algorithm above
-cancer_disrupt_heatmap$path_name <- factor(cancer_disrupt_heatmap$path_name, levels = c(rev(pathway_dendro)))
-cancer_disrupt_heatmap$sample_id <- factor(cancer_disrupt_heatmap$sample_id, levels = c(cancer_dendro))
+class67_gene_2_path_heatmap$gene_name <- factor(class67_gene_2_path_heatmap$gene_name, levels = c(rev(rownames(filtered_mut_data))))
+class67_gene_2_path_heatmap$sample_id <- factor(class67_gene_2_path_heatmap$sample_id, levels = c(sample_order))
 
-cancer_disrupt_heatmap <- left_join(cancer_disrupt_heatmap, cancer_order, by = "sample_id") ## add in cancer type information for faceting
-save(cancer_disrupt_heatmap, file = "cancer_disrupt_heatmap.Rda") 
+class67_gene_2_path_heatmap <- left_join(class67_gene_2_path_heatmap, path_match_in_set, by = "gene_name") ## add in path_combo for faceting 
+save(class67_gene_2_path_heatmap, file = "class67_gene_2_path_heatmap.Rda") 
+rm(list = ls(all.names = T))
+gc()
 ```
 
-```{r figure-4}
+```{r figure-4, eval = FALSE}
+load("../data/class67_gene_2_path_heatmap.Rda") ## load data
+load("../data/path_match_in_set.Rda")
+
+### getting facet ordering
+most_genes <- path_match_in_set %>% .$path_combo %>% table() %>% as.data.frame() %>% arrange(desc(Freq)) %>% ## arranging pathway combination based on most genes involved
+  'colnames<-' (c("path_combo", "Freq")) %>% 
+  rownames_to_column(var = "order") 
+
+fig4 <- ggplot(data = class67_gene_2_path_heatmap, aes(y=gene_name, x=sample_id, fill = membership)) + 
+  geom_tile(size = 0.6) +
+  scale_fill_manual(values = c("grey", "firebrick3")) +
+  #facet_grid(factor(path_combo, levels = most_genes$path_combo) ~ ., scales = "free", space = "free") +
+  #scale_y_discrete(position = "left") +
+  labs(tag = "A") +
+  ylab("") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_text(size = 12),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
+        axis.ticks = element_blank(),
+        strip.text.y = element_blank(),
+        strip.background = element_blank(),
+        legend.position = "none") 
+fig4
+ggsave("fig4_ggplot_heatmap.png", height = 100, width = 17, limitsize = FALSE)
+
+## fixing the text cutoff in heatmap
+ fig1Ag <- ggplotGrob(fig1A)
+ 
+ for(i in which(grepl("strip-l", fig1Ag$layout$name))){
+   fig1Ag$grobs[[i]]$layout$clip <- "off"
+ }
+ 
+ fig1A <- as.ggplot(fig1Ag)
+ rm(fig1Ag)
 
 ```
 
@@ -1980,8 +1982,118 @@ tables ST2-ST13**). We find that in most clusters the top pathways are
 determined by mutations in a handful of driver genes, TP53, PIK3CA, KRAS etc.
 However in many cancers we find divergence outside these top driver mutations,
 wherein etc etc</mark>
+<div style="text-align: right"> Table 1 Data </div>
+```{r table-1-data-generation, eval = FALSE}
+tumor_clusters <- fread("../data/umap_2d_3d_coors.tsv") ## load in data
+load("../data/moderate_enrich_prob.Rda") ## load data
+load("../data/gene2_level2_lookup.Rda")
+load("../data/gene_data.Rda")
+load("../data/gdc_gene_exp_adj.Rda")
+load("../data/pathname2level2.Rda")
 
-![](../figures/table1.png)
+id_to_names <- gene2level2_lookup %>% rownames_to_column(var = "ensembl_gene_id") %>% ## convert ensembl to gene name
+  left_join(., gene_data[,c("ensembl_gene_id", "external_gene_name")], by = "ensembl_gene_id") %>%
+  remove_rownames() %>% column_to_rownames(var = "external_gene_name") %>%
+  dplyr::select(-ensembl_gene_id) %>%
+  t() %>% as.data.frame() %>% rownames_to_column(var = "PATH_ID") %>% ## convert path_id to path_name
+  left_join(., pathname2level2, by = "PATH_ID") %>%
+  remove_rownames() %>% column_to_rownames(var = "PATH_NAME") %>%
+  dplyr::select(-PATH_ID) %>%
+  t() %>% as.data.frame()
+
+gene_mutation <- gdc_gene_exp_adj %>% rownames_to_column(var = "ensembl_gene_id") %>% ## convert ensembl to gene name
+  left_join(., gene_data[,c("ensembl_gene_id", "external_gene_name")], by = "ensembl_gene_id") %>%
+  remove_rownames() %>% column_to_rownames(var = "external_gene_name") %>%
+  dplyr::select(-ensembl_gene_id)
+
+## parameters ##
+enrich_cutoff <- 0.30
+howmanypaths <- 5 ## top _ pathways; how many top pathways do you want to see
+show_perc <- TRUE
+show_n <- TRUE
+mutated_gene_position <- 1
+################
+
+clust_spec_enrich <- moderate_enrich_prob %>% filter(signif <= 2500 & difference >= enrich_cutoff) ## signif is 95% CI with a specified cutoff
+
+clust_spec_enrich_top5 <- list()
+for(n in unique(clust_spec_enrich$clust)) {
+  message(n)
+  clust_spec_enrich_top5[[n]] <- clust_spec_enrich %>% filter(clust == n) %>% ## filter for specific cluster
+    arrange(desc(difference)) %>% ## arrange enrichment score in decreasing order 
+    dplyr::select(path, clust) %>% .[1:5,]
+}
+clust_spec_enrich_top5 <- clust_spec_enrich_top5 %>% do.call(rbind, .) %>% as.data.frame() ## combine list from for loop
+rm(clust_spec_enrich)
+
+## finding the top mutated gene for each cluster in each pathway for the top 5 pathways 
+type <- unique(tumor_clusters$project_code) ## type of cancer type in data
+cluster_spec_enrich_table <- list() ## list for forloop
+
+for(d in unique(clust_spec_enrich_top5$clust)) {
+  message(d)
+  clust_toppath <- clust_spec_enrich_top5 %>% filter(clust == d) %>% .$path %>% as.character() ## get the top pathway names for spec class
+  class_spec <- tumor_clusters %>% dplyr::select(V1, knn_clust, project_code) %>% filter(knn_clust %in% d) ## get the smaple ids and cancer type for spec class
+  top_genes_in_path_cancer_type <- list()
+  for(n in clust_toppath) { ## for each of the top paths do this
+    message(n)
+    gene_in_path <- id_to_names %>% .[,which(names(.) == n)] %>% as.data.frame() %>% ## select pathway
+    'rownames<-' (rownames(id_to_names)) %>% 
+    filter(. == 1) %>% ## filter for genes that are in that pathway
+    rownames(.)
+    top_gene_in_path <- list()
+    for(t in type) { ## looping through cancer type within class
+      message(t)
+      class_spec <- tumor_clusters %>% dplyr::select(V1, knn_clust, project_code) %>% filter(knn_clust == d) ## sample_id for class
+      if(t %in% class_spec$project_code) { ## if cancer type is in class then run this 
+        class_type_spec <- class_spec %>% filter(project_code == t) %>% column_to_rownames(var = "V1") %>% rownames() ## get cancer type specific tumor classes
+      if(length(class_type_spec) == 1) { ## if you only have 1 sample_id in the class
+        top_mut_gene <- gene_mutation %>% rownames_to_column(var = "gene") %>% .[.$gene %in% gene_in_path, names(.) %in% c("gene",  class_type_spec)] %>% remove_rownames() %>% column_to_rownames(var = "gene") %>% 'colnames<-' ("obs_count") %>% 
+          mutate(n_sample = length(class_type_spec),
+               perc_mut = round((obs_count / length(class_type_spec)) * 100, digits = 1)) %>% 
+        rownames_to_column(var = "gene") %>% arrange(desc(obs_count))
+      }
+      if(length(class_type_spec) > 1) { ## if you have more than 1 sample_id in the class
+        top_mut_gene <- gene_mutation %>% .[rownames(.) %in% gene_in_path, names(.) %in% class_type_spec] %>% 
+        rowSums() %>% as.data.frame() %>% 'colnames<-' ("obs_count") %>%
+        mutate(n_sample = length(class_type_spec),
+               perc_mut = round((obs_count / length(class_type_spec)) * 100, digits = 1)) %>% 
+        rownames_to_column(var = "gene") %>% arrange(desc(obs_count))
+      }
+      if(show_perc == TRUE & show_n == FALSE) {
+         top_gene_in_path[[t]] <- paste0(top_mut_gene$gene[mutated_gene_position], " (", top_mut_gene$perc_mut[mutated_gene_position],"%)")  
+      }
+      if(show_perc == TRUE & show_n == TRUE) {
+         top_gene_in_path[[t]] <- paste0(top_mut_gene$gene[mutated_gene_position], " (", top_mut_gene$perc_mut[mutated_gene_position],"%)", "    n = ", length(class_type_spec))  
+      }
+      if(show_perc == FALSE) {
+         top_gene_in_path[[t]] <- paste0(top_mut_gene$gene[mutated_gene_position])  
+      }
+      }
+      if(!(t %in% class_spec$project_code)){ ## if cancer type is not in class then insert NA
+        top_gene_in_path[[t]] <- "NA" 
+      }
+    }
+    top_gene_in_path <- top_gene_in_path %>% do.call(rbind, .) %>% as.data.frame() %>% 'colnames<-' (n)
+    clust_row <- data.frame(Class = d, row.names = n) %>% t() ## creating a row for cluster membership
+    top_genes_in_path_cancer_type[[n]] <- rbind(clust_row, top_gene_in_path)
+  }
+  cluster_spec_enrich_table[[n]] <- top_genes_in_path_cancer_type %>% do.call(cbind, .) %>% as.data.frame() %>% 
+  t() %>% as.data.frame() %>% rownames_to_column(var = "Pathway")
+  }
+
+cluster_spec_enrich_table1 <- cluster_spec_enrich_table %>% do.call(rbind, .) %>% as.data.frame()
+save(cluster_spec_enrich_table1, file = "cluster_spec_enrich_table1.Rda")
+rm(list = ls(all.names = T))
+gc()
+```
+
+```{r table-1}
+load("../data/cluster_spec_enrich_table1.Rda")
+cluster_spec_enrich_table1 %>% kable(caption = "Table 1: Most mutated gene in class-specific pathways (enrichment score >= 0.30) for specific cancer", row.names = FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 12) %>%
+  column_spec(1, bold = T)
+```
 <p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Table 1:** The numbers in this table are completely wrong, it is just a place holder, please ignore</p>
 
 ### Enrichment of pathways in metastasis is class-specific
@@ -2015,6 +2127,191 @@ Degranulation” and “Fc epsilon receptor (FCERI) signaling” which are speci
 cluster 9 & 10 non-metastatic tumors. Thus, pathway lesions specific to
 metastases tend toward complementary mutations that are otherwise specific to
 non-metastatic tumors of other clusters.
+<div style="text-align: right"> Table 2 Data </div>
+```{r table-2-data-generation, eval = FALSE}
+tumor_clusters <- fread("../data/umap_2d_3d_coors.tsv") ## load in data
+load("../data/gdc_reactome_path_analysis.Rda")
+
+tumor_clusters <- tumor_clusters %>% dplyr::select(V1, ajcc_metastasis_pathologic_pm, knn_clust)
+
+m0_clust <- tumor_clusters[tumor_clusters$ajcc_metastasis_pathologic_pm == "M0",] ## filter for nonmetastatic samples
+m1_clust <- tumor_clusters[tumor_clusters$ajcc_metastasis_pathologic_pm == "M1",] ## filter for metastatic samples
+
+prepare_rbeta_data_p1 <- function(data, path_analysis) {
+  n_tumor_in_group <- as.data.frame(table(data$ajcc_metastasis_pathologic_pm)) ## Getting the total number of tumor samples in each group
+  path_analysis <- path_analysis[,names(path_analysis) %in% data$V1] ## Filter only group specific cancers
+  data <- data[match(names(path_analysis), data$V1),] ## Match tumor sample ids
+  table(names(path_analysis) == data$V1) ## good they match now
+  ## Now we are going to build group specific cluster data
+  n_tumor_in_clust <- as.data.frame(table(data$knn_clust)) ## getting total n in each cluster
+  names(n_tumor_in_clust) <- c("clust", "tot_n_clust") ## rename colnames
+  clust_group <- as.character(n_tumor_in_clust$clust) ## Getting the cluster numbers
+  cluster_path_count <- list() ## Creating a list for the forloop
+  for(n in clust_group) {
+    print(n)
+    df <- subset(data, knn_clust == n) ## subset cluster number
+    df <- df$V1 ## getting tumor sample id
+    df1 <- path_analysis[,names(path_analysis) %in% df] ## getting the tumor samples from path analysis
+    df1 <- as.data.frame(rowSums(df1))
+    names(df1) <- n
+    cluster_path_count[[n]] <- df1
+  }
+  cluster_path_count <- do.call(cbind, cluster_path_count) ## Combine the list together
+  rbeta_path_df <- cluster_path_count %>% rownames_to_column(var="path") 
+  rbeta_path_df <- rbeta_path_df %>% gather(key = "clust", value = "mutation", -path) ## Wide to long format
+  global_path_mut <- as.data.frame(rowSums(cluster_path_count))
+  global_path_mut <- global_path_mut[rep(1:ncol(global_path_mut), each = max(as.numeric(as.character(rbeta_path_df$clust))))] ## Repeat column 12 times
+  names(global_path_mut) <- as.character(clust_group) ## Replace names with cluster numbers
+  global_path_mut <- global_path_mut %>% rownames_to_column(var="path") %>% gather( key = "clust", value = "global", -path) ## Wide to long format
+  rbeta_path_df <- left_join(rbeta_path_df, global_path_mut, by = c("path", "clust")) ## left_join rbetadf and global
+  rbeta_path_df <- left_join(rbeta_path_df, n_tumor_in_clust, by = "clust")
+  rbeta_path_df$global_sample <- as.numeric(sum(n_tumor_in_clust$tot_n_clust)) ## Getting total tumor sample number
+  names(rbeta_path_df) <- c("path", "clust", "clust_mut", "global_mut", "tot_n_clust", "global_sample")
+  rbeta_path_df$tot_n_clust <- as.numeric(as.character(rbeta_path_df$tot_n_clust)) ## convert tot_n_clust numeric
+  return(rbeta_path_df)
+}
+
+m0_rbeta <- prepare_rbeta_data_p1(data = m0_clust, path_analysis = gdc_reactome_path_analysis)
+## Combining cluster 6/7 cluster 910 cluster 1112
+combo_group <- c("6", "9", "11")
+compo_group_df <- list() ## list for loop
+for(n in combo_group) {
+  print(n) ## first cluster in set
+  m <- as.numeric(n) + 1 ## second cluster in set
+  m <- as.character(m)
+  df <- m0_rbeta[m0_rbeta$clust == n,] ## get rbeta info for first cluster in set
+  df1 <- m0_rbeta[m0_rbeta$clust == m,] ## get rbeta info for second cluster in set
+  tot_clust_mut <- df$clust_mut + df1$clust_mut ## add both clust muts
+  tot_n_clust <- df$tot_n_clust + df1$tot_n_clust ## add both clust n's
+  p <- paste0(n,m)
+  df2 <- m0_rbeta[1:377,]
+  df2$clust <- p ## replace with new clust name
+  df2$clust_mut <- tot_clust_mut ## replace with new clust mut count
+  df2$tot_n_clust <- tot_n_clust ## replace with new clust size
+  compo_group_df[[p]] <- df2 ## store in list and continue loop
+}
+compo_group_df <- do.call(rbind, compo_group_df) ## rbind list
+m0_rbeta <- rbind(m0_rbeta, compo_group_df) ## rbind m0_rbeta and the compo group together
+save(m0_rbeta, file = "m0_rbeta.Rda")
+
+## repeat same function above with metastasis sample
+m1_rbeta <- prepare_rbeta_data_p1(data = m1_clust, path_analysis = gdc_reactome_path_analysis)
+compo_group_df <- list() ## list for loop
+for(n in combo_group) {
+  print(n) ## first cluster in set
+  m <- as.numeric(n) + 1 ## second cluster in set
+  m <- as.character(m)
+  df <- m0_rbeta[m0_rbeta$clust == n,] ## get rbeta info for first cluster in set
+  df1 <- m0_rbeta[m0_rbeta$clust == m,] ## get rbeta info for second cluster in set
+  tot_clust_mut <- df$clust_mut + df1$clust_mut ## add both clust muts
+  tot_n_clust <- df$tot_n_clust + df1$tot_n_clust ## add both clust n's
+  p <- paste0(n,m)
+  df2 <- m0_rbeta[1:377,]
+  df2$clust <- p ## replace with new clust name
+  df2$clust_mut <- tot_clust_mut ## replace with new clust mut count
+  df2$tot_n_clust <- tot_n_clust ## replace with new clust size
+  compo_group_df[[p]] <- df2 ## store in list and continue loop
+}
+compo_group_df <- do.call(rbind, compo_group_df) ## rbind list
+m1_rbeta <- rbind(m1_rbeta, compo_group_df) ## Combine the new groups
+save(m1_rbeta, file = "m1_rbeta.Rda")
+
+## function to compiling data for rbeta analysis
+prepare_rbeta_data_p2 <- function(data) {
+  enrich_prob <- data.frame(path = data$path,
+                               clust = data$clust,
+                               fg_mut = data$clust_mut,
+                               fg_not_mut = data$tot_n_clust - data$clust_mut,
+                               bg_mut = data$global_mut,
+                               bg_not_mut = data$global_sample - data$global_mut)
+fg_mut_rate <- list()
+bg_mut_rate <- list()
+for(n in unique(as.character(enrich_prob$clust))) {
+  print(n)
+  df <- subset(enrich_prob, clust == n)
+  fg_denominator <- nrow(df) * (df$fg_mut[1] + df$fg_not_mut[1]) ## n_path * tot_n_clust_x
+  fg_numerator <- sum(df$fg_mut)
+  bg_denominator <- nrow(df) * (df$bg_mut[1] + df$bg_not_mut[1])
+  bg_numerator <- sum(df$bg_mut)
+  fg_mut_rate[[n]] <- fg_numerator / fg_denominator
+  bg_mut_rate[[n]] <- bg_numerator / bg_denominator
+}
+
+fg_mut_rate <- as.data.frame(do.call(rbind, fg_mut_rate)) ## rbind the mut rates from list
+bg_mut_rate <- as.data.frame(do.call(rbind, bg_mut_rate)) ## rbind the mut rates from list
+enrich_prob_df <- enrich_prob
+enrich_prob_df$fg_mut_rate <- rep(x = fg_mut_rate$V1, each = length(unique(enrich_prob_df$path)))
+enrich_prob_df$bg_mut_rate <- rep(x = bg_mut_rate$V1, each = length(unique(enrich_prob_df$path)))
+enrich_prob_df$rel_odds <- enrich_prob_df$fg_mut_rate / enrich_prob_df$bg_mut_rate
+enrich_prob_df$denominator <- (enrich_prob_df$bg_mut * enrich_prob_df$rel_odds) +   (enrich_prob_df$bg_not_mut / enrich_prob_df$rel_odds)
+enrich_prob_df$x_adj <- round((enrich_prob_df$fg_mut + enrich_prob_df$fg_not_mut) * (enrich_prob_df$bg_mut * enrich_prob_df$rel_odds) / enrich_prob_df$denominator)
+enrich_prob_df$y_adj <- (enrich_prob_df$fg_mut + enrich_prob_df$fg_not_mut) -   enrich_prob_df$x_adj
+return(enrich_prob_df)
+}
+
+m0_rbeta <- prepare_rbeta_data_p2(m0_rbeta)                               
+m1_rbeta <- prepare_rbeta_data_p2(m1_rbeta)     
+
+save(m0_rbeta, m1_rbeta, file = "m0_m1_rbeta.Rda")
+rm(list = ls(all.names = T)) ## cleaning up data
+gc()
+load("../data/m0_m1_rbeta.Rda")
+## Metastatic (foreground) - Nonmetastatic (background) Rbeta
+moderate_fg <- apply(m1_rbeta[,c("fg_mut", "fg_not_mut")], MARGIN = 1, function(x) {
+  rbeta(n = 1e5, shape1=x["fg_mut"], shape2=x["fg_not_mut"])
+})
+moderate_bg <- apply(m0_rbeta[,c("fg_mut", "fg_not_mut")], MARGIN = 1, function(x) {
+  rbeta(n = 1e5, shape1=x["fg_mut"], shape2=x["fg_not_mut"])
+})
+
+metastasis_cluster_moderate <- moderate_fg - moderate_bg  ## Fg - Bg ... to see how many times the Fg is larger than the Bg
+metastasis_cluster_moderate <- as.data.frame(metastasis_cluster_moderate)
+
+## ModerateEnrichment probability 
+prob <- moderate_fg > moderate_bg ## boolean data
+mean_prob <- apply(prob, MARGIN = 2, function(x) {
+  mean(x)
+})
+## Moderate Difference
+CI <- 0.025
+
+diff_fg_bg <- moderate_fg - moderate_bg ## fg - bg
+rm(moderate_fg, moderate_bg, prob)
+gc()
+quant_diff <- t(apply(diff_fg_bg, MARGIN = 2, function(x) {
+  quantile(x, c(CI, 0.5, 1-CI)) ## 95% CI
+}))
+
+sig_fg_bg <- as.data.frame(apply(diff_fg_bg, MARGIN = 2, function(x) {
+  sum(x < 0 ) ## out of 1e5 simulations, how many times is fg-bg less than 0
+}))
+
+m1_minus_m0_per_cluster_rbeta <- data.frame(path = m1_rbeta$path,
+                                   clust = m1_rbeta$clust,
+                                   probability = mean_prob,
+                                   signif = sig_fg_bg[,1],
+                                   difference = quant_diff[,2],
+                                   lower = quant_diff[,1],
+                                   upper = quant_diff[,3])
+save(m1_minus_m0_per_cluster_rbeta, file = "m1_minus_m0_per_cluster_rbeta.Rda")
+rm(list = ls(all.names = T))
+gc()
+```
+
+```{r table-2}
+load("../data/m1_minus_m0_per_cluster_rbeta.Rda")
+
+table2 <- m1_minus_m0_per_cluster_rbeta %>% filter(difference >= 0.20 & signif <= 2500) %>% ## filter effect size >= 0.20 and enrichment at a 95% CI
+  dplyr::select(path, clust, signif, difference) %>% 'colnames<-' (c("Pathway", "Cluster", "Signif", "Enrichment_Score")) ## select relevant column and rename col
+
+table2$log10pvalue <- round(-log10((table2$Signif + 1) / 1E5), digits = 2) ## Getting p value ## adding 1 for pseudo count.. 1E5 is the n simulations performed
+table2$Enrichment_Score <- round(table2$Enrichment_Score, digits = 2)
+table2$Signif <- NULL ## we don't need this anymore
+
+table2 %>% knitr::kable(format = "html") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 12) %>%
+  column_spec(1, bold = T, color = "black")
+```
 
 There were also a number of pathways that were enriched with lower specificity
 (among 4 or more clusters) which were found to be enriched in metastases. We
