@@ -1,0 +1,62 @@
+Recent advances in technology have made the study of cancer possible at
+unprecedented levels of detail and scale. Array and next-generation sequencing
+technologies have made it possible to assay germline and somatic mutations,
+expression profiles, DNA methylation, and copy number variations. To take
+advantage of these tools several large consortia, including the cancer genome
+atlas (TCGA) and pan-cancer analysis of whole genomes (PCAWG), sequenced large
+numbers of tumors and collected data from multiple assays that could be analyzed
+together, with the goal of integration and increased understanding of the
+mechanisms of cancer. These efforts have focused on recognizing and quantifying
+the importance of genes in cancer etiology as the result of selection processes,
+or classification of cancers relative to common patterns of aberration in
+multiple assays.
+
+Considerable progress has been made analyzing these data. Statistical analyses
+identify hundreds of global and tissue-specific cancer driver genes
+[@deesMuSiC2012; @tamboreroOncodriveCLUST2013;
+@lawrenceDiscoverySaturationAnalysis2014;
+@kumarStatisticallyIdentifyingTumor2015; @tokheimEvaluatingEvaluationCancer2016;
+@jiangWITER2019; @zhaoModelingPositive2019] using approaches aimed at detecting
+when genes are mutated at a greater rate than expected due to chance. Based in
+part on studies like these, it has been estimated that on the order of three
+mutations in key oncogenes and/or tumor suppressors would be sufficient to
+transform a normal cell to a cancerous state [@vogelsteinPathCancerThree2015].
+
+Other studies aim at providing a comprehensive view of mutations, gene
+expression and genomic signatures, with the express goal of understanding the
+common themes of all cancer independent of tissue of origin. Such a view of
+cancer as a malady affecting common cellular processes has long been a goal of
+the field and is perhaps best characterized in essays by @weinberg2000; @hallmarks_II (see also
+Discussion). The first of these studies, (the
+“Pan-Cancer-12” analysis) identified 11 subtypes from 12 cancer types,
+using integrative analysis with co-equal weighting of gene expression,
+methylation, copy number and proteomics data
+[@hoadleyMultiplatformAnalysis2014]. The principal finding was that
+tissue-of-origin is the predominant driving factor, though a significant
+proportion of tumors ($10\%$) could be reclassified independent of
+tissue-of-origin. In a second study involving 33 cancer types and a much greater
+number of tumors using a newer algorithm (iCluster)
+[@shenIntegrativeClusteringMultiple2009], the authors identify 28 clusters that
+could be further subdivided into organ specific groups, including
+pan-gastrointestinal, pan-gynecological, pan-squamous, pan-gynecological/
+squamous and pan-kidney [@hoadleyCellofOriginPatternsDominate2018].
+
+More recently, attempts have been made to consider pan-cancer mutations and
+other data outside the context of enrichment at the gene level. Horn _et al._
+[@hornNetSigNetworkbasedDiscovery2018] introduce approaches to address the
+sparseness of mutations, allowing the potential importance of a gene to be
+influenced by the aggregate of positive selection in its nearest network
+neighbors. This method is powerful especially when applied to a small number (on
+the order of hundreds) of tumors. However, the larger problem of cancer etiology
+remains: what mutations are required, in what order, and are there specific
+combinations of delinquent cellular processes sufficient to cause cancer? If
+there is a common logic to cancer, how is it to be detected underneath the
+overwhelming cell-of-origin signal?
+
+In this study, we attempt to address these questions by focusing on discrete
+molecular pathways as the unit of disruption in cancer. Our approach strips all
+cell-type-specific information from the mutation data and generalizing
+gene-level information to non-tissue specific cell-biological pathway
+phenotypes. We use this rubric to evaluate all cancers and show that,
+surprisingly, tumors may have distinct phenotypes completely independent of
+their tissues of origin.
