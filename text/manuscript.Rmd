@@ -53,6 +53,7 @@ library(ComplexHeatmap)
 library(knitr)
 library(kableExtra)
 library(UpSetR)
+library(cowplot)
 ```
 
 ## Abstract
@@ -1689,16 +1690,22 @@ tumor_clusters <- fread("../data/umap_2d_3d_coors.tsv") ## load in data
 load("../data/gene2_level2_lookup.Rda")
 load("../data/pathname2level2.Rda")
 load("../data/gdc_reactome_path_analysis.Rda")
+load("../data/moderate_enrich_prob.Rda")
 load("../data/gene_data.Rda")
 
 ## Parameters ##
 filtered_class <- c(6,7) ## filtering for only class 6 and 7 samples
 n_path <- 10 ## looking at the top10 path
+enrich_cutoff <- 0.30
+################
 
 ## Data Generation ##
 class_spec <- tumor_clusters %>% dplyr::select(V1, knn_clust) %>% filter(knn_clust %in% filtered_class) %>% .[,.$V1] ## sample_id for class specific
 
-toppath <- gdc_reactome_path_analysis %>% .[, names(.) %in% class_spec] %>% rowSums() %>% as.data.frame() %>% rownames_to_column(var = "path_name") %>% arrange(desc(.)) %>% .[1:n_path,] %>% .[, "path_name"] ## getting the top10 mutated pathways
+toppath <- moderate_enrich_prob %>% filter(signif <= 2500 & difference >= enrich_cutoff) %>% ## signif is 95% CI with a specified cutoff
+  filter(clust %in% filtered_class) %>% ## filter the cluster
+  arrange(desc(difference)) %>% ## arrange enrichment score in descending order
+  .[, "path"] %>% as.character() %>% unique() %>% .[1:n_path] ## getting the top10 enriched pathways
 
 genes_in_path <- gene2level2_lookup %>% .[, match(pathname2level2$PATH_ID, names(.))] %>% ## match path ids
   'colnames<-' (pathname2level2$PATH_NAME) %>% ## replace with path_names
@@ -1842,7 +1849,7 @@ rm(list = ls(all.names = T))
 gc()
 ```
 
-```{r figure-4, eval = FALSE}
+```{r figure-4, message = FALSE}
 load("../data/class67_gene_2_path_heatmap.Rda") ## load data
 load("../data/path_match_in_set.Rda")
 
@@ -1854,30 +1861,82 @@ most_genes <- path_match_in_set %>% .$path_combo %>% table() %>% as.data.frame()
 fig4 <- ggplot(data = class67_gene_2_path_heatmap, aes(y=gene_name, x=sample_id, fill = membership)) + 
   geom_tile(size = 0.6) +
   scale_fill_manual(values = c("grey", "firebrick3")) +
-  #facet_grid(factor(path_combo, levels = most_genes$path_combo) ~ ., scales = "free", space = "free") +
-  #scale_y_discrete(position = "left") +
-  labs(tag = "A") +
-  ylab("") +
   theme(axis.text.x = element_blank(),
-        axis.text.y = element_text(size = 12),
+        axis.text.y = element_blank(),
         axis.title.x = element_text(size = 12),
-        axis.title.y = element_text(size = 12),
+        axis.title.y = element_blank(),
         axis.ticks = element_blank(),
         strip.text.y = element_blank(),
         strip.background = element_blank(),
         legend.position = "none") 
-fig4
-ggsave("fig4_ggplot_heatmap.png", height = 100, width = 17, limitsize = FALSE)
 
-## fixing the text cutoff in heatmap
- fig1Ag <- ggplotGrob(fig1A)
- 
- for(i in which(grepl("strip-l", fig1Ag$layout$name))){
-   fig1Ag$grobs[[i]]$layout$clip <- "off"
- }
- 
- fig1A <- as.ggplot(fig1Ag)
- rm(fig1Ag)
+load("../data/path_match_in_set.Rda")
+
+gene_order <- path_match_in_set %>% left_join(., most_genes, by = "path_combo") %>% ## left join the data together
+  arrange(order) %>% .$gene_name ## getting the gene name order
+
+## right annotation data generation
+proteasome_r_anno <- data.frame(gene = gene_order, 
+                                psm_gene = 0)
+
+proteasome_r_anno[grep(pattern = "PSM|UBE2|UBB|UBC", x = proteasome_r_anno$gene), "psm_gene"] <- 1
+
+r_anno_color <- c("0" = "white", "1" = "black")
+r_anno <- ggplot(proteasome_r_anno) +
+  geom_bar(mapping = aes(x = 1, y = gene, fill = as.character(psm_gene)), 
+           stat = "identity", 
+           width = 1) +
+  scale_fill_manual(values = r_anno_color, breaks = "1", name = "", labels = "PSM Gene") +
+  theme_void() 
+legend <- plot_grid(get_legend(r_anno), ncol = 1)
+r_anno <- r_anno + theme(legend.position = "none")
+
+## left annotatoin data generation
+l_anno <- path_match_in_set %>% .[match(gene_order, .$gene_name),] ## order by the gene order from the heatmap
+
+## need to get top path names again
+load("../data/moderate_enrich_prob.Rda")
+enrich_cutoff <- 0.30
+filtered_class <- c(6,7)
+n_path <- 10
+toppath <- moderate_enrich_prob %>% filter(signif <= 2500 & difference >= enrich_cutoff) %>% ## signif is 95% CI with a specified cutoff
+  filter(clust %in% filtered_class) %>% ## filter the cluster
+  arrange(desc(difference)) %>% ## arrange enrichment score in descending order
+  .[, "path"] %>% as.character() %>% unique() %>% .[1:n_path] ## getting the top10 enriched pathways
+
+for(p in toppath){
+  message(p)
+  l_anno <- l_anno %>% mutate(p = 0) ## create a new col named p
+  names(l_anno)[names(l_anno) == 'p'] <- p ## rename col with pathway name
+  ## for any path_combo that includes the pathway name change the 0 into a 1
+  if(p == "AUF1 (hnRNP D0) binds and destabilizes mRNA") { ## if it has this pathway grep a different way
+    l_anno[grep(pattern = "AUF1", x = l_anno$path_combo), p] <- 1
+  }
+  if(p != "AUF1 (hnRNP D0) binds and destabilizes mRNA") { ## if it is not AUF1 do it normally
+  l_anno[grep(pattern = p, x = l_anno$path_combo), p] <- 1 
+  }
+}
+l_anno_ggplot <- list() ## list for storing ggplots
+path_legend <- list()
+for(n in 1:length(toppath)){
+  message(n)
+  p <- toppath[n]
+  message(p)
+  spec_path <- l_anno[,c("gene_name", p)]
+  names(spec_path)[names(spec_path) == p] <- "p"
+  path_ggplot <- ggplot(spec_path) +
+  geom_bar(mapping = aes(x = 1, y = gene_name, fill = as.character(p)), 
+           stat = "identity", 
+           width = 1) +
+  scale_fill_manual(values = r_anno_color, breaks = "1", name = "", labels = p) +
+  theme_void() 
+  path_legend[[n]] <- plot_grid(get_legend(path_ggplot), ncol = 1) ## extract legend from plot
+  l_anno_ggplot[[n]] <- path_ggplot + theme(legend.position = "none") ## remove legend from plot
+}
+
+
+plot <- plot_grid(l_anno_ggplot[[1]], l_anno_ggplot[[2]], l_anno_ggplot[[3]], l_anno_ggplot[[4]], l_anno_ggplot[[5]], l_anno_ggplot[[6]], l_anno_ggplot[[7]], l_anno_ggplot[[8]], l_anno_ggplot[[9]], l_anno_ggplot[[10]], fig4, r_anno, align = "h", ncol = 12, axis = "tb", rel_widths = c(rep(0.1, 10), 15, 0.1))
+plot
 
 ```
 
@@ -2390,6 +2449,9 @@ under-powered given the uneven representation of stage across cancer types.
 ```
 
 ## Supplementary Information
+
+### Supplementary Figure S1
+
 ```{r supplementary-figure-s1, fig.width= 8.5, fig.height= 11}
 umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv") ## load data
 
@@ -2413,6 +2475,8 @@ ggplot(umap_cancertype, aes(x = x_2d, y = y_2d, colour = project_code)) +
 ```
 ![**Supplementary figure S1. Distribution of cancer type on UMAP clusters.** Each panel shows the identity of individual tumors by one of 23 cancer types projected onto the cluster UMAP identified in **Figure 1 A** of the main text._]
 
+### Supplementary Figure S2
+
 ```{r supplementary-figure-s2-data-generation}
 umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv") ## load data
 umap_bg <- umap_cancertype[,-"project_code"] ## get background data for facet
@@ -2434,6 +2498,9 @@ ggplot(umap_cancertype, aes(x = x_2d, y = y_2d, colour = Subtype_Selected)) +
 ```
 
 ![**Supplementary Figure S2. Histological subtypes.** _Each panel shows the histological subtypes of one of the 23 cancers projected on to the tumors of the UMAP from **Figure 1A of the main text.**_]
+
+### Supplementary Figure S3
+
 <div style="text-align: right"> Supplementary Figure S3 Data </div>
 ```{r supplementary-figure-s3-data-generation, eval = FALSE}
 load("../data/gdc_tumor_coding_complete.Rdata")
@@ -2501,6 +2568,8 @@ ggplot(selected_mut, aes(x = x_2d, y = y_2d, colour = as.character(value))) +
 
 ![**Supplementary Figure S3. Common oncogenic mutations.** _Each panel shows one of 20 commonly mutated oncogenic genes projected on the UMAP from **Figure 1A of the main text.**_]
 
+### Supplementary Figure S4
+
 <div style="text-align: right"> Supplementary Figure S4 Data </div>
 ```{r supplementary-figure-s4-data-generation, eval = FALSE}
 load("../data/gdc_reactome_path_analysis.Rda") ## load data
@@ -2549,6 +2618,8 @@ ggplot(selected_path, aes(x = x_2d, y = y_2d, colour = as.character(value))) +
 ```
 
 ![**Supplementary Figure S4. Projection of pathway disruptions onto the UMAP.**_]
+
+### Supplementary Table ST1
 
 <div style="text-align: right"> Supplementary Figure ST1 Data </div>
 ```{r supplemental-table-st1-data-generation, eval = FALSE}
