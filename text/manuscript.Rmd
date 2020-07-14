@@ -27,7 +27,7 @@ editor_options:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-#library(rstan)
+library(rstan)
 library(foreach)
 library(sqldf)
 library(tidyverse)
@@ -1091,6 +1091,83 @@ fig1A + plot_spacer() + fig1C + plot_spacer() + fig1E + fig1F + fig1G + fig1H + 
 
 ```
 
+```{r mutation-burden-plot, message = FALSE}
+umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv")
+
+kelly.colours <- c("gray95", "gray13", "gold2", "plum4", "darkorange1",
+                   "lightskyblue2", "firebrick", "burlywood3", "gray51", "springgreen4",
+                   "lightpink2", "deepskyblue4", "lightsalmon2", "mediumpurple4",
+                   "orange", "maroon", "yellow3", "brown4", "yellow4", "sienna4", "chocolate", "gray19")
+
+
+
+mut_order <- list() ## store data in list 
+for(n in 1:max(umap_cancertype$knn_clust)) { ## loop through all the clusters
+  message(n)
+  mut_order[[n]] <- umap_cancertype %>% filter(knn_clust == n) %>%  ## filter for specific class
+    dplyr::select(V1, x_2d, y_2d, knn_clust, mut_count) %>% ## select relevant columns
+    arrange(mut_count) ## arrange mutation in increasing order
+}
+mut_order <- mut_order %>% do.call(rbind, .) %>% as.data.frame() ## rbind list
+
+mut_order$V1 <- factor(mut_order$V1, levels = mut_order$V1)
+mut_order$knn_clust <- factor(mut_order$knn_clust, levels = c(1:12))
+
+## Need the breaks positions for the x-axis
+previous_class <- 0 ## starting position 1
+position_of_previous_class <- 0 ## starting position 2
+xaxis_breaks <- list() ## list for for loop
+for(n in 1) { ## loop through 1 to 12 clusters
+  message(n)
+  class_spec <- round(mut_order %>% filter(knn_clust == n) %>% nrow(.) / 2, digits = 0) ## calculate halfway mark of class 
+  xaxis_breaks[[n]] <- class_spec + previous_class + position_of_previous_class ## adding up all variables
+  previous_class <- class_spec ## storing class halfway mark
+  for(n in 2:max(as.numeric(as.character(mut_order$knn_clust)))) {
+    message(n)
+    position_of_previous_class <- xaxis_breaks[[n-1]] ## getting the previous class position
+    class_spec <- round(mut_order %>% filter(knn_clust == n) %>% nrow(.) / 2, digits = 0) ## calculate halfway mark of new class
+    xaxis_breaks[[n]] <- class_spec + previous_class + position_of_previous_class ## adding up all variables
+    previous_class <- class_spec ## storing class halfway mark
+  }
+}
+xaxis_breaks <- as.data.frame(do.call(rbind, xaxis_breaks)) ## rbind list
+xaxis_breaks <- mut_order[rownames(mut_order) %in% xaxis_breaks$V1,] ## find the tumor samples in these positions
+
+
+total_n <- as.data.frame(table(mut_order$knn_clust))
+
+## for making dup discrete x-axis
+guide_axis_label_trans <- function(label_trans = identity, ...) {
+  axis_guide <- guide_axis(...)
+  axis_guide$label_trans <- rlang::as_function(label_trans)
+  class(axis_guide) <- c("guide_axis_trans", class(axis_guide))
+  axis_guide
+}
+
+guide_train.guide_axis_trans <- function(x, ...) {
+  trained <- NextMethod()
+  trained$key$.label <- x$label_trans(trained$key$.label)
+  trained
+}
+
+ggplot(mut_order, aes(x = V1, y = log10(mut_count + 1), color = knn_clust)) + 
+  geom_point() + 
+  ylab("Log10(Mutation Count)") + 
+  xlab("") +
+  scale_x_discrete(breaks = c(as.character(mut_order$V1[300]), as.character(xaxis_breaks$V1)), labels = c("Class =" ,1:12)) +
+  guides(x.sec = guide_axis_label_trans(~paste(c("n = ", total_n$Freq)))) + ## create second x-axis
+  scale_y_continuous(sec.axis = sec_axis(~.)) + ## dup y-axis
+  #scale_y_log10() +
+  theme_classic() +
+  theme(axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 12),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
+        legend.position = "none") +
+  scale_color_manual(values = kelly.colours[-c(1:2)])
+```
+
+
 <p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Figure 1:
 Classification of tumors by pathway disruptions.** a) Each of 377 selected
 Reactome pathways (columns) is classified as disrupted if one or more genes is
@@ -1858,6 +1935,11 @@ most_genes <- path_match_in_set %>% .$path_combo %>% table() %>% as.data.frame()
   'colnames<-' (c("path_combo", "Freq")) %>% 
   rownames_to_column(var = "order") 
 
+gene_order <- path_match_in_set %>% left_join(., most_genes, by = "path_combo") %>% ## left join the data together
+  arrange(order) %>% .$gene_name ## getting the gene name order
+
+class67_gene_2_path_heatmap$gene_name <- factor(class67_gene_2_path_heatmap$gene_name, levels = c(rev(gene_order)))
+
 fig4 <- ggplot(data = class67_gene_2_path_heatmap, aes(y=gene_name, x=sample_id, fill = membership)) + 
   geom_tile(size = 0.6) +
   scale_fill_manual(values = c("grey", "firebrick3")) +
@@ -1916,19 +1998,27 @@ for(p in toppath){
   l_anno[grep(pattern = p, x = l_anno$path_combo), p] <- 1 
   }
 }
+
 l_anno_ggplot <- list() ## list for storing ggplots
 path_legend <- list()
+
+kelly.colours <- c("gray95", "gray13", "gold2", "plum4", "darkorange1",
+                   "lightskyblue2", "firebrick", "burlywood3", "gray51", "springgreen4",
+                   "lightpink2", "deepskyblue4", "lightsalmon2", "mediumpurple4",
+                   "orange", "maroon", "yellow3", "brown4", "yellow4", "sienna4", "chocolate", "gray19")
+
 for(n in 1:length(toppath)){
   message(n)
   p <- toppath[n]
   message(p)
   spec_path <- l_anno[,c("gene_name", p)]
   names(spec_path)[names(spec_path) == p] <- "p"
+  anno_color <- c("0" = "white", "1" = kelly.colours[2+n])
   path_ggplot <- ggplot(spec_path) +
   geom_bar(mapping = aes(x = 1, y = gene_name, fill = as.character(p)), 
            stat = "identity", 
            width = 1) +
-  scale_fill_manual(values = r_anno_color, breaks = "1", name = "", labels = p) +
+  scale_fill_manual(values = anno_color, breaks = "1", name = "", labels = p) +
   theme_void() 
   path_legend[[n]] <- plot_grid(get_legend(path_ggplot), ncol = 1) ## extract legend from plot
   l_anno_ggplot[[n]] <- path_ggplot + theme(legend.position = "none") ## remove legend from plot
@@ -1936,7 +2026,9 @@ for(n in 1:length(toppath)){
 
 
 plot <- plot_grid(l_anno_ggplot[[1]], l_anno_ggplot[[2]], l_anno_ggplot[[3]], l_anno_ggplot[[4]], l_anno_ggplot[[5]], l_anno_ggplot[[6]], l_anno_ggplot[[7]], l_anno_ggplot[[8]], l_anno_ggplot[[9]], l_anno_ggplot[[10]], fig4, r_anno, align = "h", ncol = 12, axis = "tb", rel_widths = c(rep(0.1, 10), 15, 0.1))
-plot
+plot_legend <- plot_grid(path_legend[[1]], path_legend[[2]], path_legend[[3]], path_legend[[4]], path_legend[[5]], path_legend[[6]], path_legend[[7]], path_legend[[8]], path_legend[[9]], path_legend[[10]], ncol = 5)
+
+plot_grid(plot, plot_legend, ncol = 1, rel_heights = c(10, 1.5))
 
 ```
 
