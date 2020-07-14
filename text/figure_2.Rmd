@@ -1,0 +1,153 @@
+<div style="text-align: right"> Figure 2 Data </div>
+```{r oncoprint-top100-plus-panel-data-generation, eval = FALSE}
+tumor_clusters <- fread("../data/umap_2d_3d_coors.tsv") ## load in data
+load("../data/gdc_reactome_path_analysis.Rda")
+
+######################
+## oncoprint top100 ##
+######################
+onco_color <- c("0" = "grey", "1" = "firebrick3")
+
+top100path <- gdc_reactome_path_analysis %>% rowSums() %>% as.data.frame() %>% rownames_to_column(var = "path_name") %>% arrange(desc(.)) %>% .[1:100,] %>% .[, "path_name"] ## getting the top100 mutated pathways in class
+
+top100path <- gdc_reactome_path_analysis[top100path, ] ## selecting the top 100 paths
+
+top100path[top100path == "1"] <- "MUT" ## categorize boolean values
+top100path[top100path == "0"] <- " "
+  col <- c("MUT" = "firebrick3")
+heatmap_legend <- list(title = "", at = c("MUT"),
+                       labels = c("Mutation"))
+alter_fun = list(
+    background = function(x, y, w, h) {
+        grid.rect(x, y, w-unit(0.5, "mm"), h-unit(0.5, "mm"), 
+            gp = gpar(fill = "#CCCCCC", col = NA))
+    },
+    # bug red
+    MUT = function(x, y, w, h) {
+        grid.rect(x, y, w-unit(0.5, "mm"), h-unit(0.5, "mm"), 
+            gp = gpar(fill = col["MUT"], col = NA))
+    })
+  column_title <- "Top 100 Pathway PanCancer"
+  onco_res <- oncoPrint(top100path,
+    alter_fun = alter_fun, col = col,
+    column_title = column_title, heatmap_legend_param = heatmap_legend,
+    remove_empty_columns = F, remove_empty_rows = F, right_annotation = NULL,
+    top_annotation = NULL
+    )
+  
+clust_col_order <- names(top100path[,onco_res@column_order])
+path_row_order <- rownames(top100path[onco_res@row_order,])
+
+onco_ggplot <- gdc_reactome_path_analysis %>% .[rownames(.) %in% path_row_order,] %>% ## only include the top 10 paths
+  rownames_to_column(var = "path_name") %>% ## path_name to col
+  gather(., key = "sample_id", value = "mutation_status", -path_name) %>% ## wide to long format
+  mutate(path_name = factor(.$path_name, levels = c(rev(path_row_order))), ## factor to force oncoprint order
+         sample_id = factor(.$sample_id, levels = c(clust_col_order)))
+save(onco_ggplot, file = "onco_ggplot.Rda")
+
+
+#####################
+## oncoprint panel ##
+#####################
+clust_col_order <- list()
+path_row_order <- list()
+
+for(n in 1:12) {
+  class_spec_sample_id <- tumor_clusters %>% .[,c("V1", "knn_clust")] %>% filter(knn_clust == n) %>% .[,.$V1] ## get class spec sample ids
+  top10path <- gdc_reactome_path_analysis %>% .[, names(.) %in% class_spec_sample_id] %>% rowSums() %>% as.data.frame() %>% rownames_to_column(var = "path_name") %>% arrange(desc(.)) %>% .[1:10,] %>% .[, "path_name"] ## getting the top10 mutated pathways in class
+  top10path <- gdc_reactome_path_analysis[top10path, class_spec_sample_id]
+  top10path[top10path == "1"] <- "MUT" ## categorize boolean values
+  top10path[top10path == "0"] <- " "
+  col <- c("MUT" = "firebrick3")
+heatmap_legend <- list(title = "", at = c("MUT"),
+                       labels = c("Mutation"))
+alter_fun = list(
+    background = function(x, y, w, h) {
+        grid.rect(x, y, w-unit(0.5, "mm"), h-unit(0.5, "mm"), 
+            gp = gpar(fill = "#CCCCCC", col = NA))
+    },
+    # bug red
+    MUT = function(x, y, w, h) {
+        grid.rect(x, y, w-unit(0.5, "mm"), h-unit(0.5, "mm"), 
+            gp = gpar(fill = col["MUT"], col = NA))
+    })
+  column_title <- "test"
+  onco_res <- oncoPrint(top10path,
+    alter_fun = alter_fun, col = col,
+    column_title = column_title, heatmap_legend_param = heatmap_legend,
+    remove_empty_columns = F, remove_empty_rows = F, right_annotation = NULL,
+    top_annotation = NULL
+    )
+  clust_col_order[[n]] <- names(top10path[,onco_res@column_order])
+  path_row_order[[n]] <- rownames(top10path[onco_res@row_order,])
+}
+
+save(clust_col_order, path_row_order, file = "onco_clust.Rda")
+```
+
+```{r figure-2-plot, fig.width=72, fig.height=48}
+## top100 pathways pancancer oncoprint
+load("../data/onco_ggplot.Rda") ## load data
+onco_color <- c("0" = "grey", "1" = "firebrick3") ## color scheme for oncoprint
+
+fig2A <- ggplot(data = onco_ggplot, aes(x=sample_id, y=path_name)) + 
+  geom_tile(aes(fill = as.character(mutation_status))) +
+  scale_fill_manual(values = onco_color) +
+  xlab(label = "sample_id") +
+  labs(tag = "A") +
+  theme_classic() +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_text(size = 12),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_blank(),
+        axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        legend.position = "none") 
+
+## top10 pathways for each cluster
+load("../data/onco_clust.Rda") ## load in data
+load("../data/gdc_reactome_path_analysis.Rda")
+
+plots_onco <- list() ## creating a list to store all the ggplots in the for loop below
+onco_color <- c("0" = "grey", "1" = "firebrick3") ## color scheme for oncoprint
+figure_labs <- LETTERS[seq(from = 2, to = 13)]
+for(n in 1:12) {
+  onco_ggplot <- gdc_reactome_path_analysis %>% .[rownames(.) %in% path_row_order[[n]],] %>% ## only include the top 10 paths
+  .[,names(.) %in% clust_col_order[[n]]] %>% ## only include specific tumor class
+  rownames_to_column(var = "path_name") %>% ## path_name to col
+  gather(., key = "sample_id", value = "mutation_status", -path_name) %>% ## wide to long format
+  mutate(path_name = factor(.$path_name, levels = c(rev(path_row_order[[n]]))), ## factor to force oncoprint order
+         sample_id = factor(.$sample_id, levels = c(clust_col_order[[n]])))
+  plots_onco[[n]] <- ggplot(data = onco_ggplot, aes(x=sample_id, y=path_name)) + ## ggplot code
+  geom_tile(aes(fill = as.character(mutation_status))) +
+  scale_fill_manual(values = onco_color) +
+  xlab(label = paste0("Class ", n)) +
+  labs(tag = figure_labs[n]) +
+  theme_classic() +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_blank(),
+        axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        legend.position = "none") 
+}
+
+## setting patchwork panel layout
+layout <- '
+AABCD
+AABCD
+AABCD
+AAEFG
+AAEFG
+AAEFG
+AAHIJ
+AAHIJ
+AAHIJ
+AAKLM
+AAKLM
+AAKLM
+'
+
+fig2A + plots_onco[[1]] + plots_onco[[2]] + plots_onco[[3]] + plots_onco[[4]] + plots_onco[[5]] + plots_onco[[6]] + plots_onco[[7]] + plots_onco[[8]] + plots_onco[[9]] + plots_onco[[10]] + plots_onco[[11]] + plots_onco[[12]] + plot_layout(design = layout)
+```

@@ -1,0 +1,21 @@
+```{r supplementary-figure-s1, fig.width= 8.5, fig.height= 11}
+umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv") ## load data
+
+umap_bg <- umap_cancertype[,-"project_code"] ## get background data for facet
+  
+ggplot(umap_cancertype, aes(x = x_2d, y = y_2d, colour = project_code)) + 
+  geom_point(data = umap_bg, aes(x = x_2d, y = y_2d), colour = "grey", size = 1) +
+  geom_point(size = 1) +
+  theme_classic() +
+  coord_fixed() +
+  xlab("UMAP 1") + ylab("UMAP 2") +
+  scale_colour_manual(values = rep("firebrick3", 23)) +
+  theme(axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks = element_blank(),
+    axis.line = element_blank(),
+    legend.position = "none") +
+  facet_wrap(~ project_code, ncol = 5) ## facet by cancer_type
+```
