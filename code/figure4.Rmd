@@ -1,4 +1,3 @@
-
 ```{r figure-4-data-generation, eval = FALSE}
 tumor_clusters <- fread("../data/umap_2d_3d_coors.tsv") ## load in data
 load("../data/gene2_level2_lookup.Rda")
@@ -164,7 +163,6 @@ gc()
 ```
 
 ```{r figure-4, message = FALSE, fig.cap="**Figure 4: Some genes with multiple pathway memberships drive clustering.** Each column is a tumor in class 6 or 7, each row represents a gene with mutation (red) or not mutated (grey). The genes are organized according to which of the top distinguishing pathways for this class that they effect. Some genes affect multiple pathways, as indicated by the bars at left. The highlighted genes at right are all proteasomal subunits.", eval=FALSE}
-
 load("../data/class67_gene_2_path_heatmap.Rda") ## load data
 load("../data/path_match_in_set.Rda")
 

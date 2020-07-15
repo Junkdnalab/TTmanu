@@ -112,7 +112,6 @@ carrying mutations (this data is visualized in **figure 1a**).
 
 ```{r child='../code/figure1.Rmd'}
 ```
-
 In order to classify tumors using this dataset, we used multiple correspondence
 analysis (MCA) [@JSSv025i01]. First we determined the number of dimensions
 containing useful information (**figure 1b**). Then we performed a UMAP
@@ -397,7 +396,7 @@ cluster 9 & 10 non-metastatic tumors. Thus, pathway lesions specific to
 metastases tend toward complementary mutations that are otherwise specific to
 non-metastatic tumors of other clusters.
 
-```{r child='table2.Rmd'}
+```{r child='../code/table2.Rmd'}
 ```
 
 There were also a number of pathways that were enriched with lower specificity
@@ -564,4 +563,5 @@ under-powered given the uneven representation of stage across cancer types.
 ```{r child='../code/supplements.Rmd'}
 ```
 
+>>>>>>> master
 ## References

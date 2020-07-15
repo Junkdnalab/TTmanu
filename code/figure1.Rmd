@@ -766,7 +766,7 @@ umap_2d_3d_coors$ajcc_pathologic_tumor_stage[unknown] <- "Not Available"
 write.table(x = umap_2d_3d_coors, file = "umap_2d_3d_coors.tsv", quote = FALSE, sep = "\t", row.names = FALSE) ## save the data
 ```
 
-```{r fig-1a-1l, warning=FALSE, fig.height=11, fig.width=8.5}
+```{r fig-1a-1l, warning=FALSE, fig.height=11, fig.width=8.5, message = FALSE}
 load("../data/cancer_disrupt_heatmap.Rda")
 umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv")
 
@@ -847,21 +847,79 @@ fig1F <- ggplot(subset(umap_cancertype), aes(x = x_2d, y = y_2d, color = as.fact
 
 umap_cancertype$knn_clust <- factor(umap_cancertype$knn_clust, levels = c(1:12))
 
-## violin mutation count
-fig1G <- ggplot(umap_cancertype, aes(x = knn_clust, y = mut_count)) +
-    geom_violin(aes(fill = knn_clust)) + #draw_quantiles = c(0.25, 0.5, 0.75)) 
-    geom_boxplot(aes(fill = knn_clust), width=0.2) +
-    theme_classic() +
-    scale_y_log10() +
-    xlab("") +
-    ylab("Log(Mutation Count)") +
-    labs(color = "", tag = "G") +
-    theme(axis.text.x = element_text(size = 12),
-          axis.text.y = element_text(size = 12),
-          axis.title.x = element_text(size = 12),
-          axis.title.y = element_text(size = 12),
-          legend.position = "none") +
-  scale_fill_manual(values = kelly.colours[-c(1:2)])
+## mutation burden plot
+mut_order <- list() ## store data in list 
+for(n in 1:max(as.numeric(as.character(umap_cancertype$knn_clust)))) { ## loop through all the clusters
+  message(n)
+  mut_order[[n]] <- umap_cancertype %>% filter(knn_clust == n) %>%  ## filter for specific class
+    dplyr::select(V1, x_2d, y_2d, knn_clust, mut_count) %>% ## select relevant columns
+    arrange(mut_count) ## arrange mutation in increasing order
+}
+mut_order <- mut_order %>% do.call(rbind, .) %>% as.data.frame() ## rbind list
+
+mut_order$V1 <- factor(mut_order$V1, levels = mut_order$V1)
+mut_order$knn_clust <- factor(mut_order$knn_clust, levels = c(1:12))
+
+## Need the breaks positions for the x-axis
+previous_class <- 0 ## starting position 1
+position_of_previous_class <- 0 ## starting position 2
+xaxis_breaks <- list() ## list for for loop
+for(n in 1) { ## loop through 1 to 12 clusters
+  message(n)
+  class_spec <- round(mut_order %>% filter(knn_clust == n) %>% nrow(.) / 2, digits = 0) ## calculate halfway mark of class 
+  xaxis_breaks[[n]] <- class_spec + previous_class + position_of_previous_class ## adding up all variables
+  previous_class <- class_spec ## storing class halfway mark
+  for(n in 2:max(as.numeric(as.character(mut_order$knn_clust)))) {
+    message(n)
+    position_of_previous_class <- xaxis_breaks[[n-1]] ## getting the previous class position
+    class_spec <- round(mut_order %>% filter(knn_clust == n) %>% nrow(.) / 2, digits = 0) ## calculate halfway mark of new class
+    xaxis_breaks[[n]] <- class_spec + previous_class + position_of_previous_class ## adding up all variables
+    previous_class <- class_spec ## storing class halfway mark
+  }
+}
+xaxis_breaks <- as.data.frame(do.call(rbind, xaxis_breaks)) ## rbind list
+xaxis_breaks <- mut_order[rownames(mut_order) %in% xaxis_breaks$V1,] ## find the tumor samples in these positions
+
+total_n <- as.data.frame(table(mut_order$knn_clust)) ## getting total n in cluster
+
+mut_order$log10mut <- log10(mut_order$mut_count + 1) ## mutation count log transformation + pseudo count
+
+mut_median <- mut_order %>% 
+  group_by(knn_clust) %>% 
+  dplyr::summarize(mut_med = median(log10mut)) ## calculate median for each class
+
+fig1G <- ggplot(mut_order, aes(x = V1, y = log10mut, color = knn_clust)) + 
+  geom_point() + 
+  ylab("Log10(Mutation Count)") + 
+  xlab("") +
+  theme_classic() +
+  facet_wrap(~ factor(knn_clust, levels = c(1:12)), ncol = 12, scales = "free_x") +
+  geom_hline(data= mut_median, aes(yintercept=mut_med)) +
+  scale_y_continuous(sec.axis = sec_axis(~.)) + ## dup y-axis
+  scale_x_discrete(breaks = c(as.character(mut_order$V1[300]), as.character(xaxis_breaks$V1)), labels = c("n =" ,total_n$Freq)) +
+  theme(axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 12),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
+        axis.ticks.x = element_blank(),
+        axis.line.x = element_line(colour = "black", size = 0.5),
+        axis.line.x.top = element_line(colour = "black", size = 0.5),
+        #strip.background.x = element_blank(),
+        strip.placement = "outside",
+        strip.text.x = element_text(size = 12),
+        legend.position = "none") +
+  scale_color_manual(values = kelly.colours[-c(1:2)])
+
+## code to keep only the bottom border line of the facet
+fig1G <- ggplotGrob(fig1G)
+lg <- linesGrob(x=unit(c(0,1),"npc"), y=unit(c(0,0),"npc"), 
+                   gp=gpar(col="black", lwd=4))
+
+for (k in grep("strip-t",fig1G$layout$name)) {
+  fig1G$grobs[[k]]$grobs[[1]]$children[[1]] <- lg
+}
+
+fig1G <- as.ggplot(fig1G)
 
 ## umap by cancer type
 fig1H <- ggplot(umap_cancertype[umap_cancertype$project_code %in% c("COAD", "BRCA", "HNSC", "PAAD"),], aes(x = x_2d, y = y_2d, colour = project_code)) +
@@ -898,6 +956,7 @@ fig1I <- ggplot(umap_cancertype %>% filter(project_code == "BRCA" & !is.na(Subty
 ## umap brca somatic mutations
 load("../data/gdc_gene_exp_adj.Rda")
 load("../data/gene_data.Rda")
+umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv")
 brca <- gene_data %>% .[.$external_gene_name %in% c("BRCA1", "BRCA2"),] %>% dplyr::select(ensembl_gene_id, external_gene_name) ## Getting BRCA gene information
 brca <- gdc_gene_exp_adj %>% .[rownames(.) %in% brca$ensembl_gene_id, ] %>% ## we only want brca gene
   rownames_to_column(var = "ensembl_gene_id") %>%
@@ -905,16 +964,14 @@ brca <- gdc_gene_exp_adj %>% .[rownames(.) %in% brca$ensembl_gene_id, ] %>% ## w
   remove_rownames()  %>% column_to_rownames(var = "external_gene_name") %>% ## replace ensembl_id with gene_name
   dplyr::select(-ensembl_gene_id) %>% ## get ride of ensembl_id  col
   t() %>% as.data.frame() %>% ## correct orientation for umap_cancertype df
+  rownames_to_column(var = "V1") %>% ## getting data ready for leftjoin 
   mutate(BRCA1 = case_when(BRCA1 == "1" ~ "BRCA1",
                            BRCA1 == "0" ~ "NA"),
          BRCA2 = case_when(BRCA2 == "1" ~ "BRCA2",
                            BRCA2 == "0" ~ "NA")) %>%
   mutate(mut_type = gsub('NA,|,NA', '', paste(.$BRCA1, .$BRCA2, sep = ","))) %>% ## combine mutation cause some patients can have both
   dplyr::select(-BRCA1, -BRCA2) %>% ## remove col we don't need
-  rownames_to_column(var = "V1") %>% ## getting data ready for leftjoin 
   left_join(., umap_cancertype[,c("V1", "x_2d", "y_2d", "project_code")], by = "V1") ## leftjoin by sample id
-
-
 
 fig1J <- ggplot(brca %>% filter(mut_type != "NA"), aes(x = x_2d, y = y_2d, colour = mut_type)) +
   geom_point(data = brca, aes(x = x_2d, y = y_2d), colour = "grey") +
@@ -970,90 +1027,14 @@ fig1L <- ggplot(umap_cancertype, aes(x = x_2d, y = y_2d)) +
 layout <- '
 AAAABBCCDD
 AAAAEEEFFF
-AAAAGGGG##
-AAAAGGGG##
+AAAAGGGGGG
+AAAAGGGGGG
 AAAAHHIIJJ
 AAAAKKLL##
 '
 
 fig1A + plot_spacer() + fig1C + plot_spacer() + fig1E + fig1F + fig1G + fig1H + fig1I + fig1J + fig1K + fig1L + plot_layout(design = layout)
 
-```
-
-```{r mutation-burden-plot, message = FALSE}
-umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv")
-
-kelly.colours <- c("gray95", "gray13", "gold2", "plum4", "darkorange1",
-                   "lightskyblue2", "firebrick", "burlywood3", "gray51", "springgreen4",
-                   "lightpink2", "deepskyblue4", "lightsalmon2", "mediumpurple4",
-                   "orange", "maroon", "yellow3", "brown4", "yellow4", "sienna4", "chocolate", "gray19")
-
-
-
-mut_order <- list() ## store data in list 
-for(n in 1:max(umap_cancertype$knn_clust)) { ## loop through all the clusters
-  message(n)
-  mut_order[[n]] <- umap_cancertype %>% filter(knn_clust == n) %>%  ## filter for specific class
-    dplyr::select(V1, x_2d, y_2d, knn_clust, mut_count) %>% ## select relevant columns
-    arrange(mut_count) ## arrange mutation in increasing order
-}
-mut_order <- mut_order %>% do.call(rbind, .) %>% as.data.frame() ## rbind list
-
-mut_order$V1 <- factor(mut_order$V1, levels = mut_order$V1)
-mut_order$knn_clust <- factor(mut_order$knn_clust, levels = c(1:12))
-
-## Need the breaks positions for the x-axis
-previous_class <- 0 ## starting position 1
-position_of_previous_class <- 0 ## starting position 2
-xaxis_breaks <- list() ## list for for loop
-for(n in 1) { ## loop through 1 to 12 clusters
-  message(n)
-  class_spec <- round(mut_order %>% filter(knn_clust == n) %>% nrow(.) / 2, digits = 0) ## calculate halfway mark of class 
-  xaxis_breaks[[n]] <- class_spec + previous_class + position_of_previous_class ## adding up all variables
-  previous_class <- class_spec ## storing class halfway mark
-  for(n in 2:max(as.numeric(as.character(mut_order$knn_clust)))) {
-    message(n)
-    position_of_previous_class <- xaxis_breaks[[n-1]] ## getting the previous class position
-    class_spec <- round(mut_order %>% filter(knn_clust == n) %>% nrow(.) / 2, digits = 0) ## calculate halfway mark of new class
-    xaxis_breaks[[n]] <- class_spec + previous_class + position_of_previous_class ## adding up all variables
-    previous_class <- class_spec ## storing class halfway mark
-  }
-}
-xaxis_breaks <- as.data.frame(do.call(rbind, xaxis_breaks)) ## rbind list
-xaxis_breaks <- mut_order[rownames(mut_order) %in% xaxis_breaks$V1,] ## find the tumor samples in these positions
-
-
-total_n <- as.data.frame(table(mut_order$knn_clust))
-
-## for making dup discrete x-axis
-guide_axis_label_trans <- function(label_trans = identity, ...) {
-  axis_guide <- guide_axis(...)
-  axis_guide$label_trans <- rlang::as_function(label_trans)
-  class(axis_guide) <- c("guide_axis_trans", class(axis_guide))
-  axis_guide
-}
-
-guide_train.guide_axis_trans <- function(x, ...) {
-  trained <- NextMethod()
-  trained$key$.label <- x$label_trans(trained$key$.label)
-  trained
-}
-
-ggplot(mut_order, aes(x = V1, y = log10(mut_count + 1), color = knn_clust)) + 
-  geom_point() + 
-  ylab("Log10(Mutation Count)") + 
-  xlab("") +
-  scale_x_discrete(breaks = c(as.character(mut_order$V1[300]), as.character(xaxis_breaks$V1)), labels = c("Class =" ,1:12)) +
-  guides(x.sec = guide_axis_label_trans(~paste(c("n = ", total_n$Freq)))) + ## create second x-axis
-  scale_y_continuous(sec.axis = sec_axis(~.)) + ## dup y-axis
-  #scale_y_log10() +
-  theme_classic() +
-  theme(axis.text.x = element_text(size = 12),
-        axis.text.y = element_text(size = 12),
-        axis.title.x = element_text(size = 12),
-        axis.title.y = element_text(size = 12),
-        legend.position = "none") +
-  scale_color_manual(values = kelly.colours[-c(1:2)])
 ```
 
 <p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Figure 1:
