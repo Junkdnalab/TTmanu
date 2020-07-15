@@ -109,32 +109,9 @@ After selecting our pathways and genes, we then compiled a matrix of the
 pathways, assigning a Boolean value (a 1 or 0, indicating whether any pathway
 member gene carries a mutation) to the pathway regardless of the number of genes
 carrying mutations (this data is visualized in **figure 1a**).
-```{r child='data_set_generation.Rmd'}
-```
 
-```{r child='figure_1.Rmd'}
+```{r child='../code/figure1.Rmd'}
 ```
-<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Figure 1:
-Classification of tumors by pathway disruptions.** a) Each of 377 selected
-Reactome pathways (columns) is classified as disrupted if one or more genes is
-mutated in the tumor sample (rows). Tumors are grouped by tissue of origin using
-standardized abrreviations from the TCGA project. b) MCA analysis was performed
-restricted to the 36 informative components. c) The resulting MCA was projected
-down to 3 dimensions for the purpose of density based clustering (only the first
-2 dimensions are shown). Each dot represents a tumor d) HDBSCAN was used to
-perform hierarchical density based clustering tuned to minimize the fraction of
-unassigned tumors. e) HDBSCAN clustered tumors were visualized on the UMAP
-projection; tumors are colored by cluster membership (see legend). This results
-in some tumors remaining unclassified (grey points). f) kNN was used to assign
-membership to the remaining tumors. g) Violin plots of sample mutation counts
-for tumors in each class. h) Projection of cancer type identity onto UMAP.
-Abbrevs: BRCA = Breast cancer, COAD = Colorectal adenocarcinoma, HNSC = Head and
-Neck Squamous Cell, PAAD = Pancreatic adenocarcinoma. i) Projection of breast
-cancer subtypes onto the UMAP. j) projection of BRCA1/2 somatic mutation onto the
-UMAP. k) projection of tumor stage onto the UMAP,
-regardless of cancer type. l) Projection of metastatic status onto the UMAP.
-Abbrevs: M0 = non-metastatic tumors, M1 = metastatic tumors.</p>
-
 In order to classify tumors using this dataset, we used multiple correspondence
 analysis (MCA) [@JSSv025i01]. First we determined the number of dimensions
 containing useful information (**figure 1b**). Then we performed a UMAP
@@ -270,15 +247,9 @@ known pathways that are disrupted in cancer, including <mark>PI3K/Akt
 activation, DNA repair etc fix this with top 5 or so quoted pathway
 labels</mark>. The top third of pathways drop off gradually in overall mutation
 frequency, possibly owing to relative diversity among all tumors.
-```{r child='figure_2.Rmd'}
+
+```{r child='../code/figure2.Rmd'}
 ```
-<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;"><b>Figure 2:
-Pan-cancer enrichment of pathway disruptions.</b> "Oncoprint" style graphic in
-which each column represents a tumor and each row represents a pathway. The
-pathways are ranked such that the pathway with the most disruptions across all
-7,607 tumors is the first row _etc._ and tumors are ordered to prioritize the
-top pathway disruptions successively. All 377 pathways are shown. Red signifies
-pathway disrupted pathways, grey signifies not disrupted.</p>
 
 To discover what pathways drive the UMAP clustering, we calculated enrichment
 for each pathway _in-class_ relative to all other classes combined (see methods)
@@ -305,9 +276,10 @@ enrichment levels of the three, having mutations in hedgehog signaling,
 $\beta$-catenin degradation, cellular response to hypoxia, regulation of cell
 cycle and apoptosis among others. As cluster groups 9-12 and 6-7 were the most
 distinct of the 12, we chose to investigate these two groups further.
-```{r child='figure_3.Rmd'}
+<div style="text-align: right"> Figure 3 data </div>
+
+```{r child='../code/figure3.Rmd'}
 ```
-<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Figure 3. Pathway-specific enrichment within clusters.** Heatmap shows relative enrichment of each pathway (rows) within each numbered cluster (columns). The annotation at left indicates the Reactome pathway group at the second level (check this).</p>
 
 ### Gene-Pathway redundancy contributes to cluster identity
 
@@ -351,9 +323,9 @@ proteasome mutations have a tissue-of-origin (or cancer-specific) bias, and
 indeed we could observe some clustering. These data could explain how
 tissue-specific gene mutation signatures might result in general cancer
 phenotypes by converging at the pathway level.
-```{r child='figure_4.Rmd'}
+
+```{r child='../code/figure4.Rmd'}
 ```
-<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Figure 4: Some genes with multiple pathway memberships drive clustering.** Each column is a tumor in class 6 or 7, each row represents a gene with mutation (red) or not mutated (grey). The genes are organized according to which of the top distinguishing pathways for this class that they effect. Some genes affect multiple pathways, as indicated by the bars at left. The highlighted genes at right are all proteasomal subunits.</p>
 
 The proteasome plays key roles in the transduction of signals from the p53, WNT
 and NFkB pathways and it and proteasomal inhibitors have been approved for
@@ -363,7 +335,8 @@ mutations, we tabulated each gene as prognostic or not in the human protein
 expression atlas [@protein_atlas] and found 49 positive and 10 negative
 associations ( _i.e._ higher expression associated with unfavorable outcomes is
 "positive" _etc._) for 31 out of 43 (72%) proteasome genes (**figure 4b**).
-Second we looked at survival in mutations results results results (**figure 4c**). Third, we checked the mutation classes and found the overwhelming
+Second we looked at survival in mutations results results results (**figure 4c**). 
+Third, we checked the mutation classes and found the overwhelming
 majority (x out of y) are missense _vs._ various other deletarious classes (see
 **figure 4d**), suggesting that, similar to other oncogenic driver classes such
 as RAS and PI3K, proteasomal subunit mutations may result in specific
@@ -382,14 +355,14 @@ by common driver genes, or by "silent" tissue-specific effectors ( _i.e._ too
 few samples to detect above statistical significance thresholds), or a
 combination of both? To answer this question, we ranked the top cluster-specific
 pathways for each cluster, and then tabulated the most frequently mutated genes
-for each pathway as a function of cancer type (**Table 1** and **Supplementary
-tables ST2-ST13**). We find that in most clusters the top pathways are
+for each pathway as a function of cancer type (**Table 1** and **Supplementary tables ST2-ST13**). 
+We find that in most clusters the top pathways are
 determined by mutations in a handful of driver genes, TP53, PIK3CA, KRAS etc.
 However in many cancers we find divergence outside these top driver mutations,
 wherein etc etc</mark>
-```{r child='table_1.Rmd'}
+
+```{r child='../code/table1.Rmd'}
 ```
-<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Table 1:** The numbers in this table are completely wrong, it is just a place holder, please ignore</p>
 
 ### Enrichment of pathways in metastasis is class-specific
 
@@ -422,7 +395,8 @@ Degranulation” and “Fc epsilon receptor (FCERI) signaling” which are speci
 cluster 9 & 10 non-metastatic tumors. Thus, pathway lesions specific to
 metastases tend toward complementary mutations that are otherwise specific to
 non-metastatic tumors of other clusters.
-```{r child='table_2.Rmd'}
+
+```{r child='table2.Rmd'}
 ```
 
 There were also a number of pathways that were enriched with lower specificity
@@ -586,38 +560,8 @@ under-powered given the uneven representation of stage across cancer types.
 
 ## Supplementary Information
 
-### Supplementary Figure S1
-```{r child = 'figure_s1.Rmd'}
-```
-![**Supplementary figure S1. Distribution of cancer type on UMAP clusters.** Each panel shows the identity of individual tumors by one of 23 cancer types projected onto the cluster UMAP identified in **Figure 1 A** of the main text._]
-
-### Supplementary Figure S2
-```{r child = 'figure_s2.Rmd'}
+```{r child='../code/supplements.Rmd'}
 ```
 
-
-![**Supplementary Figure S2. Histological subtypes.** _Each panel shows the histological subtypes of one of the 23 cancers projected on to the tumors of the UMAP from **Figure 1A of the main text.**_]
-
-### Supplementary Figure S3
-```{r child = 'figure_s3.Rmd'}
-```
-![**Supplementary Figure S3. Common oncogenic mutations.** _Each panel shows one of 20 commonly mutated oncogenic genes projected on the UMAP from **Figure 1A of the main text.**_]
-
-### Supplementary Figure S4
-```{r child = 'figure_s4.Rmd'}
-```
-
-![**Supplementary Figure S4. Projection of pathway disruptions onto the UMAP.**_]
-
-### Supplementary Table ST1
-```{r child = 'table_s1.Rmd'}
-```
-
-
-![**Supplementary Table ST1. Frequency of pathway disruption and top genes within pathways.** _A complete list of pathway disruptions with percent mutatied samples and top genes_]
-
-
-![**Supplemental figure S6. Survival fit independent of disease status.** _The red and blue curves show the survival of people in the US by female and male, respectively. The orange and green curves show the model fits._](../figures/fig6A.png)
-
-
+>>>>>>> master
 ## References

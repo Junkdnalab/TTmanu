@@ -1,0 +1,252 @@
+### Supplementary Figure S1
+
+```{r supplementary-figure-s1, fig.width= 8.5, fig.height= 11}
+umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv") ## load data
+
+umap_bg <- umap_cancertype[,-"project_code"] ## get background data for facet
+  
+ggplot(umap_cancertype, aes(x = x_2d, y = y_2d, colour = project_code)) + 
+  geom_point(data = umap_bg, aes(x = x_2d, y = y_2d), colour = "grey", size = 1) +
+  geom_point(size = 1) +
+  theme_classic() +
+  coord_fixed() +
+  xlab("UMAP 1") + ylab("UMAP 2") +
+  scale_colour_manual(values = rep("firebrick3", 23)) +
+  theme(axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks = element_blank(),
+    axis.line = element_blank(),
+    legend.position = "none") +
+  facet_wrap(~ project_code, ncol = 5) ## facet by cancer_type
+```
+![**Supplementary figure S1. Distribution of cancer type on UMAP clusters.** Each panel shows the identity of individual tumors by one of 23 cancer types projected onto the cluster UMAP identified in **Figure 1 A** of the main text._]
+
+### Supplementary Figure S2
+
+```{r supplementary-figure-s2-data-generation}
+umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv") ## load data
+umap_bg <- umap_cancertype[,-"project_code"] ## get background data for facet
+
+ggplot(umap_cancertype, aes(x = x_2d, y = y_2d, colour = Subtype_Selected)) + 
+  geom_point(data = umap_bg, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.5) +
+  geom_point(size = 0.5) +
+  theme_classic() +
+  coord_fixed() +
+  xlab("UMAP 1") + ylab("UMAP 2") +
+  theme(axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks = element_blank(),
+    axis.line = element_blank(),
+    legend.position = "none") +
+  facet_wrap(~ project_code, ncol = 5) ## facet by cancer type
+```
+
+![**Supplementary Figure S2. Histological subtypes.** _Each panel shows the histological subtypes of one of the 23 cancers projected on to the tumors of the UMAP from **Figure 1A of the main text.**_]
+
+### Supplementary Figure S3
+
+<div style="text-align: right"> Supplementary Figure S3 Data </div>
+```{r supplementary-figure-s3-data-generation, eval = FALSE}
+load("../data/gdc_tumor_coding_complete.Rdata")
+load("../data/gene_data.Rda")
+
+## Booleanize mutation count for each tumor sample
+missense <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$missense) 
+splice <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$splice)
+frameshdel <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$frameshdel)
+frameshins <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$frameshins)
+utr3 <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$utr3)
+utr5 <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$utr5)
+nonstop <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$nonstop)
+nonsense <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$nonsense)
+
+gdc_mut_count_patient <- missense + splice + frameshdel + frameshins + utr3 + utr5 + nonstop + nonsense ## add up all the mutation count
+rm(missense, splice, frameshdel, frameshins, utr3, utr5, nonstop, nonsense)
+gc()
+gdc_mut_count_patient[gdc_mut_count_patient > 0] <- 1 ## booleanize data, anything greater than 1 is equal to 1
+
+##oncogene
+oncogene <- c("AKT2","BCL2","CTNNB1","ERBB2","KRAS","MDM2","MYC","PIK3CA","TET2","USP6") ## list of selected oncogene
+##tumor_supressor
+tumor_suppressor <- c("APC","BRIP1","CDKN2C","CHEK2","MSH2","PTEN","RB1","SMARCA4","TP53","VHL") ## list of selected tumor suppressor
+
+selected_mut <- gene_data %>% dplyr::select(external_gene_name, ensembl_gene_id) %>% filter(external_gene_name %in% c(oncogene, tumor_suppressor)) ## getting ensembl_id for the oncogenes for filtering gdc data
+
+selected_mut <- gdc_mut_count_patient %>% filter(rownames(.) %in% selected_mut$ensembl_gene_id) %>% ## filter by ensembl ids
+  rownames_to_column(var = "ensembl_gene_id") %>% left_join(., selected_mut, by = "ensembl_gene_id") %>% ## replace ensembl ids with gene name 
+  column_to_rownames(var = "external_gene_name") %>% dplyr::select(-ensembl_gene_id) %>%
+  t() %>% as.data.frame() %>% rownames_to_column(var = "V1")  ## prep for left_join
+
+
+selected_mut <- umap_cancertype %>% dplyr::select(V1, x_2d, y_2d) %>% ## select relevant columns
+  left_join(., selected_mut, by = "V1") %>%
+  melt(data = ., id.vars = c("V1", "x_2d", "y_2d")) %>%
+  filter(value != 0)
+
+save(selected_mut, file = "selected_mut.Rda")
+```
+
+```{r supplementary-figure-s3}
+load("../data/selected_mut.Rda")
+umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv") ## load data
+umap_bg <- umap_cancertype[,-"project_code"] ## get background data for facet
+
+ggplot(selected_mut, aes(x = x_2d, y = y_2d, colour = as.character(value))) + 
+  geom_point(data = umap_bg, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.5) +
+  geom_point(size = 0.5) +
+  theme_classic() +
+  coord_fixed() +
+  xlab("UMAP 1") + ylab("UMAP 2") +
+  scale_colour_manual(values = rep("firebrick3", 20)) +
+  theme(axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks = element_blank(),
+    axis.line = element_blank(),
+    legend.position = "none") +
+  facet_wrap(~ factor(variable, levels = c("AKT2","BCL2","CTNNB1","ERBB2","KRAS","MDM2","MYC","PIK3CA","TET2","USP6", 
+                                           "APC","BRIP1","CDKN2C","CHEK2","MSH2","PTEN","RB1","SMARCA4","TP53","VHL")),
+                      ncol = 5) ## facet by gene
+```
+
+![**Supplementary Figure S3. Common oncogenic mutations.** _Each panel shows one of 20 commonly mutated oncogenic genes projected on the UMAP from **Figure 1A of the main text.**_]
+
+### Supplementary Figure S4
+
+<div style="text-align: right"> Supplementary Figure S4 Data </div>
+```{r supplementary-figure-s4-data-generation, eval = FALSE}
+load("../data/gdc_reactome_path_analysis.Rda") ## load data
+umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv") 
+n_path <- 377 ## how many pathways do we want to look at starting from the most to least mutated pathway
+
+toppath <- gdc_reactome_path_analysis %>% rowSums() %>% as.data.frame() %>% rownames_to_column(var = "path_name") %>% arrange(desc(.)) %>% .[1:n_path,] %>% .[, "path_name"] ## order pathway by most to least mutated pathway
+
+selected_path <- gdc_reactome_path_analysis %>% t() %>% as.data.frame() %>% rownames_to_column(var = "V1") ## prepare pathway for left_join
+
+selected_path <- umap_cancertype %>% dplyr::select(V1, x_2d, y_2d) %>% ## select relevant columns
+  left_join(., selected_path, by = "V1") %>%
+  melt(data = ., id.vars = c("V1", "x_2d", "y_2d")) %>%
+  filter(value != 0)
+
+save(selected_path, file = "selected_path.Rda")
+```
+
+```{r supplementary-figure-s4, out.width = '90%'}
+load("../data/selected_path.Rda") ## load data
+load("../data/gdc_reactome_path_analysis.Rda")
+umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv")
+umap_bg <- umap_cancertype[,-"project_code"] ## get background data for facet
+
+n_path <- 377 ## number of pathways we want to see
+
+toppath <- gdc_reactome_path_analysis %>% rowSums() %>% as.data.frame() %>% rownames_to_column(var = "path_name") %>% arrange(desc(.)) %>% .[1:n_path,] %>% .[, "path_name"] ## order pathway by most to least mutated pathway.. needed for facet
+
+ggplot(selected_path, aes(x = x_2d, y = y_2d, colour = as.character(value))) + 
+  geom_point(data = umap_bg, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.5) +
+  geom_point(size = 0.5) +
+  theme_classic() +
+  coord_fixed() +
+  xlab("UMAP 1") + ylab("UMAP 2") +
+  scale_colour_manual(values = rep("firebrick3", 20)) +
+  theme(axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks = element_blank(),
+    axis.line = element_blank(),
+    legend.position = "none") +
+  facet_wrap(~ factor(variable, levels = toppath),
+                      ncol = 5) ## facet by pathways
+
+```
+
+![**Supplementary Figure S4. Projection of pathway disruptions onto the UMAP.**_]
+
+### Supplementary Table ST1
+
+<div style="text-align: right"> Supplementary Figure ST1 Data </div>
+```{r supplemental-table-st1-data-generation, eval = FALSE}
+load("../data/gdc_tumor_coding_complete.Rdata")
+load("../data/gdc_reactome_path_analysis.Rda")
+load("../data/gene2_level2_lookup.Rda")
+load("../data/pathname2level2.Rda")
+load("../data/gene_data.Rda")
+load("../data/gdc_gene_exp_adj.Rda")
+
+## Parameters ##
+n_path <- 377 ## how many top pathways do you want to see. 1 = top path, 2 = top path and second most
+mutated_gene_position <- c(1,2,3) ## what gene do you want to see. 1 = top gene, 2 = second most, 3 = third
+show_perc <- TRUE ## show perc for mutated gene
+
+
+toppath <- gdc_reactome_path_analysis %>% rowSums() %>% as.data.frame() %>% rownames_to_column(var = "path_name") %>% arrange(desc(.)) %>% .[1:n_path,] %>% .[, "path_name"] ## getting the top mutated pathways
+
+id_to_names <- gene2level2_lookup %>% rownames_to_column(var = "ensembl_gene_id") %>% ## convert ensembl to gene name
+  left_join(., gene_data[,c("ensembl_gene_id", "external_gene_name")], by = "ensembl_gene_id") %>%
+  remove_rownames() %>% column_to_rownames(var = "external_gene_name") %>%
+  dplyr::select(-ensembl_gene_id) %>%
+  t() %>% as.data.frame() %>% rownames_to_column(var = "PATH_ID") %>% ## convert path_id to path_name
+  left_join(., pathname2level2, by = "PATH_ID") %>%
+  remove_rownames() %>% column_to_rownames(var = "PATH_NAME") %>%
+  dplyr::select(-PATH_ID) %>%
+  t() %>% as.data.frame()
+
+gene_mutation <- gdc_gene_exp_adj %>% rownames_to_column(var = "ensembl_gene_id") %>% ## convert ensembl to gene name
+  left_join(., gene_data[,c("ensembl_gene_id", "external_gene_name")], by = "ensembl_gene_id") %>%
+  remove_rownames() %>% column_to_rownames(var = "external_gene_name") %>%
+  dplyr::select(-ensembl_gene_id)
+
+table_st1 <- list() ## list for forloop 
+
+for(n in toppath) {
+  message(n)
+  ## finding top mutated gene in pathway
+  gene_in_path <- id_to_names %>% .[,which(names(.) == n)] %>% as.data.frame() %>% ## select pathway
+    'rownames<-' (rownames(id_to_names)) %>% 
+    filter(. == 1) %>% ## filter for genes that are in that pathway
+    rownames(.)
+  top_mut_gene <- gene_mutation %>% .[rownames(.) %in% gene_in_path, ] %>% ## only include genes in paths
+      rowSums() %>% as.data.frame() %>% 'colnames<-' ("obs_count") %>% ## sum the pathway mutation
+      mutate(n_sample = length(gene_mutation),
+             perc_mut = round((obs_count / length(gene_mutation)) * 100, digits = 1)) %>% 
+      rownames_to_column(var = "gene") %>% arrange(desc(obs_count))
+  top_gene_in_path <- list()
+  for(p in mutated_gene_position) {
+    message(p)
+    if(show_perc == TRUE) {
+    top_gene_in_path[[p]] <- paste0(top_mut_gene$gene[p], " (", top_mut_gene$perc_mut[p],"%)")  
+    }
+    if(show_perc == FALSE) {
+    top_gene_in_path[[p]] <- paste0(top_mut_gene$gene[p])  
+    }
+  }
+  top_gene_in_path <- top_gene_in_path %>% do.call(rbind, .) %>% as.data.frame() %>% ## rbind list
+   'rownames<-' (mutated_gene_position) %>% t() %>% as.data.frame()
+  ## calculating the percent mutated samples
+  spec_path <- data.frame(Pathway = n,
+                          Percent_Mutated = round(gdc_reactome_path_analysis %>% .[n,] %>% sum() / length(gdc_reactome_path_analysis) * 100, digits = 1))
+  table_st1[[n]] <- cbind(spec_path, top_gene_in_path)
+}
+table_st1 <- as.data.frame(do.call(rbind, table_st1))
+save(table_st1, file = "table_st1.Rda")  
+rm(list = ls(all.names = T))  
+gc()
+```
+
+```{r supplemental-table-st1}
+load("../data/table_st1.Rda")
+
+table_st1 %>% dplyr::select(-Pathway) %>% knitr::kable(format = "html") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 12) %>%
+  column_spec(1, bold = T, color = "black")
+```
+
+![**Supplementary Table ST1. Frequency of pathway disruption and top genes within pathways.** _A complete list of pathway disruptions with percent mutatied samples and top genes_]
+
+
+![**Supplemental figure S6. Survival fit independent of disease status.** _The red and blue curves show the survival of people in the US by female and male, respectively. The orange and green curves show the model fits._](../figures/fig6A.png)
