@@ -396,7 +396,7 @@ cluster 9 & 10 non-metastatic tumors. Thus, pathway lesions specific to
 metastases tend toward complementary mutations that are otherwise specific to
 non-metastatic tumors of other clusters.
 
-```{r child='table2.Rmd'}
+```{r child='../code/table2.Rmd'}
 ```
 
 There were also a number of pathways that were enriched with lower specificity

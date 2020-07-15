@@ -86,7 +86,6 @@ save(clust_col_order, path_row_order, file = "onco_clust.Rda")
 ```
 
 ```{r figure-2-plot, fig.width=72, fig.height=48, fig.cap="Figure 2: Pan-cancer enrichment of pathway disruptions. Waterfall plot; columns represent tumors. Each row represents a pathway. The pathways are ranked such that the pathway with the most disruptions across all 7,607 tumors is the first row _etc._ and tumors are ordered to prioritize the top pathway disruptions successively. All 377 pathways are shown. Red signifies pathway disrupted pathways, grey signifies not disrupted."}
-
 ## top100 pathways pancancer oncoprint
 load("../data/onco_ggplot.Rda") ## load data
 onco_color <- c("0" = "grey", "1" = "firebrick3") ## color scheme for oncoprint
