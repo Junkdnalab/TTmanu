@@ -163,13 +163,14 @@ gc()
 ```
 
 ```{r child = '../code/figure4_function.Rmd'}
-
 ```
+
 
 ```{r figure-4-oncoprint, message = FALSE, fig.cap="**Figure 4: Some genes with multiple pathway memberships drive clustering.** Each column is a tumor in class 6 or 7, each row represents a gene with mutation (red) or not mutated (grey). The genes are organized according to which of the top distinguishing pathways for this class that they effect. Some genes affect multiple pathways, as indicated by the bars at left. The highlighted genes at right are all proteasomal subunits."}
 
-class67 <- oncoprint_style(filtered_class = c(6,7), n_path = 10)
-class67
+fig4 <- oncoprint_style(filtered_class = c(6,7), n_path = 10)
+fig4
+
 ```
 
 
