@@ -106,7 +106,13 @@ gc()
 
 ```{r table-1}
 load("../data/cluster_spec_enrich_table1.Rda")
-cluster_spec_enrich_table1 %>% kable(caption = "Table 1: Most mutated gene in class-specific pathways (enrichment score >= 0.30) for specific cancer", row.names = FALSE) %>%
+tumor_clusters <- fread("../data/umap_2d_3d_coors.tsv") ## load in data
+
+## Selecting the top 10 cancers with the largest n for table 1
+n_tumor <- as.data.frame(table(tumor_clusters$project_code))
+n_tumor <- n_tumor %>% arrange(desc(Freq)) %>% .[1:10, "Var1"] %>% as.character() %>% .[order(.)]
+
+cluster_spec_enrich_table1 %>% .[, c("Pathway", "Class", n_tumor)] %>% kable(caption = "Table 1: Most mutated gene in class-specific pathways (enrichment score >= 0.30) for specific cancer", row.names = FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 12) %>%
   column_spec(1, bold = T)
 ```
