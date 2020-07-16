@@ -146,17 +146,25 @@ the context of single cell experiments.
 
 ### On metastasis as a convergence of phenotypes
 
-The class-specific metastatic pathway enrichment we observe (in **table 2**) may
-be a result of the pathways directly promoting metastatic phenotypes, or
-alternatively that such mutations are more likely to turn metastatic because
-they acquire a stronger or more complete oncogenic phenotype, since (again) we
-don’t know the order in which they were acquired. The fact that most metastatic
-enrichment is cluster-specific and has a tendency to overlap with
-cluster-specific pathways from non-metastatic tumors of neighboring clusters
-favors the latter explanation, and suggests a mechanism of complementarity in
-which newly acquired mutations converge on a single deadly phenotype that
-captures most or all of the critical features of end-stage cancer. If this is
-the case, we speculate that once we discover the vulnerabilities of each cluster
-we might also reasonably predict which pathways are susceptible to further
-selection and therefore target them  therapeutically at the same time to prevent
-further adaptation.
+We report that pathway enrichment across all classes (pooled) yielded generally
+lower effect sizes and larger p-values than the cluster specific analysis,
+suggesting that signal is diluted when the samples are analyzed this way, and
+supporting the view that metastasis has class-specific requirements. It should
+be noted, however, that in spite of this lack of global enrichment, some of the
+cluster specific pathways reflect known metastatic associations, _e.g._ pathways
+associated with asparagine and aspartate metabolism in class 10
+[@knott_asparagus]. Since the number of metastatic tumors is relatively low this
+part of our analysis is likely underpowered and subject to expanded analysis
+with larger cohorts. Nonetheless, the class-specific metastatic pathway
+enrichment we observe (in **table 2**) could be a result of the pathways
+directly promoting metastatic phenotypes in these classes, or because they
+acquire a stronger or more complete oncogenic phenotype, since (again) we don’t
+know the order in which they were acquired in individual tumor samples. The fact
+that most metastatic enrichment is cluster-specific and has a tendency to
+overlap with cluster-specific pathways from non-metastatic tumors of neighboring
+clusters favors the latter interpretation, and suggests a mechanism of
+complementarity, in which newly acquired mutations result in similar classes
+converging on a single deadly phenotype that captures most or all of the
+critical features of end-stage cancer. If this is the case, once we discover the
+requirements of each cluster with respect to metastasis we can target them
+therapeutically and prevent further adaptation.
