@@ -1,9 +1,4 @@
----
-output: html_document
-editor_options: 
-  chunk_output_type: console
----
-```{r figure-4-data-generation, eval = FALSE}
+```{r figure-4-data-generation_function}
 tumor_clusters <- fread("../data/umap_2d_3d_coors.tsv") ## load in data
 load("../data/gene2_level2_lookup.Rda")
 load("../data/pathname2level2.Rda")
@@ -27,7 +22,7 @@ load("../data/gene_data.Rda")
 # gdc_mut_count_patient[gdc_mut_count_patient > 0] <- 1 ## booleanize data, anything greater than 1 is equal to 1
 # save(gdc_mut_count_patient, file = "../data/gdc_mut_count_patient_booleanized.Rda")
 load("../data/gdc_mut_count_patient_booleanized.Rda")
-filtered_class <- 12
+filtered_class <- 3
 n_path <- 10
 enrich_cutoff <- 0.30
 oncoprint_style <- function(filtered_class, n_path, enrich_cutoff = 0.30) {
@@ -100,16 +95,16 @@ oncoprint_style <- function(filtered_class, n_path, enrich_cutoff = 0.30) {
     rownames_to_column(var = "order") 
 
   gene_order <- path_match_in_set %>% left_join(., most_genes, by = "path_combo") %>% ## left join the data together
-  arrange(order) %>% .$gene_name ## getting the gene name order
-  
+  arrange(as.numeric(order)) %>% .$gene_name ## getting the gene name order
   ## gene mutation data and tumor samples - Booleanize mutation count for each tumor sample
   message("working on mutation data")
   filtered_mut_data <- gdc_mut_count_patient %>% rownames_to_column(var = "ensembl_gene_id") %>% ## ensembl id to col
     left_join(., gene_data[,c("ensembl_gene_id", "external_gene_name")], by = "ensembl_gene_id") %>% ## left_join data by ensembl_gene_id
     column_to_rownames(var = "external_gene_name") %>% dplyr::select(-ensembl_gene_id) %>% ## replace ensembl_id with gene_name
-    .[rownames(.) %in% gene_order, names(.) %in% class_spec] ## filter by genes in top10 path of filtered class and tumor samples associated with it
+    .[rownames(.) %in% gene_order, names(.) %in% class_spec] %>% ## filter by genes in top10 path of filtered class and tumor samples associated with it
+    .[match(gene_order, rownames(.)),]
   message("Running pheatmap to get coordinates")
-  pheatmap_res <- pheatmap(filtered_mut_data[gene_order,],
+  pheatmap_res <- pheatmap(filtered_mut_data,
          show_rownames = T,
          show_colnames = F,
          treeheight_row = 0,
@@ -125,7 +120,7 @@ oncoprint_style <- function(filtered_class, n_path, enrich_cutoff = 0.30) {
          clustering_method = "ward.D2",
          fontsize = 10,
          legend = T)
-  
+  dev.off()
   pheatmap_order <- pheatmap_res$tree_col$order ## getting sample clustering order
   sample_order <- names(filtered_mut_data) ## getting the sample_id original order 
   sample_order <- sample_order[pheatmap_order] ## reorder cancer by heatmap order
@@ -134,10 +129,9 @@ oncoprint_style <- function(filtered_class, n_path, enrich_cutoff = 0.30) {
   gather(., key = "sample_id", value = "membership", -gene_name) ## wide to long format
   gene_2_path_heatmap$membership <- as.character(gene_2_path_heatmap$membership) ## turn boolean values into categories
   ## set levels based on clustering algorithm above
+  gene_2_path_heatmap <- left_join(gene_2_path_heatmap, path_match_in_set, by = "gene_name") ## add in path_combo for faceting 
   gene_2_path_heatmap$gene_name <- factor(gene_2_path_heatmap$gene_name, levels = c(rev(gene_order)))
   gene_2_path_heatmap$sample_id <- factor(gene_2_path_heatmap$sample_id, levels = c(sample_order))
-
-  gene_2_path_heatmap <- left_join(gene_2_path_heatmap, path_match_in_set, by = "gene_name") ## add in path_combo for faceting 
   heatmap_ggplot <- ggplot(data = gene_2_path_heatmap, aes(y=gene_name, x=sample_id, fill = membership)) + 
   geom_tile(size = 0.6) +
   scale_fill_manual(values = c("grey", "firebrick3")) +
@@ -148,7 +142,8 @@ oncoprint_style <- function(filtered_class, n_path, enrich_cutoff = 0.30) {
         axis.ticks = element_blank(),
         strip.text.y = element_blank(),
         strip.background = element_blank(),
-        legend.position = "none") 
+        legend.position = "none") +
+    ggtitle(paste0("Class ", filtered_class))
   ## left annotatoin data generation
   l_anno <- path_match_in_set %>% .[match(gene_order, .$gene_name),] ## order by the gene order from the heatmap
 
@@ -163,7 +158,19 @@ oncoprint_style <- function(filtered_class, n_path, enrich_cutoff = 0.30) {
     if(p == "Signaling by Type 1 Insulin-like Growth Factor 1 Receptor (IGF1R)") { ## if it has this pathway grep a different way
      l_anno[grep(pattern = "Signaling by Type 1 Insulin", x = l_anno$path_combo), p] <- 1
     }
-    if(p != "AUF1 (hnRNP D0) binds and destabilizes mRNA" & p != "Signaling by Type 1 Insulin-like Growth Factor 1 Receptor (IGF1R)") { ## if it is not AUF1 do it normally
+    if(p == "Signaling by the B Cell Receptor (BCR)") { ## if it has this pathway grep a different way
+     l_anno[grep(pattern = "Signaling by the B Cell Receptor", x = l_anno$path_combo), p] <- 1
+    }
+    if(p == "Erythropoietin activates Phosphoinositide-3-kinase (PI3K)") { ## if it has this pathway grep a different way
+     l_anno[grep(pattern = "Erythropoietin activates Phosphoinositide-3-kinase", x = l_anno$path_combo), p] <- 1
+    }
+    if(p == "Nonsense Mediated Decay (NMD) independent of the Exon Junction Complex (EJC)") { ## if it has this pathway grep a different way
+     l_anno[grep(pattern = "independent of the Exon Junction Complex", x = l_anno$path_combo), p] <- 1
+    }
+    if(p == "Nonsense Mediated Decay (NMD) enhanced by the Exon Junction Complex (EJC)") { ## if it has this pathway grep a different way
+     l_anno[grep(pattern = "enhanced by the Exon Junction Complex", x = l_anno$path_combo), p] <- 1
+    }
+    if(p != "AUF1 (hnRNP D0) binds and destabilizes mRNA" & p != "Signaling by Type 1 Insulin-like Growth Factor 1 Receptor (IGF1R)" & p != "Signaling by the B Cell Receptor (BCR)" & p != "Erythropoietin activates Phosphoinositide-3-kinase (PI3K)" & p != "Nonsense Mediated Decay (NMD) independent of the Exon Junction Complex (EJC)" & p != "Nonsense Mediated Decay (NMD) enhanced by the Exon Junction Complex (EJC)") { ## if it is not AUF1 do it normally
     l_anno[grep(pattern = p, x = l_anno$path_combo), p] <- 1 
     }
   }
@@ -175,7 +182,8 @@ oncoprint_style <- function(filtered_class, n_path, enrich_cutoff = 0.30) {
                      "lightskyblue2", "firebrick", "burlywood3", "gray51", "springgreen4",
                      "lightpink2", "deepskyblue4", "lightsalmon2", "mediumpurple4",
                      "orange", "maroon", "yellow3", "brown4", "yellow4", "sienna4", "chocolate", "gray19")
-
+  
+  l_anno$gene_name <- factor(l_anno$gene_name, levels = c(rev(gene_order))) ##factor gene_name
   for(n in 1:length(toppath)){
     message(n)
     p <- toppath[n]
@@ -183,7 +191,7 @@ oncoprint_style <- function(filtered_class, n_path, enrich_cutoff = 0.30) {
     spec_path <- l_anno[,c("gene_name", p)]
     names(spec_path)[names(spec_path) == p] <- "p"
     anno_color <- c("0" = "white", "1" = kelly.colours[2+n])
-    path_ggplot <- ggplot(spec_path) +
+    path_ggplot <- ggplot(spec_path) + ## making plot for left annotation
     geom_bar(mapping = aes(x = 1, y = gene_name, fill = as.character(p)), 
             stat = "identity", 
             width = 1) +
@@ -193,16 +201,34 @@ oncoprint_style <- function(filtered_class, n_path, enrich_cutoff = 0.30) {
     l_anno_ggplot[[n]] <- path_ggplot + theme(legend.position = "none") ## remove legend from plot
   }
 
+  plotlist <- c(l_anno_ggplot, list(heatmap_ggplot)) ## make a list of plots for cowplot
 
-  plot <- plot_grid(l_anno_ggplot[[1]], l_anno_ggplot[[2]], l_anno_ggplot[[3]], l_anno_ggplot[[4]], l_anno_ggplot[[5]], l_anno_ggplot[[6]], l_anno_ggplot[[7]], l_anno_ggplot[[8]], l_anno_ggplot[[9]], l_anno_ggplot[[10]], heatmap_ggplot, align = "h", ncol = 11, axis = "tb", rel_widths = c(rep(0.1, 10), 15))
-plot_legend <- plot_grid(path_legend[[1]], path_legend[[2]], path_legend[[3]], path_legend[[4]], path_legend[[5]], path_legend[[6]], path_legend[[7]], path_legend[[8]], path_legend[[9]], path_legend[[10]], ncol = 5)
+  plot <- plot_grid(plotlist = plotlist, align = "h", ncol = 11, axis = "tb", rel_widths = c(rep(0.1, length(l_anno_ggplot)), 15))
+plot_legend <- plot_grid(plotlist = path_legend, ncol = 5)
 
 return(plot_grid(plot, plot_legend, ncol = 1, rel_heights = c(10, 1.5)))
 }
 
-test1 <- oncoprint_style(filtered_class = c(6,7), n_path = 10)
-test12 <- oncoprint_style(filtered_class = 12, n_path = 10)
-test11 <- oncoprint_style(filtered_class = 11, n_path = 10)
+# class2 <- oncoprint_style(filtered_class = 2, n_path = 10)
+# class2
+# class3 <- oncoprint_style(filtered_class = 3, n_path = 10)
+# class3
+# class4 <- oncoprint_style(filtered_class = 4, n_path = 10)
+# class4
+# class5 <- oncoprint_style(filtered_class = 5, n_path = 10)
+# class5
+# class6 <- oncoprint_style(filtered_class = 6, n_path = 10)
+# class6
+# class7 <- oncoprint_style(filtered_class = 7, n_path = 10)
+# class7
+# class9 <- oncoprint_style(filtered_class = 9, n_path = 10)
+# class9
+# class10 <- oncoprint_style(filtered_class = 10, n_path = 10)
+# class10
+# class11 <- oncoprint_style(filtered_class = 11, n_path = 10)
+# class11
+# class12 <- oncoprint_style(filtered_class = 12, n_path = 10)
+# class12
 
 
 ```

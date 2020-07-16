@@ -892,6 +892,7 @@ fig1G <- ggplot(mut_order, aes(x = V1, y = log10mut, color = knn_clust)) +
   geom_point() + 
   ylab("Log10(Mutation Count)") + 
   xlab("") +
+  labs(tag = "G") +
   theme_classic() +
   facet_wrap(~ factor(knn_clust, levels = c(1:12)), ncol = 12, scales = "free_x") +
   geom_hline(data= mut_median, aes(yintercept=mut_med)) +
