@@ -1,3 +1,17 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+```{r}
+library(data.table)
+library(ggplot2)
+library(ggplotify)
+library(tidyverse)
+library(grid)
+library(patchwork)
+```
+
 <div style="text-align: right"> Generation of Somatic Mutation Data </div>
 ```{r data-set-creation, eval=FALSE}
 ## Data acquired from GDC
@@ -766,7 +780,7 @@ umap_2d_3d_coors$ajcc_pathologic_tumor_stage[unknown] <- "Not Available"
 write.table(x = umap_2d_3d_coors, file = "umap_2d_3d_coors.tsv", quote = FALSE, sep = "\t", row.names = FALSE) ## save the data
 ```
 
-```{r fig-1a-1l, warning=FALSE, fig.height=11, fig.width=8.5, message = FALSE}
+```{r fig-1a-1l, warning=FALSE, fig.height=15, fig.width=16, message = FALSE}
 load("../data/cancer_disrupt_heatmap.Rda")
 umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv")
 
@@ -780,8 +794,8 @@ fig1A <- ggplot(data = cancer_disrupt_heatmap, aes(y=sample_id, x=path_name, fil
   scale_fill_manual(values = c("grey", "firebrick3")) +
   facet_grid(type ~ ., scales = "free", space = "free", switch = "y") +
 scale_y_discrete(position = "left") +
-  labs(tag = "A") +
   ylab("") +
+  xlab("377 Reactome Pathways") +
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
         axis.title.x = element_text(size = 12),
@@ -808,7 +822,6 @@ fig1C <- ggplot(umap_cancertype, aes(x=x_2d, y=y_2d)) +
   xlab("umap_1") +
   ylab("umap_2") +
   theme_classic() +
-  labs(tag = "C") +
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
         axis.title.x = element_text(size = 12),
@@ -823,7 +836,6 @@ fig1E <- ggplot(subset(umap_cancertype, clust !=0), aes(x = x_2d, y = y_2d, colo
   xlab("umap_1") +
   ylab("umap_2") +
   theme_classic() +
-  labs(tag = "E") +
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
         axis.title.x = element_text(size = 12),
@@ -838,7 +850,6 @@ fig1F <- ggplot(subset(umap_cancertype), aes(x = x_2d, y = y_2d, color = as.fact
   xlab("umap_1") +
   ylab("umap_2") +
   theme_classic() +
-  labs(tag = "F") +
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
         axis.title.x = element_text(size = 12),
@@ -888,16 +899,30 @@ mut_median <- mut_order %>%
   group_by(knn_clust) %>% 
   dplyr::summarize(mut_med = median(log10mut)) ## calculate median for each class
 
+## Need to add 50 pseudo samples front and end of data so they don't touch the y-axis
+mut_order <- mut_order[,c("V1", "knn_clust", "log10mut")] ## selecting relevant column
+
+begin_NA <- data.frame(V1 = paste0("sample", 1:50), 
+                       knn_clust = min(as.numeric(mut_order$knn_clust)), ## put lowest cluster to prevent a new facet
+                       log10mut = NA) ## put NA values so they don't get plotted
+end_NA <- data.frame(V1 = paste0("sample", 51:100), ## repeat the step for the ends
+                       knn_clust = max(as.numeric(mut_order$knn_clust)),
+                       log10mut = NA)
+mut_order <- rbind(begin_NA, mut_order, end_NA) ## rbind the data in a specfic order
+
+mut_order$V1 <- factor(mut_order$V1, levels = mut_order$V1) ## factor samples
+mut_order$knn_clust <- factor(mut_order$knn_clust, levels = c(1:12)) ## factor clusters
+#### test ####
+
 fig1G <- ggplot(mut_order, aes(x = V1, y = log10mut, color = knn_clust)) + 
   geom_point(size = 0.25) + 
   ylab("Log10(Mutation Count)") + 
   xlab("") +
-  labs(tag = "G") +
   theme_classic() +
   facet_wrap(~ factor(knn_clust, levels = c(1:12)), ncol = 12, scales = "free_x") +
   geom_hline(data= mut_median, aes(yintercept=mut_med)) +
   scale_y_continuous(sec.axis = sec_axis(~.)) + ## dup y-axis
-  scale_x_discrete(breaks = c(as.character(mut_order$V1[300]), as.character(xaxis_breaks$V1)), labels = c("n =" ,total_n$Freq)) +
+  scale_x_discrete(breaks = c(as.character(mut_order$V1[1]), as.character(xaxis_breaks$V1)), labels = c("n =" ,total_n$Freq)) +
   theme(axis.text.x = element_text(size = 10),
         axis.text.y = element_text(size = 10),
         axis.title.x = element_text(size = 12),
@@ -905,9 +930,10 @@ fig1G <- ggplot(mut_order, aes(x = V1, y = log10mut, color = knn_clust)) +
         axis.ticks.x = element_blank(),
         axis.line.x = element_line(colour = "black", size = 0.5),
         axis.line.x.top = element_line(colour = "black", size = 0.5),
-        #strip.background.x = element_blank(),
+        panel.spacing = unit(1, "lines"),
+        strip.background = element_rect(size = 0.5),
         strip.placement = "outside",
-        strip.text.x = element_text(size = 12),
+        strip.text.x = element_text(size = 10),
         legend.position = "none") +
   scale_color_manual(values = kelly.colours[-c(1:2)])
 
@@ -929,7 +955,7 @@ fig1H <- ggplot(umap_cancertype[umap_cancertype$project_code %in% c("COAD", "BRC
   theme_classic() +
   ylab("umap_2") +
   xlab("umap_1") +
-  labs(tag = "H", color = "") +
+  labs(color = "") +
   scale_color_manual(labels = c("BRCA", "COAD", "HNSC", "PAAD"), 
                      values = c('#fb9a99', '#b15928', '#6a3d9a', 'springgreen4')) +
   theme(axis.text.x = element_blank(),
@@ -946,7 +972,7 @@ fig1I <- ggplot(umap_cancertype %>% filter(project_code == "BRCA" & !is.na(Subty
   theme_classic() +
   ylab("umap_2") +
   xlab("umap_1") +
-  labs(tag = "I", color = "") +
+  labs(color = "") +
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
         axis.title.x = element_text(size = 12),
@@ -980,7 +1006,7 @@ fig1J <- ggplot(brca %>% filter(mut_type != "NA"), aes(x = x_2d, y = y_2d, colou
   theme_classic() +
   ylab("umap_2") +
   xlab("umap_1") +
-  labs(color = "", tag = "J") +
+  labs(color = "") +
   scale_color_manual(labels = c("BRCA1", "BRCA1,BRCA2", "BRCA2"), 
                      values = c('#33a02c', '#e31a1c', '#ff7f00')) +
   theme(axis.text.x = element_blank(),
@@ -997,7 +1023,7 @@ fig1K <- ggplot(subset(umap_cancertype, ajcc_pathologic_tumor_stage != "Not Avai
   theme_classic() +
   ylab("umap_2") +
   xlab("umap_1") +
-  labs(tag = "K", color = "") +
+  labs(color = "") +
   scale_color_manual(labels = c("Stage I", "Stage II", "Stage III", "Stage IV"), 
                      values = c('darkgoldenrod3','dodgerblue3','yellow3','tomato2')) +
   theme(axis.text.x = element_blank(),
@@ -1014,7 +1040,7 @@ fig1L <- ggplot(umap_cancertype, aes(x = x_2d, y = y_2d)) +
   geom_point(data = subset(umap_cancertype, ajcc_metastasis_pathologic_pm == "M1"), aes(x = x_2d, y = y_2d, colour = ajcc_metastasis_pathologic_pm), size = 0.25) + 
   ylab("umap_2") +
   xlab("umap_1") +
-  labs(tag = "L", color = "") +
+  labs(color = "") +
   scale_color_manual(labels = c("M0", "M1"), 
                      values = c('#a6cee3','#1f78b4')) +
   theme_classic() +
@@ -1025,16 +1051,18 @@ fig1L <- ggplot(umap_cancertype, aes(x = x_2d, y = y_2d)) +
         axis.ticks = element_blank(),
         legend.position = "bottom")
 
+empty_plot <- ggplot() + theme_void()
+
 layout <- '
-AAAABBCCDD
-AAAAEEEFFF
-AAAAGGGGGG
-AAAAGGGGGG
-AAAAHHIIJJ
-AAAAKKLL##
+AAAABBBCCCDDD
+AAAAEEEFFF###
+AAAAGGGGGGGGG
+AAAAGGGGGGGGG
+AAAAHHHIIIJJJ
+AAAAKKKLLL###
 '
 
-fig1A + plot_spacer() + fig1C + plot_spacer() + fig1E + fig1F + fig1G + fig1H + fig1I + fig1J + fig1K + fig1L + plot_layout(design = layout)
+fig1A + empty_plot + fig1C + empty_plot + fig1E + fig1F + fig1G + fig1H + fig1I + fig1J + fig1K + fig1L + plot_layout(design = layout) + plot_annotation(tag_levels = 'A')
 
 ```
 
