@@ -750,7 +750,7 @@ umap_3d_coors <- gdc_umap_coors %>%
   mutate(
     clust = as.factor(hdb_cluster_assignment$cluster),
     member_prob = hdb_cluster_assignment$membership_prob,
-    row.names = rownames(gdc_umap_coors)
+    sample_id = rownames(gdc_umap_coors)
   )
 ## clust 0 is unclassified cluster                       
 
