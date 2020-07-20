@@ -677,7 +677,7 @@ gdc.umap <- uwot::umap(mca_res$ind$coord,
                        n_neighbors = round(sqrt(nrow(mca_res$ind$coord))), # 87
                        n_epochs = 1000,
                        n_threads = 1)
-gdc_umap_coors <- as.data.frame(plotting_umap) %>%
+gdc_umap_coors <- as.data.frame(gdc.umap) %>%
   rename(plot_x = V1, plot_y = V2, plot_z = V3)
 
 ####################
