@@ -686,11 +686,11 @@ rng <- RNGseq(max_n_pt * n_iter, 42)
 r <- rng[[3649]]
 
 rngtools::setRNG(r)
-gdc.umap <- uwot::umap(mca_res$ind$coord, 
-                       n_components = 3,
-                       n_neighbors = round(sqrt(nrow(mca_res$ind$coord))), # 87
-                       n_epochs = 1000,
-                       n_threads = 1)
+gdc.umap <- umap(mca_res$ind$coord, 
+                 n_components = 3,
+                 n_neighbors = round(sqrt(nrow(mca_res$ind$coord))), # 87
+                 n_epochs = 1000,
+                 n_threads = 1)
 gdc_umap_coors <- as.data.frame(gdc.umap) %>%
   rename(plot_x = V1, plot_y = V2, plot_z = V3)
 rownames(gdc_umap_coors) <- rownames(gdc_path_mca)
@@ -750,7 +750,7 @@ save(score_df, sample_df, optimal_minPts, file = "optimal_minpts_score.rda")
 ####################
 rngtools::setRNG(r)
 
-cluster_umap <- uwot::umap(mca_res$ind$coord,
+cluster_umap <- umap(mca_res$ind$coord,
   min_dist = 1e-6,
   n_components = 3,
   n_neighbors = round(sqrt(nrow(mca_res$ind$coord))),
@@ -762,9 +762,10 @@ hdb_cluster_assignment <- hdbscan(cluster_umap, minPts = optimal_minPts)
 umap_3d_coors <- gdc_umap_coors %>%
   bind_cols(as.data.frame(cluster_umap)) %>%
   mutate(
+    n_pathways_mut = rowSums(gdc_path[, -1]),
     clust = as.factor(hdb_cluster_assignment$cluster),
     member_prob = hdb_cluster_assignment$membership_prob,
-    row.names = rownames(gdc_umap_coors)
+    sample_id = rownames(gdc_umap_coors)
   )
 ## clust 0 is unclassified cluster                       
 
@@ -797,9 +798,9 @@ gc()
 mutation_count <-mutation_count %>% .[rownames(.) %in% rownames(gene2level2_lookup),] %>% ## filter data with genes in our pathway lookup table
   colSums() %>% as.data.frame() %>% ## sum the mutation count
   'colnames<-' (c("mut_count")) %>% ## rename colname
-  rownames_to_column(var = "V1") ## move rownames to column
+  rownames_to_column(var = "sample_id") ## move rownames to column
 
-umap_2d_3d_coors <- left_join(umap_2d_3d_coors, mutation_count, by = "V1") 
+umap_3d_coors <- left_join(umap_3d_coors, mutation_count, by = "sample_id") 
 
 ####################
 ## Figure 1H data ##
@@ -808,9 +809,9 @@ tumor_samples <- gdc_tumor_coding_complete %>% colData(.) %>%
   as.data.frame(.) %>%
   dplyr::select(project_code) %>% 
   mutate(project_code = gsub(pattern = "\\-.*", replacement = "", x = .$project_code)) %>%
-  rownames_to_column(var = "V1")
+  rownames_to_column(var = "sample_id")
 
-umap_2d_3d_coors <- left_join(umap_2d_3d_coors, tumor_samples, by = "V1")
+umap_3d_coors <- left_join(umap_3d_coors, tumor_samples, by = "sample_id")
 
 ####################
 ## Figure 1I data ##
@@ -829,8 +830,8 @@ subtypes <- subtypes %>% dplyr::select(pan.samplesID, Subtype_Selected) %>% ## s
 #save(subtypes, file = "subtypes.Rda")
 load("../data/subtypes.Rda")
 
-umap_2d_3d_coors <- umap_2d_3d_coors %>%
-  mutate(pan.samplesID = substring(text = .$V1, first = 1, last = 12)) %>%
+umap_3d_coors <- umap_3d_coors %>%
+  mutate(pan.samplesID = substring(text = .$sample_id, first = 1, last = 12)) %>%
   left_join(., subtypes, by = "pan.samplesID") %>% ## left_join subtype data to umap
   dplyr::select(-pan.samplesID)
 
@@ -879,37 +880,37 @@ tcga_clinical_tumor_staging <- missing_sample %>% 'colnames<-' (names(tcga_clini
 
 save(tcga_clinical_tumor_staging, file = "tcga_clinical_tumor_staging.Rda")
 
-umap_2d_3d_coors <- umap_2d_3d_coors %>%
-  mutate(bcr_patient_barcode = substring(text = .$V1, first = 1, last = 12)) %>%
+umap_3d_coors <- umap_3d_coors %>%
+  mutate(bcr_patient_barcode = substring(text = .$sample_id, first = 1, last = 12)) %>%
   left_join(., tcga_clinical_tumor_staging, by = "bcr_patient_barcode") %>% ## left_join clinical data to umap
   dplyr::select(-bcr_patient_barcode)
 
-M0 <- umap_2d_3d_coors$ajcc_metastasis_pathologic_pm %in% c("cM0 (i+)", "M0")
-M1 <- umap_2d_3d_coors$ajcc_metastasis_pathologic_pm %in% c("M1", "M1a", "M1b", "M1c")
-NA.value <- umap_2d_3d_coors$ajcc_metastasis_pathologic_pm %in% c("[Discrepancy]", "[Not Applicable]", "[Not Available]", "MX")
+M0 <- umap_3d_coors$ajcc_metastasis_pathologic_pm %in% c("cM0 (i+)", "M0")
+M1 <- umap_3d_coors$ajcc_metastasis_pathologic_pm %in% c("M1", "M1a", "M1b", "M1c")
+NA.value <- umap_3d_coors$ajcc_metastasis_pathologic_pm %in% c("[Discrepancy]", "[Not Applicable]", "[Not Available]", "MX")
   
-umap_2d_3d_coors$ajcc_metastasis_pathologic_pm[M0] <- "M0"
-umap_2d_3d_coors$ajcc_metastasis_pathologic_pm[M1] <- "M1"
-umap_2d_3d_coors$ajcc_metastasis_pathologic_pm[NA.value] <- "NA"
+umap_3d_coors$ajcc_metastasis_pathologic_pm[M0] <- "M0"
+umap_3d_coors$ajcc_metastasis_pathologic_pm[M1] <- "M1"
+umap_3d_coors$ajcc_metastasis_pathologic_pm[NA.value] <- "NA"
 
-stage1 <- umap_2d_3d_coors$ajcc_pathologic_tumor_stage %in% c("Stage I", "Stage IA", "Stage IA1", "Stage IA2", "Stage IB", "Stage IB1", "Stage IB2", "Stage IC")
-stage2 <- umap_2d_3d_coors$ajcc_pathologic_tumor_stage %in% c("Stage II", "Stage IIA", "Stage IIA1", "Stage IIA2", "Stage IIB", "Stage IIC")
-stage3 <- umap_2d_3d_coors$ajcc_pathologic_tumor_stage %in% c("Stage III", "Stage IIIA", "Stage IIIB", "Stage IIIC", "Stage IIIC1", "Stage IIIC2")
-stage4 <- umap_2d_3d_coors$ajcc_pathologic_tumor_stage %in% c("Stage IV", "Stage IVA", "Stage IVB", "Stage IVC")
-unknown <- umap_2d_3d_coors$ajcc_pathologic_tumor_stage %in% c("Stage X", "[Discrepancy]", "[Not Applicable]", "I/II NOS", "NA", "[Not Available]")
+stage1 <- umap_3d_coors$ajcc_pathologic_tumor_stage %in% c("Stage I", "Stage IA", "Stage IA1", "Stage IA2", "Stage IB", "Stage IB1", "Stage IB2", "Stage IC")
+stage2 <- umap_3d_coors$ajcc_pathologic_tumor_stage %in% c("Stage II", "Stage IIA", "Stage IIA1", "Stage IIA2", "Stage IIB", "Stage IIC")
+stage3 <- umap_3d_coors$ajcc_pathologic_tumor_stage %in% c("Stage III", "Stage IIIA", "Stage IIIB", "Stage IIIC", "Stage IIIC1", "Stage IIIC2")
+stage4 <- umap_3d_coors$ajcc_pathologic_tumor_stage %in% c("Stage IV", "Stage IVA", "Stage IVB", "Stage IVC")
+unknown <- umap_3d_coors$ajcc_pathologic_tumor_stage %in% c("Stage X", "[Discrepancy]", "[Not Applicable]", "I/II NOS", "NA", "[Not Available]")
 
-umap_2d_3d_coors$ajcc_pathologic_tumor_stage[stage1] <- "Stage I"
-umap_2d_3d_coors$ajcc_pathologic_tumor_stage[stage2] <- "Stage II"
-umap_2d_3d_coors$ajcc_pathologic_tumor_stage[stage3] <- "Stage III"
-umap_2d_3d_coors$ajcc_pathologic_tumor_stage[stage4] <- "Stage IV"
-umap_2d_3d_coors$ajcc_pathologic_tumor_stage[unknown] <- "Not Available"
+umap_3d_coors$ajcc_pathologic_tumor_stage[stage1] <- "Stage I"
+umap_3d_coors$ajcc_pathologic_tumor_stage[stage2] <- "Stage II"
+umap_3d_coors$ajcc_pathologic_tumor_stage[stage3] <- "Stage III"
+umap_3d_coors$ajcc_pathologic_tumor_stage[stage4] <- "Stage IV"
+umap_3d_coors$ajcc_pathologic_tumor_stage[unknown] <- "Not Available"
 
-write.table(x = umap_2d_3d_coors, file = "umap_2d_3d_coors.tsv", quote = FALSE, sep = "\t", row.names = FALSE) ## save the data
+write.table(x = umap_3d_coors, file = "umap_3d_coors.tsv", quote = FALSE, sep = "\t", row.names = FALSE) ## save the data
 ```
 
 ```{r fig-1a-1l, warning=FALSE, fig.height=15, fig.width=16, message = FALSE}
 load("../data/cancer_disrupt_heatmap.Rda")
-umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv")
+umap_cancertype <- fread("../data/umap_3d_coors.tsv")
 
 kelly.colours <- c("gray95", "gray13", "gold2", "plum4", "darkorange1",
                    "lightskyblue2", "firebrick", "burlywood3", "gray51", "springgreen4",
@@ -943,56 +944,86 @@ scale_y_discrete(position = "left") +
  fig1A <- as.ggplot(fig1Ag)
  rm(fig1Ag)
 
-# optimal_mca_dimensions <- randomize %>%
-#   filter(pvalue < 0.05) %>%
-#   filter(eigenvalue == max(eigenvalue)) %>%
-#   pull(eigenvalue)
-# 
-# permut_p <- randomize %>%
-#   filter(eigenvalue < 50) %>%
-#   ggplot(aes(x = eigenvalue, y = expl_var / 100)) +
-#   geom_line(aes(colour = "#998ec3")) +
-#   geom_line(aes(y = perm / 100, colour = "#f1a340")) +
-#   scale_color_identity(guide = guide_legend(title = ""), 
-#                        labels = c("Eigenvalues", "Permuted Eigenvalues")) +
-#   scale_y_continuous(labels = scales::percent) +
-#   xlab("MCA Eigenvalues") +
-#   ylab("explained variance") +
-#   theme_classic()
-# 
-# pvalue_p <- randomize %>%
-#   filter(eigenvalue < 50) %>%
-#   ggplot(aes(x = eigenvalue, y = pvalue)) +
-#   geom_line() +
-#   geom_point() +
-#   geom_vline(xintercept = optimal_dimensions, color = "red") +
-#   ggtitle(label = "", subtitle = paste0("Significant dimensions = ", optimal_dimensions)) +
-#   xlab("MCA Eigenvalues") +
-#   ylab("P-value") +
-#   theme_classic()
-# 
-# fig1B <- permut_p /
-#   pvalue_p + plot_annotation(title = "Significance of MCA Eigenvalues")
+load("../data/figure1B_data.rda")
+optimal_mca_dimensions <- randomize %>%
+  filter(pvalue < 0.05) %>%
+  filter(eigenvalue == max(eigenvalue)) %>%
+  pull(eigenvalue)
 
-## umap monochrome 2d
-fig1C <- ggplot(umap_cancertype, aes(x=x_2d, y=y_2d)) +
-  geom_point(colour = "grey", size = 0.25) +
-  xlab("umap_1") +
-  ylab("umap_2") +
+permut_p <- randomize %>%
+  filter(eigenvalue < 50) %>%
+  ggplot(aes(x = eigenvalue, y = expl_var / 100)) +
+  geom_line(aes(colour = "#998ec3")) +
+  geom_line(aes(y = perm / 100, colour = "#f1a340")) +
+  scale_color_identity(guide = guide_legend(title = ""), 
+                       labels = c("Eigenvalues", "Permuted Eigenvalues")) +
+  scale_y_continuous(labels = scales::percent) +
+  xlab("MCA Eigenvalues") +
+  ylab("explained variance") +
+  theme_classic() +
+  theme(axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12))
+
+pvalue_p <- randomize %>%
+  filter(eigenvalue < 50) %>%
+  ggplot(aes(x = eigenvalue, y = pvalue)) +
+  geom_line() +
+  geom_point() +
+  geom_vline(xintercept = optimal_dimensions, color = "red") +
+  ggtitle(label = "", subtitle = paste0("Significant dimensions = ", optimal_dimensions)) +
+  xlab("MCA Eigenvalues") +
+  ylab("P-value") +
+  theme_classic() +
+  theme(axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12))
+
+fig1B <- permut_p /
+  pvalue_p + plot_annotation(title = "Significance of MCA Eigenvalues")
+
+fig1C <- ggplot(umap_cancertype %>% arrange(n_pathways_mut), 
+                aes(x=plot_x, y=plot_y)) +
+  geom_point(size = 0.25) +
+  xlab("UMAP 1") +
+  ylab("UMAP 2") +
+  coord_fixed() +
+  theme_classic() +
+  scale_color_viridis_c()
+  labs(tag = "C") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
+        axis.ticks = element_blank())
+
+load("../data/optimal_minpts_score.rda")
+fig1D <- ggplot(score_df, aes(x = minPts, y = score)) +
+  geom_point(data = sample_df, color = "grey", aes(y = value)) +
+  geom_point() + 
+  geom_line() +
+  geom_vline(xintercept = optimal_minPts, color = "#ff0000") +
+  scale_y_log10() +
+  xlab("Minimum Cluster Size") +
+  ggtitle(paste0("Optimal Minimum Cluster Size = ", optimal_minPts)) +
   theme_classic() +
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
         axis.title.x = element_text(size = 12),
         axis.title.y = element_text(size = 12),
         axis.ticks = element_blank())
+
 ## umap hdb_scan
-fig1E <- ggplot(subset(umap_cancertype, clust !=0), aes(x = x_2d, y = y_2d, color = as.factor(clust))) +
-  geom_point(data = umap_cancertype, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.25) +
+fig1E <- ggplot(subset(umap_cancertype, clust !=0), aes(x = plot_x, y = plot_y, color = as.factor(clust))) +
+  geom_point(data = umap_cancertype, aes(x = plot_x, y = plot_y), colour = "grey", size = 0.25) +
   geom_point(size = 0.25) + scale_color_manual(values = kelly.colours[-c(1:2)]) +
   guides(color = F) +
   theme_classic() +
-  xlab("umap_1") +
-  ylab("umap_2") +
+  xlab("UMAP 1") +
+  ylab("UMAP 2") +
+  coord_fixed() +
   theme_classic() +
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
@@ -1001,12 +1032,13 @@ fig1E <- ggplot(subset(umap_cancertype, clust !=0), aes(x = x_2d, y = y_2d, colo
         axis.ticks = element_blank())
 
 ## umap knn_clust 
-fig1F <- ggplot(subset(umap_cancertype), aes(x = x_2d, y = y_2d, color = as.factor(knn_clust))) +
+fig1F <- ggplot(subset(umap_cancertype), aes(x = plot_x, y = plot_y, color = as.factor(knn_clust))) +
   geom_point(size = 0.25) + scale_color_manual(values = kelly.colours[-c(1:2)]) +
   guides(color = F) +
   theme_classic() +
-  xlab("umap_1") +
-  ylab("umap_2") +
+  xlab("UMAP 1") +
+  ylab("UMAP 2") +
+  coord_fixed() +
   theme_classic() +
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
@@ -1021,12 +1053,12 @@ mut_order <- list() ## store data in list
 for(n in 1:max(as.numeric(as.character(umap_cancertype$knn_clust)))) { ## loop through all the clusters
   message(n)
   mut_order[[n]] <- umap_cancertype %>% filter(knn_clust == n) %>%  ## filter for specific class
-    dplyr::select(V1, x_2d, y_2d, knn_clust, mut_count) %>% ## select relevant columns
+    dplyr::select(sample_id, plot_x, plot_y, knn_clust, mut_count) %>% ## select relevant columns
     arrange(mut_count) ## arrange mutation in increasing order
 }
 mut_order <- mut_order %>% do.call(rbind, .) %>% as.data.frame() ## rbind list
 
-mut_order$V1 <- factor(mut_order$V1, levels = mut_order$V1)
+mut_order$sample_id <- factor(mut_order$sample_id, levels = mut_order$sample_id)
 mut_order$knn_clust <- factor(mut_order$knn_clust, levels = c(1:12))
 
 ## Need the breaks positions for the x-axis
@@ -1047,7 +1079,7 @@ for(n in 1) { ## loop through 1 to 12 clusters
   }
 }
 xaxis_breaks <- as.data.frame(do.call(rbind, xaxis_breaks)) ## rbind list
-xaxis_breaks <- mut_order[rownames(mut_order) %in% xaxis_breaks$V1,] ## find the tumor samples in these positions
+xaxis_breaks <- mut_order[rownames(mut_order) %in% xaxis_breaks$sample_id,] ## find the tumor samples in these positions
 
 total_n <- as.data.frame(table(mut_order$knn_clust)) ## getting total n in cluster
 
@@ -1057,6 +1089,7 @@ mut_median <- mut_order %>%
   group_by(knn_clust) %>% 
   dplyr::summarize(mut_med = median(log10mut)) ## calculate median for each class
 
+<<<<<<< HEAD
 ## Need to add 50 pseudo samples front and end of data so they don't touch the y-axis
 mut_order <- mut_order[,c("V1", "knn_clust", "log10mut")] ## selecting relevant column
 
@@ -1072,7 +1105,7 @@ mut_order$V1 <- factor(mut_order$V1, levels = mut_order$V1) ## factor samples
 mut_order$knn_clust <- factor(mut_order$knn_clust, levels = c(1:12)) ## factor clusters
 #### test ####
 
-fig1G <- ggplot(mut_order, aes(x = V1, y = log10mut, color = knn_clust)) + 
+fig1G <- ggplot(mut_order, aes(x = sample_id, y = log10mut, color = knn_clust)) + 
   geom_point(size = 0.25) + 
   ylab("Log10(Mutation Count)") + 
   xlab("") +
@@ -1107,14 +1140,15 @@ for (k in grep("strip-t",fig1G$layout$name)) {
 fig1G <- as.ggplot(fig1G)
 
 ## umap by cancer type
-fig1H <- ggplot(umap_cancertype[umap_cancertype$project_code %in% c("COAD", "BRCA", "HNSC", "PAAD"),], aes(x = x_2d, y = y_2d, colour = project_code)) +
-  geom_point(data = umap_cancertype, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.25) +
+fig1H <- ggplot(umap_cancertype[umap_cancertype$project_code %in% c("COAD", "BRCA", "HNSC", "PAAD"),], aes(x = plot_x, y = plot_y, colour = project_code)) +
+  geom_point(data = umap_cancertype, aes(x = plot_x, y = plot_y), colour = "grey", size = 0.25) +
   geom_point(size = 0.25) + 
   theme_classic() +
-  ylab("umap_2") +
-  xlab("umap_1") +
-  labs(color = "") +
   guides(fill = guide_legend(override.aes = list(size=8))) +
+  ylab("UMAP 2") +
+  xlab("UMAP 1") +
+  coord_fixed() +
+  labs(tag = "H", color = "") +
   scale_color_manual(labels = c("BRCA", "COAD", "HNSC", "PAAD"), 
                      values = c('#fb9a99', '#b15928', '#6a3d9a', 'springgreen4')) +
   theme(axis.text.x = element_blank(),
@@ -1125,13 +1159,15 @@ fig1H <- ggplot(umap_cancertype[umap_cancertype$project_code %in% c("COAD", "BRC
         legend.position = "bottom")
 
 ## umap of brca subtype
-fig1I <- ggplot(umap_cancertype %>% filter(project_code == "BRCA" & !is.na(Subtype_Selected)), aes(x = x_2d, y = y_2d, colour = Subtype_Selected)) +
-  geom_point(data = umap_cancertype, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.25) +
+fig1I <- ggplot(umap_cancertype %>% filter(project_code == "BRCA" & !is.na(Subtype_Selected)), aes(x = plot_x, y = plot_y, colour = Subtype_Selected)) +
+  geom_point(data = umap_cancertype, aes(x = plot_x, y = plot_y), colour = "grey", size = 0.25) +
   geom_point(size = 0.25) +
   theme_classic() +
-  ylab("umap_2") +
-  xlab("umap_1") +
-  labs(color = "") +
+  ylab("UMAP 2") +
+  xlab("UMAP 1") +
+  coord_fixed() +
+  labs(tag = "I", color = "") +
+>>>>>>> master
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
         axis.title.x = element_text(size = 12),
@@ -1142,7 +1178,7 @@ fig1I <- ggplot(umap_cancertype %>% filter(project_code == "BRCA" & !is.na(Subty
 ## umap brca somatic mutations
 load("../data/gdc_gene_exp_adj.Rda")
 load("../data/gene_data.Rda")
-umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv")
+umap_cancertype <- fread("../data/umap_3d_coors.tsv")
 brca <- gene_data %>% .[.$external_gene_name %in% c("BRCA1", "BRCA2"),] %>% dplyr::select(ensembl_gene_id, external_gene_name) ## Getting BRCA gene information
 brca <- gdc_gene_exp_adj %>% .[rownames(.) %in% brca$ensembl_gene_id, ] %>% ## we only want brca gene
   rownames_to_column(var = "ensembl_gene_id") %>%
@@ -1150,22 +1186,23 @@ brca <- gdc_gene_exp_adj %>% .[rownames(.) %in% brca$ensembl_gene_id, ] %>% ## w
   remove_rownames()  %>% column_to_rownames(var = "external_gene_name") %>% ## replace ensembl_id with gene_name
   dplyr::select(-ensembl_gene_id) %>% ## get ride of ensembl_id  col
   t() %>% as.data.frame() %>% ## correct orientation for umap_cancertype df
-  rownames_to_column(var = "V1") %>% ## getting data ready for leftjoin 
+  rownames_to_column(var = "sample_id") %>% ## getting data ready for leftjoin 
   mutate(BRCA1 = case_when(BRCA1 == "1" ~ "BRCA1",
                            BRCA1 == "0" ~ "NA"),
          BRCA2 = case_when(BRCA2 == "1" ~ "BRCA2",
                            BRCA2 == "0" ~ "NA")) %>%
   mutate(mut_type = gsub('NA,|,NA', '', paste(.$BRCA1, .$BRCA2, sep = ","))) %>% ## combine mutation cause some patients can have both
   dplyr::select(-BRCA1, -BRCA2) %>% ## remove col we don't need
-  left_join(., umap_cancertype[,c("V1", "x_2d", "y_2d", "project_code")], by = "V1") ## leftjoin by sample id
+  left_join(., umap_cancertype[,c("sample_id", "plot_x", "plot_y", "project_code")], by = "sample_id") ## leftjoin by sample id
 
-fig1J <- ggplot(brca %>% filter(mut_type != "NA"), aes(x = x_2d, y = y_2d, colour = mut_type)) +
-  geom_point(data = brca, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.25) +
+fig1J <- ggplot(brca %>% filter(mut_type != "NA"), aes(x = plot_x, y = plot_y, colour = mut_type)) +
+  geom_point(data = brca, aes(x = plot_x, y = plot_y), colour = "grey", size = 0.25) +
   geom_point(size = 0.25) + 
   theme_classic() +
-  ylab("umap_2") +
-  xlab("umap_1") +
-  labs(color = "") +
+  ylab("UMAP 2") +
+  xlab("UMAP 1") +
+  coord_fixed() +
+  labs(color = "", tag = "J") +
   scale_color_manual(labels = c("BRCA1", "BRCA1,BRCA2", "BRCA2"), 
                      values = c('#33a02c', '#e31a1c', '#ff7f00')) +
   theme(axis.text.x = element_blank(),
@@ -1176,13 +1213,14 @@ fig1J <- ggplot(brca %>% filter(mut_type != "NA"), aes(x = x_2d, y = y_2d, colou
         legend.position = "bottom")
 
 ## umap stage
-fig1K <- ggplot(subset(umap_cancertype, ajcc_pathologic_tumor_stage != "Not Available"), aes(x = x_2d, y = y_2d, colour = ajcc_pathologic_tumor_stage)) +
-  geom_point(data = umap_cancertype, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.25) +
+fig1K <- ggplot(subset(umap_cancertype, ajcc_pathologic_tumor_stage != "Not Available"), aes(x = plot_x, y = plot_y, colour = ajcc_pathologic_tumor_stage)) +
+  geom_point(data = umap_cancertype, aes(x = plot_x, y = plot_y), colour = "grey", size = 0.25) +
   geom_point(size = 0.25) + 
   theme_classic() +
-  ylab("umap_2") +
-  xlab("umap_1") +
-  labs(color = "") +
+  ylab("UMAP 2") +
+  xlab("UMAP 1") +
+  coord_fixed() +
+  labs(tag = "K", color = "") +
   scale_color_manual(labels = c("Stage I", "Stage II", "Stage III", "Stage IV"), 
                      values = c('darkgoldenrod3','dodgerblue3','yellow3','tomato2')) +
   theme(axis.text.x = element_blank(),
@@ -1193,13 +1231,14 @@ fig1K <- ggplot(subset(umap_cancertype, ajcc_pathologic_tumor_stage != "Not Avai
         legend.position = "bottom") 
 
 ## umap metastasis
-fig1L <- ggplot(umap_cancertype, aes(x = x_2d, y = y_2d)) +
-  geom_point(data = umap_cancertype, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.25) +
-  geom_point(data = subset(umap_cancertype, ajcc_metastasis_pathologic_pm == "M0"), aes(x = x_2d, y = y_2d, colour = ajcc_metastasis_pathologic_pm), size = 0.25) + 
-  geom_point(data = subset(umap_cancertype, ajcc_metastasis_pathologic_pm == "M1"), aes(x = x_2d, y = y_2d, colour = ajcc_metastasis_pathologic_pm), size = 0.25) + 
-  ylab("umap_2") +
-  xlab("umap_1") +
-  labs(color = "") +
+fig1L <- ggplot(umap_cancertype, aes(x = plot_x, y = plot_y)) +
+  geom_point(data = umap_cancertype, aes(x = plot_x, y = plot_y), colour = "grey", size = 0.25) +
+  geom_point(data = subset(umap_cancertype, ajcc_metastasis_pathologic_pm == "M0"), aes(x = plot_x, y = plot_y, colour = ajcc_metastasis_pathologic_pm), size = 0.25) + 
+  geom_point(data = subset(umap_cancertype, ajcc_metastasis_pathologic_pm == "M1"), aes(x = plot_x, y = plot_y, colour = ajcc_metastasis_pathologic_pm), size = 0.25) + 
+  ylab("UMAP 2") +
+  xlab("UMAP 1") +
+  coord_fixed() +
+  labs(tag = "L", color = "") +
   scale_color_manual(labels = c("M0", "M1"), 
                      values = c('#a6cee3','#1f78b4')) +
   theme_classic() +
@@ -1221,7 +1260,7 @@ AAAAHHHIIIJJJ
 AAAAKKKLLL###
 '
 
-fig1A + empty_plot + fig1C + empty_plot + fig1E + fig1F + fig1G + fig1H + fig1I + fig1J + fig1K + fig1L + plot_layout(design = layout) + plot_annotation(tag_levels = 'A')
+fig1A + fig1B + fig1C + fig1D + fig1E + fig1F + fig1G + fig1H + fig1I + fig1J + fig1K + fig1L + plot_layout(design = layout)
 
 ```
 

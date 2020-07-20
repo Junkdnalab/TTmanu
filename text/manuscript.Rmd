@@ -43,7 +43,6 @@ library(cluster)
 library(pheatmap)
 library(clusterProfiler)
 library(org.Hs.eg.db)
-library(umap)
 library(dbscan)
 library(class)
 library(TCGAbiolinks)
@@ -54,6 +53,10 @@ library(knitr)
 library(kableExtra)
 library(UpSetR)
 library(cowplot)
+library(doRNG)
+library(uwot)
+library(janitor)
+library(FactoMineR)
 ```
 
 ## Abstract
