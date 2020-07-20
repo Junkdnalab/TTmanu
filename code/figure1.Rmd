@@ -620,37 +620,164 @@ cancer_disrupt_heatmap <- left_join(cancer_disrupt_heatmap, cancer_order, by = "
 save(cancer_disrupt_heatmap, file = "cancer_disrupt_heatmap.Rda") 
 
 ####################
+## Figure 1B data ##
+####################
+gdc_path <- gdc_reactome_path_analysis %>%
+  t() %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "sample") %>% ## move path_names to column
+  .[match(rownames(tumor_samples), .$sample), ]
+
+gdc_path_mca <- left_join(gdc_path, tumor_samples[, c(1, 3)],
+  by = c("sample" = "submitted_sample_id")) %>%
+  column_to_rownames(var = "sample")
+
+gdc_path_sample_names <- rownames(gdc_path_mca)
+gdc_path_tumor_types <- gdc_path_mca$project_code.x
+
+gdc_path_mca$project_code.x <- NULL
+
+## create a categorical variable from the boolean variable
+pathway_list <- make_clean_names(colnames(gdc_path_mca))
+pathway_count <- length(pathway_list)
+gdc_path_mca <- as.data.frame(lapply(gdc_path_mca, function(x) {
+  factor(x, levels = c(0, 1), labels = c("no", "yes"))
+}))
+colnames(gdc_path_mca) <- pathway_list
+gdc_path_mca$project_code <- gdc_path_tumor_types
+rownames(gdc_path_mca) <- gdc_path_sample_names
+
+## perform mca
+mca_res <- MCA(X = gdc_path_mca[, pathway_list], graph = FALSE)
+
+expl_var <- mca_res$eig[, 2]
+expl_var_perm <- matrix(NA, ncol = length(mca_res$eig[, 2]), nrow = 100)
+
+set.seed(4242)
+for (k in seq(100)) {
+  gdc_perm <- as.data.frame(lapply(gdc_path_mca[, pathway_list], sample))
+  MCA_perm <- MCA(X = gdc_perm, graph = FALSE)
+  expl_var_perm[k, ] <- MCA_perm$eig[, 2]
+}
+
+randomize <- tibble(
+  eigenvalue = 1:length(expl_var),
+  expl_var = expl_var,
+  perm = colMeans(expl_var_perm),
+  pvalue = rowSums(t(expl_var_perm) >= expl_var) / 100
+)
+
+optimal_mca_dimensions <- randomize %>%
+  filter(pvalue < 0.05) %>%
+  filter(eigenvalue == max(eigenvalue)) %>%
+  pull(eigenvalue)
+
+mca_res <- MCA(
+  X = gdc_path_mca[, pathway_list],
+  ncp = optimal_mca_dimensions, graph = FALSE
+)
+
+save(randomize, mca_res, file = "figure1B_data.rda")
+
+####################
 ## Figure 1C data ##
 ####################
-gdc_path <- gdc_reactome_path_analysis %>% t() %>% as.data.frame() %>%
-  rownames_to_column(var = "sample") %>% ## move path_names to column
-  .[match(rownames(tumor_samples), .$sample),]
-  
-## umap analysis
-set.seed(3296)
-gdc.umap <- umap(gdc_path[,2:length(gdc_path)]) ## default n_component is 2
-gdc_umap_coors <- data.frame(x_2d = gdc.umap$layout[,1], y_2d = gdc.umap$layout[,2])
+rng <- RNGseq(max_n_pt * n_iter, 42)
+r <- rng[[3649]]
+
+rngtools::setRNG(r)
+gdc.umap <- uwot::umap(mca_res$ind$coord, 
+                       n_components = 3,
+                       n_neighbors = round(sqrt(nrow(mca_res$ind$coord))), # 87
+                       n_epochs = 1000,
+                       n_threads = 1)
+gdc_umap_coors <- as.data.frame(gdc.umap) %>%
+  rename(plot_x = V1, plot_y = V2, plot_z = V3)
+rownames(gdc_umap_coors) <- rownames(gdc_path_mca)
+
+####################
+## Figure 1D data ##
+####################
+n_iter <- 40
+max_n_pt <- 200
+score_mca <- matrix(as.numeric(NA), nrow = max_n_pt - 2, ncol = n_iter)
+
+n_tumors <- nrow(mca_res$ind$coord)
+
+cl <- makeCluster(8)
+registerDoParallel(cl)
+
+for (i in 3:max_n_pt) {
+  print(paste0("MIN POINTS = ", i))
+  score_iter <- foreach(1:n_iter,
+    .combine = c,
+    .export = c("mca_res"),
+    .packages = c("dbscan", "uwot"),
+    r = rng[(i - 1) * n_iter + 1:n_iter]
+  ) %dopar% {
+    rngtools::setRNG(r)
+    umap_init_mca <- umap(mca_res$ind$coord, 
+                          min_dist = 1e-6, 
+                          n_components = 3, 
+                          n_neighbors = round(sqrt(nrow(mca_res$ind$coord))), 
+                          n_epochs = 1000, 
+                          n_threads = 1)
+    res <- hdbscan(umap_init_mca, minPts = i)
+    score_iter_temp <- sum(res$membership_prob < 0.05) / n_tumors
+    return(score_iter_temp)
+  }
+  score_mca[i - 2, ] <- score_iter
+}
+
+score <- rowMeans(score_mca)
+score_df <- tibble(minPts = 3:max_n_pt, score = score)
+
+sample_df <- score_mca %>%
+  as.data.frame() %>%
+  as_tibble() %>%
+  add_column(minPts = 3:max_n_pt, .before = 1) %>%
+  pivot_longer(-minPts) %>%
+  group_by(minPts)
+
+optimal_minPts <- score_df %>%
+  filter(score == min(score)) %>%
+  pull(minPts)
+
+save(score_df, sample_df, optimal_minPts, file = "optimal_minpts_score.rda")
 
 ####################
 ## Figure 1E data ##
 ####################
-## To identify clusters using hdbscan, use umap in the third dimension
-set.seed(3296)
-gdc.umap.3d <- umap(gdc_path[,2:length(gdc_path)], n_components = 3)
-gdc.umap.3d <- data.frame(x_3d = gdc.umap.3d$layout[,1], y_3d = gdc.umap.3d$layout[,2], z_3d = gdc.umap.3d$layout[,3]) ## coors of umap
-rownames(gdc.umap.3d) <- gdc_path$sample ## insert sample_id in rownames
-hdb_cluster_assignment <- hdbscan(gdc.umap.3d, minPts =  114) ## min group size for cluster is 114 (value before cluster number drops significantly)
-umap_2d_3d_coors <- data.frame(x_2d = gdc_umap_coors$x_2d, y_2d = gdc_umap_coors$y_2d, x_3d = gdc.umap.3d$x_3d, y_3d = gdc.umap.3d$y_3d, z_3d = gdc.umap.3d$z_3d, clust = as.factor(hdb_cluster_assignment$cluster), member_prob = hdb_cluster_assignment$membership_prob, row.names = rownames(gdc.umap.3d)) ## clust 0 is unclassified cluster
+rngtools::setRNG(r)
+
+cluster_umap <- uwot::umap(mca_res$ind$coord,
+  min_dist = 1e-6,
+  n_components = 3,
+  n_neighbors = round(sqrt(nrow(mca_res$ind$coord))),
+  n_epochs = 1000,
+  n_threads = 1
+)
+colnames(cluster_umap) <- c("cluster_x", "cluster_y", "cluster_z")
+hdb_cluster_assignment <- hdbscan(cluster_umap, minPts = optimal_minPts)
+umap_3d_coors <- gdc_umap_coors %>%
+  bind_cols(as.data.frame(cluster_umap)) %>%
+  mutate(
+    clust = as.factor(hdb_cluster_assignment$cluster),
+    member_prob = hdb_cluster_assignment$membership_prob,
+    row.names = rownames(gdc_umap_coors)
+  )
+## clust 0 is unclassified cluster                       
 
 ####################
 ## Figure 1F data ##
 ####################
 ## reclassifying clust 0 using our classified cluster as training test and unclassified as test set
-umap_2d_3d_coors$knn_clust <- umap_2d_3d_coors$clust
-umap_2d_3d_coors$knn_clust[umap_2d_3d_coors$clust==0]<-class::knn(train = umap_2d_3d_coors[,c("x_3d", "y_3d", "z_3d")][which(umap_2d_3d_coors$clust!=0),],
-                                                                  test = umap_2d_3d_coors[,c("x_3d", "y_3d", "z_3d")][which(umap_2d_3d_coors$clust==0),],
-                                                                  cl = umap_2d_3d_coors$clust[umap_2d_3d_coors$clust!=0], 
-                                                                  k=15)
+umap_3d_coors$clust_knn <- umap_3d_coors$clust
+umap_3d_coors$clust_knn[umap_3d_coors$clust == 0] <- class::knn(
+  train = umap_3d_coors[which(umap_3d_coors$clust != 0), c("cluster_x", "cluster_y", "cluster_z")],
+  test = umap_3d_coors[which(umap_3d_coors$clust == 0), c("cluster_x", "cluster_y", "cluster_z")],
+  cl = umap_3d_coors$clust[umap_3d_coors$clust != 0], k = 87
+)
 
 ####################
 ## Figure 1G data ##
@@ -815,6 +942,37 @@ scale_y_discrete(position = "left") +
  
  fig1A <- as.ggplot(fig1Ag)
  rm(fig1Ag)
+
+optimal_mca_dimensions <- randomize %>%
+  filter(pvalue < 0.05) %>%
+  filter(eigenvalue == max(eigenvalue)) %>%
+  pull(eigenvalue)
+
+permut_p <- randomize %>%
+  filter(eigenvalue < 50) %>%
+  ggplot(aes(x = eigenvalue, y = expl_var / 100)) +
+  geom_line(aes(colour = "#998ec3")) +
+  geom_line(aes(y = perm / 100, colour = "#f1a340")) +
+  scale_color_identity(guide = guide_legend(title = ""), 
+                       labels = c("Eigenvalues", "Permuted Eigenvalues")) +
+  scale_y_continuous(labels = scales::percent) +
+  xlab("MCA Eigenvalues") +
+  ylab("explained variance") +
+  theme_classic()
+
+pvalue_p <- randomize %>%
+  filter(eigenvalue < 50) %>%
+  ggplot(aes(x = eigenvalue, y = pvalue)) +
+  geom_line() +
+  geom_point() +
+  geom_vline(xintercept = optimal_dimensions, color = "red") +
+  ggtitle(label = "", subtitle = paste0("Significant dimensions = ", optimal_dimensions)) +
+  xlab("MCA Eigenvalues") +
+  ylab("P-value") +
+  theme_classic()
+
+fig1B <- permut_p /
+  pvalue_p + plot_annotation(title = "Significance of MCA Eigenvalues")
 
 ## umap monochrome 2d
 fig1C <- ggplot(umap_cancertype, aes(x=x_2d, y=y_2d)) +
