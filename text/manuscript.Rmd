@@ -324,7 +324,7 @@ indeed we could observe some clustering. These data could explain how
 tissue-specific gene mutation signatures might result in general cancer
 phenotypes by converging at the pathway level.
 
-```{r child='../code/figure4.Rmd'}
+```{r child='../code/figure4_function.Rmd'}
 ```
 
 The proteasome plays key roles in the transduction of signals from the p53, WNT
@@ -563,5 +563,4 @@ under-powered given the uneven representation of stage across cancer types.
 ```{r child='../code/supplements.Rmd'}
 ```
 
->>>>>>> master
 ## References

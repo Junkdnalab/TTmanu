@@ -1,4 +1,4 @@
-```{r figure-4-data-generation_function}
+```{r figure-4-data-generation_function, message = FALSE, eval = FALSE}
 tumor_clusters <- fread("../data/umap_2d_3d_coors.tsv") ## load in data
 load("../data/gene2_level2_lookup.Rda")
 load("../data/pathname2level2.Rda")
@@ -22,7 +22,7 @@ load("../data/gene_data.Rda")
 # gdc_mut_count_patient[gdc_mut_count_patient > 0] <- 1 ## booleanize data, anything greater than 1 is equal to 1
 # save(gdc_mut_count_patient, file = "../data/gdc_mut_count_patient_booleanized.Rda")
 load("../data/gdc_mut_count_patient_booleanized.Rda")
-filtered_class <- 3
+filtered_class <- c(6,7)
 n_path <- 10
 enrich_cutoff <- 0.30
 oncoprint_style <- function(filtered_class, n_path, enrich_cutoff = 0.30) {
@@ -135,6 +135,7 @@ oncoprint_style <- function(filtered_class, n_path, enrich_cutoff = 0.30) {
   heatmap_ggplot <- ggplot(data = gene_2_path_heatmap, aes(y=gene_name, x=sample_id, fill = membership)) + 
   geom_tile(size = 0.6) +
   scale_fill_manual(values = c("grey", "firebrick3")) +
+  xlab("Tumor Samples") +
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
         axis.title.x = element_text(size = 12),
@@ -197,39 +198,24 @@ oncoprint_style <- function(filtered_class, n_path, enrich_cutoff = 0.30) {
             width = 1) +
     scale_fill_manual(values = anno_color, breaks = "1", name = "", labels = p) +
     theme_void() 
-    path_legend[[n]] <- plot_grid(get_legend(path_ggplot), ncol = 1) ## extract legend from plot
+    path_legend[[n]] <- get_legend(path_ggplot) ## extract legend from plot
     l_anno_ggplot[[n]] <- path_ggplot + theme(legend.position = "none") ## remove legend from plot
   }
 
   plotlist <- c(l_anno_ggplot, list(heatmap_ggplot)) ## make a list of plots for cowplot
 
-  plot <- plot_grid(plotlist = plotlist, align = "h", ncol = 11, axis = "tb", rel_widths = c(rep(0.1, length(l_anno_ggplot)), 15))
-plot_legend <- plot_grid(plotlist = path_legend, ncol = 5)
+  plot <- plot_grid(plotlist = plotlist, align = "h", ncol = 11, axis = "tb", rel_widths = c(rep(0.1, length(l_anno_ggplot)), 5))
+  plot_legend <- plot_grid(plotlist = path_legend, ncol = 1, align = "v")
 
-return(plot_grid(plot, plot_legend, ncol = 1, rel_heights = c(10, 1.5)))
+return(plot_grid(plot, plot_grid(NULL, plot_legend1, NULL, ncol = 1, rel_heights = c(1, 1, 1)), ncol = 2, rel_widths = c(2.5, 2), axis = "tbl"))
 }
 
-# class2 <- oncoprint_style(filtered_class = 2, n_path = 10)
-# class2
-# class3 <- oncoprint_style(filtered_class = 3, n_path = 10)
-# class3
-# class4 <- oncoprint_style(filtered_class = 4, n_path = 10)
-# class4
-# class5 <- oncoprint_style(filtered_class = 5, n_path = 10)
-# class5
-# class6 <- oncoprint_style(filtered_class = 6, n_path = 10)
-# class6
-# class7 <- oncoprint_style(filtered_class = 7, n_path = 10)
-# class7
-# class9 <- oncoprint_style(filtered_class = 9, n_path = 10)
-# class9
-# class10 <- oncoprint_style(filtered_class = 10, n_path = 10)
-# class10
-# class11 <- oncoprint_style(filtered_class = 11, n_path = 10)
-# class11
-# class12 <- oncoprint_style(filtered_class = 12, n_path = 10)
-# class12
+class67 <- oncoprint_style(filtered_class = c(6,7), n_path = 10)
+save(class67, file = "class67.Rda")
+```
 
-
+```{r figure-4-plot, out.width= '90%', fig.cap="**Figure 4: Some genes with multiple pathway memberships drive clustering.** Each column is a tumor in class 6 or 7, each row represents a gene with mutation (red) or not mutated (grey). The genes are organized according to which of the top distinguishing pathways for this class that they effect. Some genes affect multiple pathways, as indicated by the bars at left. The highlighted genes at right are all proteasomal subunits."}
+load("../data/class67.Rda")
+class67
 ```
 

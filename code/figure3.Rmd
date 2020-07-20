@@ -164,7 +164,7 @@ save(effect_heatmap, file = "effect_heatmap.Rda")
 ```{r group-pathway-enrichment heatmap, fig.width= 5, fig.height= 10, fig.align= 'center', fig.cap="**Figure 3. Pathway-specific enrichment within clusters.** Heatmap shows relative enrichment of each pathway (rows) within each numbered cluster (columns). The annotation at left indicates the Reactome pathway group at the second level (check this)."}
 load("../data/effect_heatmap.Rda") ## load data
 effect_heatmap$test <- 1
-class(effect_heatmap$cluster)
+
 effect_colors = c("1" = "#2d004b", "2" = "#542788", "3" = "#8073ac", "4" = "#b2abd2", "5" = "#d8daeb", "6" = "white", "7" = "#fee0b6", "8" = "#fdb863", "9" = "#e08214","10" = "#b35806","11" ="#7f3b08") ## color scheme
 
 fig3 <- ggplot(data = effect_heatmap, aes(x=cluster, y=path_name)) + 
