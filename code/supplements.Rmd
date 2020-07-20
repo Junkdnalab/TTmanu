@@ -1,13 +1,19 @@
 ### Supplementary Figure S1
+```{r}
+library(data.table)
+library(ggplot2)
+library(kableExtra)
+library(tidyverse)
+```
 
-```{r supplementary-figure-s1, fig.width= 8.5, fig.height= 11}
+```{r supplementary-figure-s1, out.width = '90%', fig.align='center'}
 umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv") ## load data
 
 umap_bg <- umap_cancertype[,-"project_code"] ## get background data for facet
   
 ggplot(umap_cancertype, aes(x = x_2d, y = y_2d, colour = project_code)) + 
-  geom_point(data = umap_bg, aes(x = x_2d, y = y_2d), colour = "grey", size = 1) +
-  geom_point(size = 1) +
+  geom_point(data = umap_bg, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.25) +
+  geom_point(size = 0.25) +
   theme_classic() +
   coord_fixed() +
   xlab("UMAP 1") + ylab("UMAP 2") +
@@ -25,13 +31,13 @@ ggplot(umap_cancertype, aes(x = x_2d, y = y_2d, colour = project_code)) +
 
 ### Supplementary Figure S2
 
-```{r supplementary-figure-s2-data-generation}
+```{r supplementary-figure-s2-data-generation, out.width = '90%', fig.align = "center"}
 umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv") ## load data
 umap_bg <- umap_cancertype[,-"project_code"] ## get background data for facet
 
 ggplot(umap_cancertype, aes(x = x_2d, y = y_2d, colour = Subtype_Selected)) + 
-  geom_point(data = umap_bg, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.5) +
-  geom_point(size = 0.5) +
+  geom_point(data = umap_bg, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.25) +
+  geom_point(size = 0.25) +
   theme_classic() +
   coord_fixed() +
   xlab("UMAP 1") + ylab("UMAP 2") +
@@ -90,14 +96,14 @@ selected_mut <- umap_cancertype %>% dplyr::select(V1, x_2d, y_2d) %>% ## select 
 save(selected_mut, file = "selected_mut.Rda")
 ```
 
-```{r supplementary-figure-s3}
+```{r supplementary-figure-s3, out.width='77%', fig.align = "center"}
 load("../data/selected_mut.Rda")
 umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv") ## load data
 umap_bg <- umap_cancertype[,-"project_code"] ## get background data for facet
 
 ggplot(selected_mut, aes(x = x_2d, y = y_2d, colour = as.character(value))) + 
-  geom_point(data = umap_bg, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.5) +
-  geom_point(size = 0.5) +
+  geom_point(data = umap_bg, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.25) +
+  geom_point(size = 0.25) +
   theme_classic() +
   coord_fixed() +
   xlab("UMAP 1") + ylab("UMAP 2") +
@@ -110,7 +116,7 @@ ggplot(selected_mut, aes(x = x_2d, y = y_2d, colour = as.character(value))) +
     axis.line = element_blank(),
     legend.position = "none") +
   facet_wrap(~ factor(variable, levels = c("AKT2","BCL2","CTNNB1","ERBB2","KRAS","MDM2","MYC","PIK3CA","TET2","USP6", 
-                                           "APC","BRIP1","CDKN2C","CHEK2","MSH2","PTEN","RB1","SMARCA4","TP53","VHL")),
+                                  "APC","BRIP1","CDKN2C","CHEK2","MSH2","PTEN","RB1","SMARCA4","TP53","VHL")),
                       ncol = 5) ## facet by gene
 ```
 
@@ -133,10 +139,8 @@ selected_path <- umap_cancertype %>% dplyr::select(V1, x_2d, y_2d) %>% ## select
   melt(data = ., id.vars = c("V1", "x_2d", "y_2d")) %>%
   filter(value != 0)
 
-save(selected_path, file = "selected_path.Rda")
-```
+save(selected_path, file = "../data/selected_path.Rda")
 
-```{r supplementary-figure-s4, out.width = '90%'}
 load("../data/selected_path.Rda") ## load data
 load("../data/gdc_reactome_path_analysis.Rda")
 umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv")
@@ -146,22 +150,76 @@ n_path <- 377 ## number of pathways we want to see
 
 toppath <- gdc_reactome_path_analysis %>% rowSums() %>% as.data.frame() %>% rownames_to_column(var = "path_name") %>% arrange(desc(.)) %>% .[1:n_path,] %>% .[, "path_name"] ## order pathway by most to least mutated pathway.. needed for facet
 
-ggplot(selected_path, aes(x = x_2d, y = y_2d, colour = as.character(value))) + 
-  geom_point(data = umap_bg, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.5) +
-  geom_point(size = 0.5) +
-  theme_classic() +
-  coord_fixed() +
-  xlab("UMAP 1") + ylab("UMAP 2") +
-  scale_colour_manual(values = rep("firebrick3", 20)) +
-  theme(axis.text.x = element_blank(),
-    axis.text.y = element_blank(),
-    axis.title.x = element_blank(),
-    axis.title.y = element_blank(),
-    axis.ticks = element_blank(),
-    axis.line = element_blank(),
-    legend.position = "none") +
-  facet_wrap(~ factor(variable, levels = toppath),
-                      ncol = 5) ## facet by pathways
+## creating layout to plot all 377 pathways
+figs4_layout <- data.frame(start = seq(from = 1, to = length(toppath), by = 25),
+                          end = c(seq(from = 25, to = length(toppath), by = 25), length(toppath)))
+
+for(n in 1:nrow(figs4_layout)) {
+  message(n)
+  pathway_layout <- figs4_layout %>% .[n,] ## getting the layout for selecting pathways
+  pathway_layout <- toppath[pathway_layout$start:pathway_layout$end] ## filtering those pathways from toppath
+  filtered_path <- selected_path %>% filter(variable %in% pathway_layout) %>% ## filtering our data to only include those pathways
+    mutate(variable = factor(variable, levels = c(pathway_layout)))
+  ggplot_umap <- ggplot(filtered_path, aes(x = x_2d, y = y_2d, colour = as.character(value))) + 
+    geom_point(data = umap_bg, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.1) +
+    geom_point(size = 0.1) +
+    theme_classic() +
+    coord_fixed() +
+    xlab("UMAP 1") + ylab("UMAP 2") +
+    scale_colour_manual(values = rep("firebrick3", 25)) +
+    theme(axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.line = element_blank(),
+      strip.text = element_text(size = 5),
+      legend.position = "none") +
+    facet_wrap(~ variable,
+               ncol = 5) ## facet by pathways
+  new_dfname <- paste0("ggplot_umap_", n)
+  assign(paste0(new_dfname), value = ggplot_umap)
+}
+
+save(ggplot_umap_1,ggplot_umap_2,ggplot_umap_3,ggplot_umap_4,ggplot_umap_5,ggplot_umap_6,ggplot_umap_7,ggplot_umap_8,ggplot_umap_9,ggplot_umap_10,ggplot_umap_11,ggplot_umap_12,ggplot_umap_13,ggplot_umap_14,ggplot_umap_15,ggplot_umap_16, file = "../data/fig_s4_ggplot.Rda")
+```
+
+```{r supplementary-figure-s4, message = FALSE, echo = FALSE, out.width = '90%', fig.align= 'center'}
+load("../data/fig_s4_ggplot.Rda")
+
+ggplot_umap_1
+ggplot_umap_2
+ggplot_umap_3
+ggplot_umap_4
+ggplot_umap_5
+ggplot_umap_6
+ggplot_umap_7
+ggplot_umap_8
+ggplot_umap_9
+ggplot_umap_10
+ggplot_umap_11
+ggplot_umap_12
+ggplot_umap_13
+ggplot_umap_14
+ggplot_umap_15
+ggplot_umap_16
+
+# ggplot(selected_path, aes(x = x_2d, y = y_2d, colour = as.character(value))) + 
+#   geom_point(data = umap_bg, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.5) +
+#   geom_point(size = 0.5) +
+#   theme_classic() +
+#   coord_fixed() +
+#   xlab("UMAP 1") + ylab("UMAP 2") +
+#   scale_colour_manual(values = rep("firebrick3", 20)) +
+#   theme(axis.text.x = element_blank(),
+#     axis.text.y = element_blank(),
+#     axis.title.x = element_blank(),
+#     axis.title.y = element_blank(),
+#     axis.ticks = element_blank(),
+#     axis.line = element_blank(),
+#     legend.position = "none") +
+#   facet_wrap(~ factor(variable, levels = toppath),
+#                       ncol = 5) ## facet by pathways
 
 ```
 
