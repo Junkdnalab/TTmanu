@@ -943,36 +943,36 @@ scale_y_discrete(position = "left") +
  fig1A <- as.ggplot(fig1Ag)
  rm(fig1Ag)
 
-optimal_mca_dimensions <- randomize %>%
-  filter(pvalue < 0.05) %>%
-  filter(eigenvalue == max(eigenvalue)) %>%
-  pull(eigenvalue)
-
-permut_p <- randomize %>%
-  filter(eigenvalue < 50) %>%
-  ggplot(aes(x = eigenvalue, y = expl_var / 100)) +
-  geom_line(aes(colour = "#998ec3")) +
-  geom_line(aes(y = perm / 100, colour = "#f1a340")) +
-  scale_color_identity(guide = guide_legend(title = ""), 
-                       labels = c("Eigenvalues", "Permuted Eigenvalues")) +
-  scale_y_continuous(labels = scales::percent) +
-  xlab("MCA Eigenvalues") +
-  ylab("explained variance") +
-  theme_classic()
-
-pvalue_p <- randomize %>%
-  filter(eigenvalue < 50) %>%
-  ggplot(aes(x = eigenvalue, y = pvalue)) +
-  geom_line() +
-  geom_point() +
-  geom_vline(xintercept = optimal_dimensions, color = "red") +
-  ggtitle(label = "", subtitle = paste0("Significant dimensions = ", optimal_dimensions)) +
-  xlab("MCA Eigenvalues") +
-  ylab("P-value") +
-  theme_classic()
-
-fig1B <- permut_p /
-  pvalue_p + plot_annotation(title = "Significance of MCA Eigenvalues")
+# optimal_mca_dimensions <- randomize %>%
+#   filter(pvalue < 0.05) %>%
+#   filter(eigenvalue == max(eigenvalue)) %>%
+#   pull(eigenvalue)
+# 
+# permut_p <- randomize %>%
+#   filter(eigenvalue < 50) %>%
+#   ggplot(aes(x = eigenvalue, y = expl_var / 100)) +
+#   geom_line(aes(colour = "#998ec3")) +
+#   geom_line(aes(y = perm / 100, colour = "#f1a340")) +
+#   scale_color_identity(guide = guide_legend(title = ""), 
+#                        labels = c("Eigenvalues", "Permuted Eigenvalues")) +
+#   scale_y_continuous(labels = scales::percent) +
+#   xlab("MCA Eigenvalues") +
+#   ylab("explained variance") +
+#   theme_classic()
+# 
+# pvalue_p <- randomize %>%
+#   filter(eigenvalue < 50) %>%
+#   ggplot(aes(x = eigenvalue, y = pvalue)) +
+#   geom_line() +
+#   geom_point() +
+#   geom_vline(xintercept = optimal_dimensions, color = "red") +
+#   ggtitle(label = "", subtitle = paste0("Significant dimensions = ", optimal_dimensions)) +
+#   xlab("MCA Eigenvalues") +
+#   ylab("P-value") +
+#   theme_classic()
+# 
+# fig1B <- permut_p /
+#   pvalue_p + plot_annotation(title = "Significance of MCA Eigenvalues")
 
 ## umap monochrome 2d
 fig1C <- ggplot(umap_cancertype, aes(x=x_2d, y=y_2d)) +
@@ -1114,6 +1114,7 @@ fig1H <- ggplot(umap_cancertype[umap_cancertype$project_code %in% c("COAD", "BRC
   ylab("umap_2") +
   xlab("umap_1") +
   labs(color = "") +
+  guides(fill = guide_legend(override.aes = list(size=8))) +
   scale_color_manual(labels = c("BRCA", "COAD", "HNSC", "PAAD"), 
                      values = c('#fb9a99', '#b15928', '#6a3d9a', 'springgreen4')) +
   theme(axis.text.x = element_blank(),
