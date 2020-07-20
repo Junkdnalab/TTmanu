@@ -961,7 +961,7 @@ fig1B <- permut_p /
   pvalue_p + plot_annotation(title = "Significance of MCA Eigenvalues")
 
 ## umap monochrome 2d
-fig1C <- ggplot(umap_cancertype, aes(x=x_2d, y=y_2d)) +
+fig1C <- ggplot(umap_cancertype, aes(x=plot_x, y=plot_y)) +
   geom_point(colour = "grey", size = 0.25) +
   xlab("umap_1") +
   ylab("umap_2") +
@@ -973,8 +973,8 @@ fig1C <- ggplot(umap_cancertype, aes(x=x_2d, y=y_2d)) +
         axis.title.y = element_text(size = 12),
         axis.ticks = element_blank())
 ## umap hdb_scan
-fig1E <- ggplot(subset(umap_cancertype, clust !=0), aes(x = x_2d, y = y_2d, color = as.factor(clust))) +
-  geom_point(data = umap_cancertype, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.25) +
+fig1E <- ggplot(subset(umap_cancertype, clust !=0), aes(x = plot_x, y = plot_y, color = as.factor(clust))) +
+  geom_point(data = umap_cancertype, aes(x = plot_x, y = plot_y), colour = "grey", size = 0.25) +
   geom_point(size = 0.25) + scale_color_manual(values = kelly.colours[-c(1:2)]) +
   guides(color = F) +
   theme_classic() +
@@ -989,7 +989,7 @@ fig1E <- ggplot(subset(umap_cancertype, clust !=0), aes(x = x_2d, y = y_2d, colo
         axis.ticks = element_blank())
 
 ## umap knn_clust 
-fig1F <- ggplot(subset(umap_cancertype), aes(x = x_2d, y = y_2d, color = as.factor(knn_clust))) +
+fig1F <- ggplot(subset(umap_cancertype), aes(x = plot_x, y = plot_y, color = as.factor(knn_clust))) +
   geom_point(size = 0.25) + scale_color_manual(values = kelly.colours[-c(1:2)]) +
   guides(color = F) +
   theme_classic() +
@@ -1010,7 +1010,7 @@ mut_order <- list() ## store data in list
 for(n in 1:max(as.numeric(as.character(umap_cancertype$knn_clust)))) { ## loop through all the clusters
   message(n)
   mut_order[[n]] <- umap_cancertype %>% filter(knn_clust == n) %>%  ## filter for specific class
-    dplyr::select(sample_id, x_2d, y_2d, knn_clust, mut_count) %>% ## select relevant columns
+    dplyr::select(sample_id, plot_x, plot_y, knn_clust, mut_count) %>% ## select relevant columns
     arrange(mut_count) ## arrange mutation in increasing order
 }
 mut_order <- mut_order %>% do.call(rbind, .) %>% as.data.frame() ## rbind list
@@ -1081,8 +1081,8 @@ for (k in grep("strip-t",fig1G$layout$name)) {
 fig1G <- as.ggplot(fig1G)
 
 ## umap by cancer type
-fig1H <- ggplot(umap_cancertype[umap_cancertype$project_code %in% c("COAD", "BRCA", "HNSC", "PAAD"),], aes(x = x_2d, y = y_2d, colour = project_code)) +
-  geom_point(data = umap_cancertype, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.25) +
+fig1H <- ggplot(umap_cancertype[umap_cancertype$project_code %in% c("COAD", "BRCA", "HNSC", "PAAD"),], aes(x = plot_x, y = plot_y, colour = project_code)) +
+  geom_point(data = umap_cancertype, aes(x = plot_x, y = plot_y), colour = "grey", size = 0.25) +
   geom_point(size = 0.25) + 
   theme_classic() +
   ylab("umap_2") +
@@ -1098,8 +1098,8 @@ fig1H <- ggplot(umap_cancertype[umap_cancertype$project_code %in% c("COAD", "BRC
         legend.position = "bottom")
 
 ## umap of brca subtype
-fig1I <- ggplot(umap_cancertype %>% filter(project_code == "BRCA" & !is.na(Subtype_Selected)), aes(x = x_2d, y = y_2d, colour = Subtype_Selected)) +
-  geom_point(data = umap_cancertype, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.25) +
+fig1I <- ggplot(umap_cancertype %>% filter(project_code == "BRCA" & !is.na(Subtype_Selected)), aes(x = plot_x, y = plot_y, colour = Subtype_Selected)) +
+  geom_point(data = umap_cancertype, aes(x = plot_x, y = plot_y), colour = "grey", size = 0.25) +
   geom_point(size = 0.25) +
   theme_classic() +
   ylab("umap_2") +
@@ -1130,10 +1130,10 @@ brca <- gdc_gene_exp_adj %>% .[rownames(.) %in% brca$ensembl_gene_id, ] %>% ## w
                            BRCA2 == "0" ~ "NA")) %>%
   mutate(mut_type = gsub('NA,|,NA', '', paste(.$BRCA1, .$BRCA2, sep = ","))) %>% ## combine mutation cause some patients can have both
   dplyr::select(-BRCA1, -BRCA2) %>% ## remove col we don't need
-  left_join(., umap_cancertype[,c("sample_id", "x_2d", "y_2d", "project_code")], by = "sample_id") ## leftjoin by sample id
+  left_join(., umap_cancertype[,c("sample_id", "plot_x", "plot_y", "project_code")], by = "sample_id") ## leftjoin by sample id
 
-fig1J <- ggplot(brca %>% filter(mut_type != "NA"), aes(x = x_2d, y = y_2d, colour = mut_type)) +
-  geom_point(data = brca, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.25) +
+fig1J <- ggplot(brca %>% filter(mut_type != "NA"), aes(x = plot_x, y = plot_y, colour = mut_type)) +
+  geom_point(data = brca, aes(x = plot_x, y = plot_y), colour = "grey", size = 0.25) +
   geom_point(size = 0.25) + 
   theme_classic() +
   ylab("umap_2") +
@@ -1149,8 +1149,8 @@ fig1J <- ggplot(brca %>% filter(mut_type != "NA"), aes(x = x_2d, y = y_2d, colou
         legend.position = "bottom")
 
 ## umap stage
-fig1K <- ggplot(subset(umap_cancertype, ajcc_pathologic_tumor_stage != "Not Available"), aes(x = x_2d, y = y_2d, colour = ajcc_pathologic_tumor_stage)) +
-  geom_point(data = umap_cancertype, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.25) +
+fig1K <- ggplot(subset(umap_cancertype, ajcc_pathologic_tumor_stage != "Not Available"), aes(x = plot_x, y = plot_y, colour = ajcc_pathologic_tumor_stage)) +
+  geom_point(data = umap_cancertype, aes(x = plot_x, y = plot_y), colour = "grey", size = 0.25) +
   geom_point(size = 0.25) + 
   theme_classic() +
   ylab("umap_2") +
@@ -1166,10 +1166,10 @@ fig1K <- ggplot(subset(umap_cancertype, ajcc_pathologic_tumor_stage != "Not Avai
         legend.position = "bottom") 
 
 ## umap metastasis
-fig1L <- ggplot(umap_cancertype, aes(x = x_2d, y = y_2d)) +
-  geom_point(data = umap_cancertype, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.25) +
-  geom_point(data = subset(umap_cancertype, ajcc_metastasis_pathologic_pm == "M0"), aes(x = x_2d, y = y_2d, colour = ajcc_metastasis_pathologic_pm), size = 0.25) + 
-  geom_point(data = subset(umap_cancertype, ajcc_metastasis_pathologic_pm == "M1"), aes(x = x_2d, y = y_2d, colour = ajcc_metastasis_pathologic_pm), size = 0.25) + 
+fig1L <- ggplot(umap_cancertype, aes(x = plot_x, y = plot_y)) +
+  geom_point(data = umap_cancertype, aes(x = plot_x, y = plot_y), colour = "grey", size = 0.25) +
+  geom_point(data = subset(umap_cancertype, ajcc_metastasis_pathologic_pm == "M0"), aes(x = plot_x, y = plot_y, colour = ajcc_metastasis_pathologic_pm), size = 0.25) + 
+  geom_point(data = subset(umap_cancertype, ajcc_metastasis_pathologic_pm == "M1"), aes(x = plot_x, y = plot_y, colour = ajcc_metastasis_pathologic_pm), size = 0.25) + 
   ylab("umap_2") +
   xlab("umap_1") +
   labs(tag = "L", color = "") +
