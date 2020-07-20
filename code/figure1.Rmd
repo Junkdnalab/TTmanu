@@ -660,7 +660,7 @@ optimal_mca_dimensions <- randomize %>%
 
 mca_res <- MCA(
   X = gdc_path_mca[, pathway_list],
-  ncp = optimal_dimensions, graph = FALSE
+  ncp = optimal_mca_dimensions, graph = FALSE
 )
 
 save(randomize, mca_res, file = "figure1B_data.rda")
@@ -679,6 +679,7 @@ gdc.umap <- uwot::umap(mca_res$ind$coord,
                        n_threads = 1)
 gdc_umap_coors <- as.data.frame(gdc.umap) %>%
   rename(plot_x = V1, plot_y = V2, plot_z = V3)
+rownames(gdc_umap_coors) <- rownames(gdc_path_mca)
 
 ####################
 ## Figure 1D data ##
@@ -733,13 +734,25 @@ save(score_df, sample_df, optimal_minPts, file = "optimal_minpts_score.rda")
 ####################
 ## Figure 1E data ##
 ####################
-## To identify clusters using hdbscan, use umap in the third dimension
-set.seed(3296)
-gdc.umap.3d <- umap(gdc_path[,2:length(gdc_path)], n_components = 3)
-gdc.umap.3d <- data.frame(x_3d = gdc.umap.3d$layout[,1], y_3d = gdc.umap.3d$layout[,2], z_3d = gdc.umap.3d$layout[,3]) ## coors of umap
-rownames(gdc.umap.3d) <- gdc_path$sample ## insert sample_id in rownames
-hdb_cluster_assignment <- hdbscan(gdc.umap.3d, minPts =  114) ## min group size for cluster is 114 (value before cluster number drops significantly)
-umap_2d_3d_coors <- data.frame(x_2d = gdc_umap_coors$x_2d, y_2d = gdc_umap_coors$y_2d, x_3d = gdc.umap.3d$x_3d, y_3d = gdc.umap.3d$y_3d, z_3d = gdc.umap.3d$z_3d, clust = as.factor(hdb_cluster_assignment$cluster), member_prob = hdb_cluster_assignment$membership_prob, row.names = rownames(gdc.umap.3d)) ## clust 0 is unclassified cluster
+rngtools::setRNG(r)
+
+cluster_umap <- uwot::umap(mca_res$ind$coord,
+  min_dist = 1e-6,
+  n_components = 3,
+  n_neighbors = round(sqrt(nrow(mca_res$ind$coord))),
+  n_epochs = 1000,
+  n_threads = 1
+)
+colnames(cluster_umap) <- c("cluster_x", "cluster_y", "cluster_z")
+hdb_cluster_assignment <- hdbscan(cluster_umap, minPts = optimal_minPts)
+umap_3d_coors <- gdc_umap_coors %>%
+  bind_cols(as.data.frame(cluster_umap)) %>%
+  mutate(
+    clust = as.factor(hdb_cluster_assignment$cluster),
+    member_prob = hdb_cluster_assignment$membership_prob,
+    row.names = rownames(gdc_umap_coors)
+  )
+## clust 0 is unclassified cluster                       
 
 ####################
 ## Figure 1F data ##
