@@ -758,11 +758,12 @@ umap_3d_coors <- gdc_umap_coors %>%
 ## Figure 1F data ##
 ####################
 ## reclassifying clust 0 using our classified cluster as training test and unclassified as test set
-umap_2d_3d_coors$knn_clust <- umap_2d_3d_coors$clust
-umap_2d_3d_coors$knn_clust[umap_2d_3d_coors$clust==0]<-class::knn(train = umap_2d_3d_coors[,c("x_3d", "y_3d", "z_3d")][which(umap_2d_3d_coors$clust!=0),],
-                                                                  test = umap_2d_3d_coors[,c("x_3d", "y_3d", "z_3d")][which(umap_2d_3d_coors$clust==0),],
-                                                                  cl = umap_2d_3d_coors$clust[umap_2d_3d_coors$clust!=0], 
-                                                                  k=15)
+umap_3d_coors$clust_knn <- umap_3d_coors$clust
+umap_3d_coors$clust_knn[umap_3d_coors$clust == 0] <- class::knn(
+  train = umap_3d_coors[which(umap_3d_coors$clust != 0), c("cluster_x", "cluster_y", "cluster_z")],
+  test = umap_3d_coors[which(umap_3d_coors$clust == 0), c("cluster_x", "cluster_y", "cluster_z")],
+  cl = umap_3d_coors$clust[umap_3d_coors$clust != 0], k = 87
+)
 
 ####################
 ## Figure 1G data ##
