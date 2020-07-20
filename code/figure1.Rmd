@@ -668,14 +668,17 @@ save(randomize, mca_res, file = "figure1B_data.rda")
 ####################
 ## Figure 1C data ##
 ####################
-gdc_path <- gdc_reactome_path_analysis %>% t() %>% as.data.frame() %>%
-  rownames_to_column(var = "sample") %>% ## move path_names to column
-  .[match(rownames(tumor_samples), .$sample),]
-  
-## umap analysis
-set.seed(3296)
-gdc.umap <- umap(gdc_path[,2:length(gdc_path)]) ## default n_component is 2
-gdc_umap_coors <- data.frame(x_2d = gdc.umap$layout[,1], y_2d = gdc.umap$layout[,2])
+rng <- RNGseq(max_n_pt * n_iter, 42)
+r <- rng[[3649]]
+
+rngtools::setRNG(r)
+gdc.umap <- uwot::umap(mca_res$ind$coord, 
+                       n_components = 3,
+                       n_neighbors = round(sqrt(nrow(mca_res$ind$coord))), # 87
+                       n_epochs = 1000,
+                       n_threads = 1)
+gdc_umap_coors <- as.data.frame(plotting_umap) %>%
+  rename(plot_x = V1, plot_y = V2, plot_z = V3)
 
 ####################
 ## Figure 1E data ##
