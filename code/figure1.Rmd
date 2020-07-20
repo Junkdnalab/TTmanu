@@ -606,6 +606,66 @@ cancer_disrupt_heatmap <- left_join(cancer_disrupt_heatmap, cancer_order, by = "
 save(cancer_disrupt_heatmap, file = "cancer_disrupt_heatmap.Rda") 
 
 ####################
+## Figure 1B data ##
+####################
+gdc_path <- gdc_reactome_path_analysis %>%
+  t() %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "sample") %>% ## move path_names to column
+  .[match(rownames(tumor_samples), .$sample), ]
+
+gdc_path_mca <- left_join(gdc_path, tumor_samples[, c(1, 3)],
+  by = c("sample" = "submitted_sample_id")) %>%
+  column_to_rownames(var = "sample")
+
+gdc_path_sample_names <- rownames(gdc_path_mca)
+gdc_path_tumor_types <- gdc_path_mca$project_code.x
+
+gdc_path_mca$project_code.x <- NULL
+
+## create a categorical variable from the boolean variable
+pathway_list <- make_clean_names(colnames(gdc_path_mca))
+pathway_count <- length(pathway_list)
+gdc_path_mca <- as.data.frame(lapply(gdc_path_mca, function(x) {
+  factor(x, levels = c(0, 1), labels = c("no", "yes"))
+}))
+colnames(gdc_path_mca) <- pathway_list
+gdc_path_mca$project_code <- gdc_path_tumor_types
+rownames(gdc_path_mca) <- gdc_path_sample_names
+
+## perform mca
+mca_res <- MCA(X = gdc_path_mca[, pathway_list], graph = FALSE)
+
+expl_var <- mca_res$eig[, 2]
+expl_var_perm <- matrix(NA, ncol = length(mca_res$eig[, 2]), nrow = 100)
+
+set.seed(4242)
+for (k in seq(100)) {
+  gdc_perm <- as.data.frame(lapply(gdc_path_mca[, pathway_list], sample))
+  MCA_perm <- MCA(X = gdc_perm, graph = FALSE)
+  expl_var_perm[k, ] <- MCA_perm$eig[, 2]
+}
+
+randomize <- tibble(
+  eigenvalue = 1:length(expl_var),
+  expl_var = expl_var,
+  perm = colMeans(expl_var_perm),
+  pvalue = rowSums(t(expl_var_perm) >= expl_var) / 100
+)
+
+optimal_mca_dimensions <- randomize %>%
+  filter(pvalue < 0.05) %>%
+  filter(eigenvalue == max(eigenvalue)) %>%
+  pull(eigenvalue)
+
+mca_res <- MCA(
+  X = gdc_path_mca[, pathway_list],
+  ncp = optimal_dimensions, graph = FALSE
+)
+
+save(randomize, mca_res, file = "figure1B_data.rda")
+
+####################
 ## Figure 1C data ##
 ####################
 gdc_path <- gdc_reactome_path_analysis %>% t() %>% as.data.frame() %>%
@@ -801,6 +861,37 @@ scale_y_discrete(position = "left") +
  
  fig1A <- as.ggplot(fig1Ag)
  rm(fig1Ag)
+
+optimal_mca_dimensions <- randomize %>%
+  filter(pvalue < 0.05) %>%
+  filter(eigenvalue == max(eigenvalue)) %>%
+  pull(eigenvalue)
+
+permut_p <- randomize %>%
+  filter(eigenvalue < 50) %>%
+  ggplot(aes(x = eigenvalue, y = expl_var / 100)) +
+  geom_line(aes(colour = "#998ec3")) +
+  geom_line(aes(y = perm / 100, colour = "#f1a340")) +
+  scale_color_identity(guide = guide_legend(title = ""), 
+                       labels = c("Eigenvalues", "Permuted Eigenvalues")) +
+  scale_y_continuous(labels = scales::percent) +
+  xlab("MCA Eigenvalues") +
+  ylab("explained variance") +
+  theme_classic()
+
+pvalue_p <- randomize %>%
+  filter(eigenvalue < 50) %>%
+  ggplot(aes(x = eigenvalue, y = pvalue)) +
+  geom_line() +
+  geom_point() +
+  geom_vline(xintercept = optimal_dimensions, color = "red") +
+  ggtitle(label = "", subtitle = paste0("Significant dimensions = ", optimal_dimensions)) +
+  xlab("MCA Eigenvalues") +
+  ylab("P-value") +
+  theme_classic()
+
+fig1B <- permut_p /
+  pvalue_p + plot_annotation(title = "Significance of MCA Eigenvalues")
 
 ## umap monochrome 2d
 fig1C <- ggplot(umap_cancertype, aes(x=x_2d, y=y_2d)) +
