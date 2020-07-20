@@ -681,6 +681,56 @@ gdc_umap_coors <- as.data.frame(plotting_umap) %>%
   rename(plot_x = V1, plot_y = V2, plot_z = V3)
 
 ####################
+## Figure 1D data ##
+####################
+n_iter <- 40
+max_n_pt <- 200
+score_mca <- matrix(as.numeric(NA), nrow = max_n_pt - 2, ncol = n_iter)
+
+n_tumors <- nrow(mca_res$ind$coord)
+
+cl <- makeCluster(8)
+registerDoParallel(cl)
+
+for (i in 3:max_n_pt) {
+  print(paste0("MIN POINTS = ", i))
+  score_iter <- foreach(1:n_iter,
+    .combine = c,
+    .export = c("mca_res"),
+    .packages = c("dbscan", "uwot"),
+    r = rng[(i - 1) * n_iter + 1:n_iter]
+  ) %dopar% {
+    rngtools::setRNG(r)
+    umap_init_mca <- umap(mca_res$ind$coord, 
+                          min_dist = 1e-6, 
+                          n_components = 3, 
+                          n_neighbors = round(sqrt(nrow(mca_res$ind$coord))), 
+                          n_epochs = 1000, 
+                          n_threads = 1)
+    res <- hdbscan(umap_init_mca, minPts = i)
+    score_iter_temp <- sum(res$membership_prob < 0.05) / n_tumors
+    return(score_iter_temp)
+  }
+  score_mca[i - 2, ] <- score_iter
+}
+
+score <- rowMeans(score_mca)
+score_df <- tibble(minPts = 3:max_n_pt, score = score)
+
+sample_df <- score_mca %>%
+  as.data.frame() %>%
+  as_tibble() %>%
+  add_column(minPts = 3:max_n_pt, .before = 1) %>%
+  pivot_longer(-minPts) %>%
+  group_by(minPts)
+
+optimal_minPts <- score_df %>%
+  filter(score == min(score)) %>%
+  pull(minPts)
+
+save(score_df, sample_df, optimal_minPts, file = "optimal_minpts_score.rda")
+
+####################
 ## Figure 1E data ##
 ####################
 ## To identify clusters using hdbscan, use umap in the third dimension
