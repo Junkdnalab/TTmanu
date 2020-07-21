@@ -1,5 +1,5 @@
 ```{r figure-4-data-generation_function, message = FALSE, eval = FALSE}
-tumor_clusters <- fread("../data/umap_2d_3d_coors.tsv") ## load in data
+tumor_clusters <- fread("../data/umap_3d_coors.tsv") ## load in data
 load("../data/gene2_level2_lookup.Rda")
 load("../data/pathname2level2.Rda")
 load("../data/gdc_reactome_path_analysis.Rda")
@@ -22,11 +22,11 @@ load("../data/gene_data.Rda")
 # gdc_mut_count_patient[gdc_mut_count_patient > 0] <- 1 ## booleanize data, anything greater than 1 is equal to 1
 # save(gdc_mut_count_patient, file = "../data/gdc_mut_count_patient_booleanized.Rda")
 load("../data/gdc_mut_count_patient_booleanized.Rda")
-filtered_class <- c(6,7)
+filtered_class <- 2
 n_path <- 10
 enrich_cutoff <- 0.30
 oncoprint_style <- function(filtered_class, n_path, enrich_cutoff = 0.30) {
-  class_spec <- tumor_clusters %>% dplyr::select(V1, knn_clust) %>% filter(knn_clust %in% filtered_class) %>% .[,.$V1] ## sample_id for class specific
+  class_spec <- tumor_clusters %>% dplyr::select(sample_id, clust_knn) %>% filter(clust_knn %in% filtered_class) %>% .[,.$sample_id] ## sample_id for class specific
   toppath <- moderate_enrich_prob %>% filter(signif <= 2500 & difference >= enrich_cutoff) %>% ## signif is 95% CI with a specified cutoff
   filter(clust %in% filtered_class) %>% ## filter the cluster
   arrange(desc(difference)) %>% ## arrange enrichment score in descending order
@@ -207,15 +207,17 @@ oncoprint_style <- function(filtered_class, n_path, enrich_cutoff = 0.30) {
   plot <- plot_grid(plotlist = plotlist, align = "h", ncol = 11, axis = "tb", rel_widths = c(rep(0.1, length(l_anno_ggplot)), 5))
   plot_legend <- plot_grid(plotlist = path_legend, ncol = 1, align = "v")
 
-return(plot_grid(plot, plot_grid(NULL, plot_legend1, NULL, ncol = 1, rel_heights = c(1, 1, 1)), ncol = 2, rel_widths = c(2.5, 2), axis = "tbl"))
+return(plot_grid(plot, plot_grid(NULL, plot_legend, NULL, ncol = 1, rel_heights = c(1, 1, 1)), ncol = 2, rel_widths = c(2.5, 2), axis = "tbl"))
 }
 
-class67 <- oncoprint_style(filtered_class = c(6,7), n_path = 10)
-save(class67, file = "class67.Rda")
+class_spec_fig4 <- oncoprint_style(filtered_class = 2, n_path = 10)
+save(class_spec_fig4, file = "../data/class_spec_fig4.Rda")
+rm(list = ls(all.names = T))
+gc()
 ```
 
 ```{r figure-4-plot, out.width= '90%', fig.cap="**Figure 4: Some genes with multiple pathway memberships drive clustering.** Each column is a tumor in class 6 or 7, each row represents a gene with mutation (red) or not mutated (grey). The genes are organized according to which of the top distinguishing pathways for this class that they effect. Some genes affect multiple pathways, as indicated by the bars at left. The highlighted genes at right are all proteasomal subunits."}
-load("../data/class67.Rda")
-class67
+load("../data/class_spec_fig4.Rda")
+class_spec_fig4
 ```
 
