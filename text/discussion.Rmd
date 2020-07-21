@@ -43,7 +43,7 @@ regardless of tissue of origin, which then converge on end stage cancer by
 accumulating complementary mutations to the other classes (**figure 1l** and
 **Table 2**).
 
-We find that most tumors segregate into one of 12 biologically distinct
+We find that most tumors segregate into one of twelve biologically distinct
 clusters, regardless of the cancer type (**figure 1h** and **supplementary
 figure S1**). Some cancer types ( _e.g._ pancreatic adenocarcinomas in the RAS
 arm clusters 9 and 10, and breast cancers being excluded from the same cluster,
