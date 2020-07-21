@@ -90,24 +90,23 @@ multiple pathway mutations, chiefly because such metrics favor larger pathways (
 _i.e._ pathways with more member genes) over smaller ones, and non-expressed
 genes over expressed ones due to transcription coupled repair
 [@kandothMutationalLandscapeSignificance2013; @kimPancancerAnalysisSomatic2018;
-@Pervasive_lesion_segregation]. Data selected in this manner are likely to be
-noisy for several reasons. First, point mutations can be deleterious
-(attenuating or hypomorphic) or activating (neomorphic) in genes that act
-functionally as either activators or repressors. Within the scope of this study
-we must accept this uncertainty and assume mutations are generically disruptive
-to the cell regardless of whether they are activating or deactivating or whether
-they affect a gene that we might classify as one thing or another ( _e.g._
-"Tumor suppressor" or "Oncogene"). Second, as previously mentioned, we know that
-low-expressed genes and non-expressed genes are known to accumulate mutations at
-a higher rate due to transcription coupled repair. To address this issue, we
-identified genes with low expression in each type of cancer and eliminated them
-for that cancer type only (see methods for details). <strike>Highly expressed
-genes also have high mutation rates owing to transcription induced mutagenesis
-[@parkGenomicEvidenceElevated2012]. We felt that this mechanism results in
-cell-type-specific biases that might be biologically meaningful for
-predisposition to different classes of cancer however, and therefore chose to
-include these genes in our analysis.</strike>
-
+@Pervasive_lesion_segregation; @expression-aware-annotation]. Data selected in
+this manner are likely to be noisy for several reasons. First, point mutations
+can be deleterious (attenuating or hypomorphic) or activating (neomorphic) in
+genes that act functionally as either activators or repressors. Within the scope
+of this study we must accept this uncertainty and assume mutations are
+generically disruptive to the cell regardless of whether they are activating or
+deactivating or whether they affect a gene that we might classify as one thing
+or another ( _e.g._ "Tumor suppressor" or "Oncogene"). Second, as previously
+noted, we know that low-expressed genes and non-expressed genes are known to
+accumulate mutations at a higher rate due to transcription coupled repair. To
+address this issue, we identified genes with low expression in each type of
+cancer and eliminated them for that cancer type only (see methods for details).
+<strike>Highly expressed genes also may have high mutation rates owing to
+transcription induced mutagenesis [@parkGenomicEvidenceElevated2012]. We felt
+that this mechanism results in cell-type-specific biases that might be
+biologically meaningful for predisposition to different classes of cancer
+however, and therefore chose to include these genes in our analysis.</strike>
 After selecting our pathways and genes, we then compiled a matrix of the
 pathways, assigning a Boolean value (a 1 or 0, indicating whether any pathway
 member gene carries a mutation) to the pathway regardless of the number of genes
