@@ -1,5 +1,5 @@
 ```{r figure-4-data-generation, eval = FALSE}
-tumor_clusters <- fread("../data/umap_2d_3d_coors.tsv") ## load in data
+tumor_clusters <- fread("../data/umap_3d_coors.tsv") ## load in data
 load("../data/gene2_level2_lookup.Rda")
 load("../data/pathname2level2.Rda")
 load("../data/gdc_reactome_path_analysis.Rda")
@@ -7,7 +7,7 @@ load("../data/moderate_enrich_prob.Rda")
 load("../data/gene_data.Rda")
 
 ## Parameters ##
-filtered_class <- c(6,7) ## filtering for only class 6 and 7 samples
+filtered_class <- c(2) ## filtering for only class 2 samples
 n_path <- 10 ## looking at the top10 path
 enrich_cutoff <- 0.30
 ################

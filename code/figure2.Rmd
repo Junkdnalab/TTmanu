@@ -1,6 +1,6 @@
 <div style="text-align: right"> Figure 2 Data </div>
 ```{r oncoprint-top100-plus-panel-data-generation, eval = FALSE}
-tumor_clusters <- fread("../data/umap_2d_3d_coors.tsv") ## load in data
+tumor_clusters <- fread("../data/umap_3d_coors.tsv") ## load in data
 load("../data/gdc_reactome_path_analysis.Rda")
 
 ######################
@@ -14,7 +14,7 @@ top100path <- gdc_reactome_path_analysis[top100path, ] ## selecting the top 100 
 
 top100path[top100path == "1"] <- "MUT" ## categorize boolean values
 top100path[top100path == "0"] <- " "
-  col <- c("MUT" = "firebrick3")
+col <- c("MUT" = "firebrick3")
 heatmap_legend <- list(title = "", at = c("MUT"),
                        labels = c("Mutation"))
 alter_fun = list(
@@ -52,8 +52,8 @@ save(onco_ggplot, file = "onco_ggplot.Rda")
 clust_col_order <- list()
 path_row_order <- list()
 
-for(n in 1:12) {
-  class_spec_sample_id <- tumor_clusters %>% .[,c("V1", "knn_clust")] %>% filter(knn_clust == n) %>% .[,.$V1] ## get class spec sample ids
+for(n in 1:max(tumor_clusters$clust_knn)) {
+  class_spec_sample_id <- tumor_clusters %>% .[,c("sample_id", "clust_knn")] %>% filter(clust_knn == n) %>% .[,.$sample_id] ## get class spec sample ids
   top10path <- gdc_reactome_path_analysis %>% .[, names(.) %in% class_spec_sample_id] %>% rowSums() %>% as.data.frame() %>% rownames_to_column(var = "path_name") %>% arrange(desc(.)) %>% .[1:10,] %>% .[, "path_name"] ## getting the top10 mutated pathways in class
   top10path <- gdc_reactome_path_analysis[top10path, class_spec_sample_id]
   top10path[top10path == "1"] <- "MUT" ## categorize boolean values
@@ -110,8 +110,7 @@ load("../data/gdc_reactome_path_analysis.Rda")
 
 plots_onco <- list() ## creating a list to store all the ggplots in the for loop below
 onco_color <- c("0" = "grey", "1" = "firebrick3") ## color scheme for oncoprint
-figure_labs <- LETTERS[seq(from = 2, to = 13)]
-for(n in 1:12) {
+for(n in 1:length(clust_col_order)) {
   onco_ggplot <- gdc_reactome_path_analysis %>% .[rownames(.) %in% path_row_order[[n]],] %>% ## only include the top 10 paths
   .[,names(.) %in% clust_col_order[[n]]] %>% ## only include specific tumor class
   rownames_to_column(var = "path_name") %>% ## path_name to col
@@ -122,7 +121,6 @@ for(n in 1:12) {
   geom_tile(aes(fill = as.character(mutation_status))) +
   scale_fill_manual(values = onco_color) +
   xlab(label = paste0("Class ", n)) +
-  labs(tag = figure_labs[n]) +
   theme_classic() +
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
@@ -149,5 +147,5 @@ AAKLM
 AAKLM
 '
 
-fig2A + plots_onco[[1]] + plots_onco[[2]] + plots_onco[[3]] + plots_onco[[4]] + plots_onco[[5]] + plots_onco[[6]] + plots_onco[[7]] + plots_onco[[8]] + plots_onco[[9]] + plots_onco[[10]] + plots_onco[[11]] + plots_onco[[12]] + plot_layout(design = layout)
+fig2A + plots_onco[[1]] + plots_onco[[2]] + plots_onco[[3]] + plots_onco[[4]] + plots_onco[[5]] + plots_onco[[6]] + plots_onco[[7]] + plots_onco[[8]] + plots_onco[[9]] + plots_onco[[10]] + plot_layout(design = layout) + plot_annotation(tag_levels = "A")
 ```
