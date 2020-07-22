@@ -1,28 +1,57 @@
 ### Classification of tumors independent of tissue-of-origin
  
-One of the biggest technical hurdles in tumor research is that the search space
+One of the biggest hurdles in cancer research is that the search space
 comprising ~20,000 protein-coding genes is comparable with the number of tumor
-samples, even with multiple mutations per sample
-[@hornNetSigNetworkbasedDiscovery2018]. And that is not accounting for the fact
-that ~30k non-coding genes and hundreds of thousands of non-coding regulatory
-elements exist with oncogenic or tumor suppressor potential in spite of many
-efforts detect non-random or selected mutation above the noise[@deesMuSiC2012;
+samples, even with multiple mutations per sample. And that is not accounting for
+the fact that ~30k non-coding genes and hundreds of thousands of non-coding
+regulatory elements exist with oncogenic or tumor suppressor potential
+[@deesMuSiC2012;
 @tamboreroOncodriveCLUST2013; @lawrenceDiscoverySaturationAnalysis2014;
 @kumarStatisticallyIdentifyingTumor2015; @jiangWITER2019;
 @zhaoModelingPositive2019; @non-coding-mutations-Zhang]. Hence, we sought to
 investigate cancer as a disease of basic cellular and biochemical pathways,
 which we accomplished by translating gene-level mutations into pathway level
-disruptions.
+disruptions. Our approach differs from previously proposed methods [@PATHNET] in
+that we chose to focus on pathways as the unit of disruption instead of the
+gene, using the conceit that individual mutations may be sufficient to disrupt
+entire pathways (as is often the case with drivers). Rather than evaluating the
+burden of mutations on each pathway within or across tumors, which can be biased
+by the number of genes or the coverage of pathway-linked genes in the genome,
+and which we find to be relatively uniformly distributed, we scored each pathway
+in binary fashion, allowing one mutation or multiple mutations to count equally
+in a sample. To our knowledge, this approach has not previously been attempted
+in the literature in spite of its relative simplicity.
+
+We limited our analysis to mutations with likely deleterious effects, including
+missense, nonsense, frame-shift stop-gain and splice site mutations in genes
+that are actively expressed in each cancer type, thus avoiding bias from
+transcription coupled repair. Our method of filtration differs from the
+"rank-and-cut" method of [@PCAWG-MAIN] but represents a reasonable attempt to
+account for the same biases. We also filtered genes on the basis of pathway
+membership in biochemical pathways, excluding curated genesets related to
+diseases, syndromes, or classes of proteins ( _e.g._ transcription factors). We
+chose this approach to limit redundancy, which is already high in the remaining
+pathways for some driver genes, and to exclude biologically unrelated
+collections of genes. We do not account for non-coding mutations, amplification
+events or structural variants, though we hope to include them in subsequent
+studies (see below). Our pathway-centric analysis also allows us to circumvent
+the problem that some cancer-promoting mutations likely occur at low enough
+frequencies as to be indistinguishable from background. Attempts to capture
+these associations better using Bayesian networks have yielded important new
+insights into this problem and new genes that would not have been possible with
+traditional analysis [@hornNetSigNetworkbasedDiscovery2018], supporting the case
+that pathway-centric approaches like ours have the potential to increase
+statistical power.
 
 The hypothesis that cancer is the result of dysfunction from a limited number of
 basic cellular processes common to all living human cells was first
 introduced and later expanded on in a pair of classic essays by Hanahan and
-Weinberg [@weinberg200; @hallmarks_II]. In this view all tumors, regardless of
-tissue of origin, acquire 6 essential phenotypes; sustaining proliferative
+Weinberg [@weinberg200; @hallmarks_II]. In this view, all tumors regardless of
+tissue of origin acquire 6 essential phenotypes; sustaining proliferative
 signaling, evading growth suppressors, replicative immortality, evading
-apoptosis, supportive angiogenesis, and tissue invasion and metastasis
+apoptosis, supportive angiogenesis, tissue invasion and metastasis
 [@weinberg2000]. Advancements in the field over the ensuing decade led to the
-inclusion of new tumor promoting processes, namely deregulation of celullar
+inclusion of new tumor promoting processes, namely deregulation of cellular
 energy cycle, tumor promoting inflammation, evasion of the immune system, genome
 instability, and on top of these acquired traits a new appreciation for the
 concept of the tumor microenvironment and its contribution to the evolution and
@@ -30,18 +59,20 @@ promotion of metastatic tumorigenesis [@hallmarks_II].
 
 An alternative hypothesis is that every tumor belongs to one of a large number
 of syndromes which are unique to each tissue-of-origin, that share some
-mechanisms and treatment strategies. Recent publication of Encode, Roadmap and TCGA
-consortium papers present a view largely consistent with the latter
-hypothesis. Perhaps owing to the intractable complexity of genomic data in all
-its forms, the inescapable conclusion thus far is that tissue-of-origin remains
-the most important driver of tumor characteristics at every scale and by every
-technique. Our observations contrast with this view, and instead support an
-interpretation of publicly available  data in which all tumors manifest one of a
-limited number of metastable phenotypes resulting from disruptions in basic
-pathways represented by our classes (**figure 1a-k**), with increased fitness
-regardless of tissue of origin, which then converge on end stage cancer by
-accumulating complementary mutations to the other classes (**figure 1l** and
-**Table 2**).
+mechanisms and treatment strategies. Recent publication of TCGA consortium
+papers present a view largely, and surprisingly, consistent with this hypothesis
+[@hoadleyMultiplatformAnalysis2014; @hoadleyCellofOriginPatternsDominate2018].
+Perhaps owing to the intractable complexity of genomic, proteomic data and
+patient metadata in all its forms, the inescapable conclusion thus far is that
+tissue-of-origin remains the most important driver of tumor characteristics at
+every scale and by every measure. Our observations contrast with this view, and
+instead support an interpretation of publicly available data in which all tumors
+manifest one of a limited number of metastable phenotypes resulting from
+disruptions in basic pathways represented by our classes (**figure 1a-k**). Each
+of these classes may represent unique combinations of pathway disruptions with
+increased fitness regardless of tissue of origin, which then converge on end
+stage cancer by accumulating complementary mutations to the other classes
+(**figure 1l** and **Table 2**).
 
 We find that most tumors segregate into one of twelve biologically distinct
 clusters, regardless of the cancer type (**figure 1h** and **supplementary
