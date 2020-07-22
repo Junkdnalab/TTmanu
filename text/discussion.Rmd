@@ -123,7 +123,7 @@ mutations and metastasis. General cancer promoting processes must include
 factors that relate to genome stability and immortality, as "enabling
 characteristics" of the cancer phenotype [@hallmarks_II]. Such pathways are
 disrupted in all or most of the defined classes (see **figures 2** and
-**supplementary figure S1**) and often are the result of abberations involving
+**supplementary figure S1**) and often are the result of aberrations involving
 common driver genes such as BRCA1/2, MMR genes, mitotic checkpoints, Cohesion
 complexes, _etc._ (**supplementary figure S3** and **supplemental file 1**).
 Class-specific evolution must involve the acquisition of combinatorial
@@ -138,11 +138,11 @@ defects, and natural selection produces the classes we observed.
 One of the drawbacks of bulk tumor whole genome sequencing data is the problem
 of tumor heterogeneity, both in terms of evolving subclones with different or
 passively diverging mutation profiles which then serve as a substrate for futher
-selection. Moreover consortium samples are likely to contain contamination from
-support tissue and inflammatory and immune cells of the innate and adaptive
-immune systems, all potentially harboring cancer supporting mutations
-[@bhowmick_review]. We think it will be instructive to explore these ideas in
-the context of single cell experiments.
+selection [@PCAWG-MAIN; @PCAWG-EVO]. Moreover consortium samples are likely to
+contain contamination from support tissue and inflammatory and immune cells of
+the innate and adaptive immune systems, potentially harboring cancer supporting
+mutations [@bhowmick_review]. We think it will be instructive to explore these
+ideas in the context of single cell experiments.
 
 ### On metastasis as a convergence of phenotypes
 
@@ -165,6 +165,7 @@ overlap with cluster-specific pathways from non-metastatic tumors of neighboring
 clusters favors the latter interpretation, and suggests a mechanism of
 complementarity, in which newly acquired mutations result in similar classes
 converging on a single deadly phenotype that captures most or all of the
-critical features of end-stage cancer. If this is the case, once we discover the
-requirements of each cluster with respect to metastasis we can target them
-therapeutically and prevent further adaptation.
+critical features of end-stage cancer. This is consistent with the observation
+that tumors increase diversity of driver mutations in later stages [@PCAWG-EVO].
+When we discover the requirements of each cluster with respect to metastasis we
+can target them therapeutically and prevent further adaptation.
