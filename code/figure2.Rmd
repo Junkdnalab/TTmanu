@@ -1,4 +1,10 @@
 <div style="text-align: right"> Figure 2 Data </div>
+```{r}
+library(ggplot2)
+library(patchwork)
+library(tidyverse)
+```
+
 ```{r oncoprint-top100-plus-panel-data-generation, eval = FALSE}
 tumor_clusters <- fread("../data/umap_3d_coors.tsv") ## load in data
 load("../data/gdc_reactome_path_analysis.Rda")
@@ -85,7 +91,7 @@ alter_fun = list(
 save(clust_col_order, path_row_order, file = "onco_clust.Rda")
 ```
 
-```{r figure-2-plot, fig.width=72, fig.height=48, fig.cap="Figure 2: Pan-cancer enrichment of pathway disruptions. Waterfall plot; columns represent tumors. Each row represents a pathway. The pathways are ranked such that the pathway with the most disruptions across all 7,607 tumors is the first row _etc._ and tumors are ordered to prioritize the top pathway disruptions successively. All 377 pathways are shown. Red signifies pathway disrupted pathways, grey signifies not disrupted."}
+```{r figure-2-plot, fig.width=72, fig.height=60, fig.cap="Figure 2: Pan-cancer enrichment of pathway disruptions. Waterfall plot; columns represent tumors. Each row represents a pathway. The pathways are ranked such that the pathway with the most disruptions across all 7,607 tumors is the first row _etc._ and tumors are ordered to prioritize the top pathway disruptions successively. All 377 pathways are shown. Red signifies pathway disrupted pathways, grey signifies not disrupted."}
 ## top100 pathways pancancer oncoprint
 load("../data/onco_ggplot.Rda") ## load data
 onco_color <- c("0" = "grey", "1" = "firebrick3") ## color scheme for oncoprint
@@ -93,16 +99,17 @@ onco_color <- c("0" = "grey", "1" = "firebrick3") ## color scheme for oncoprint
 fig2A <- ggplot(data = onco_ggplot, aes(x=sample_id, y=path_name)) + 
   geom_tile(aes(fill = as.character(mutation_status))) +
   scale_fill_manual(values = onco_color) +
-  xlab(label = "sample_id") +
-  labs(tag = "A") +
   theme_classic() +
   theme(axis.text.x = element_blank(),
-        axis.text.y = element_text(size = 12),
-        axis.title.x = element_text(size = 12),
+        axis.text.y = element_blank(),
+        axis.title.x = element_blank(),
         axis.title.y = element_blank(),
+        plot.title = element_text(hjust = 0.5, size = 60),
+        plot.tag = element_text(size = 48, hjust = 0, vjust = 0),
         axis.ticks = element_blank(),
         axis.line = element_blank(),
-        legend.position = "none") 
+        legend.position = "none") +
+  ggtitle("Pan-Cancer")
 
 ## top10 pathways for each cluster
 load("../data/onco_clust.Rda") ## load in data
@@ -120,15 +127,17 @@ for(n in 1:length(clust_col_order)) {
   plots_onco[[n]] <- ggplot(data = onco_ggplot, aes(x=sample_id, y=path_name)) + ## ggplot code
   geom_tile(aes(fill = as.character(mutation_status))) +
   scale_fill_manual(values = onco_color) +
-  xlab(label = paste0("Class ", n)) +
   theme_classic() +
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
-        axis.title.x = element_text(size = 12),
+        axis.title.x = element_blank(),
         axis.title.y = element_blank(),
+        plot.title = element_text(hjust = 0.5, size = 60),
         axis.ticks = element_blank(),
         axis.line = element_blank(),
-        legend.position = "none") 
+        plot.tag = element_text(size = 48, hjust = 0, vjust = 0),
+        legend.position = "none") +
+  ggtitle(paste0("Class ", n))
 }
 
 ## setting patchwork panel layout
@@ -149,3 +158,102 @@ AAKLM
 
 fig2A + plots_onco[[1]] + plots_onco[[2]] + plots_onco[[3]] + plots_onco[[4]] + plots_onco[[5]] + plots_onco[[6]] + plots_onco[[7]] + plots_onco[[8]] + plots_onco[[9]] + plots_onco[[10]] + plot_layout(design = layout) + plot_annotation(tag_levels = "A")
 ```
+## oncoprint style of union set pathways
+```{r, eval = FALSE}
+tumor_clusters <- fread("../data/umap_3d_coors.tsv") ## load in data
+load("../data/gdc_reactome_path_analysis.Rda")
+
+## getting the top 5 pathways from each cluster
+n_toppaths <- 5
+
+toppaths <- list() ## list to store data
+for(n in 1:max(tumor_clusters$clust_knn)) {
+  spec_class <- tumor_clusters %>% filter(clust_knn == n) %>% .$sample_id
+  toppaths[[n]] <- gdc_reactome_path_analysis %>% .[, names(.) %in% spec_class] %>% 
+    rowSums() %>% as.data.frame() %>%
+    'colnames<-' ("Freq") %>%
+    rownames_to_column(var = "pathname") %>%
+    arrange(desc(Freq)) %>%
+    mutate(clust = n) %>% .[1:n_toppaths,]
+}
+
+toppaths <- as.data.frame(do.call(rbind, toppaths))
+## union set of the top pathways from each cluster
+union_toppaths <- unique(toppaths$pathname)
+
+clust_col_order1 <- list()
+path_row_order1 <- list()
+
+for(n in 1:max(tumor_clusters$clust_knn)) {
+  class_spec_sample_id <- tumor_clusters %>% .[,c("sample_id", "clust_knn")] %>% filter(clust_knn == n) %>% .[,.$sample_id] ## get class spec sample ids
+  top10path <- gdc_reactome_path_analysis[union_toppaths, class_spec_sample_id]
+  top10path[top10path == "1"] <- "MUT" ## categorize boolean values
+  top10path[top10path == "0"] <- " "
+  col <- c("MUT" = "firebrick3")
+heatmap_legend <- list(title = "", at = c("MUT"),
+                       labels = c("Mutation"))
+alter_fun = list(
+    background = function(x, y, w, h) {
+        grid.rect(x, y, w-unit(0.5, "mm"), h-unit(0.5, "mm"), 
+            gp = gpar(fill = "#CCCCCC", col = NA))
+    },
+    # bug red
+    MUT = function(x, y, w, h) {
+        grid.rect(x, y, w-unit(0.5, "mm"), h-unit(0.5, "mm"), 
+            gp = gpar(fill = col["MUT"], col = NA))
+    })
+  column_title <- "test"
+  onco_res <- oncoPrint(top10path,
+    alter_fun = alter_fun, col = col,
+    column_title = column_title, heatmap_legend_param = heatmap_legend,
+    remove_empty_columns = F, remove_empty_rows = F, right_annotation = NULL,
+    top_annotation = NULL
+    )
+  clust_col_order1[[n]] <- names(top10path[,onco_res@column_order])
+  path_row_order1[[n]] <- rownames(top10path[onco_res@row_order,])
+}
+
+save(clust_col_order1, path_row_order1, file = "../data/onco_clust1.Rda")
+
+## getting tumor sample orders 
+for(n in 1) {
+df <- as.data.frame(clust_col_order1[[n]])
+names(df) <- "sample_id"
+df$cluster <- n
+for(p in 2:length(clust_col_order1)) {
+  df1 <- as.data.frame(clust_col_order1[[p]])
+  names(df1) <- "sample_id"
+  df1$cluster <- p
+  df <- rbind(df, df1)
+  rm(df1)
+}
+}
+
+## setting up for ggplot geom_tile
+union_pathways_analysis <- gdc_reactome_path_analysis %>% .[rownames(.) %in% path_row_order1[[1]],] %>% 
+  t() %>% as.data.frame() %>% 
+  rownames_to_column(var = "sample_id") %>% 
+  gather(., key = path_name, value = "mutation_status", -sample_id) %>%
+  left_join(., tumor_clusters[,c("sample_id", "clust_knn")]) %>%
+  mutate(path_name = factor(.$path_name, levels = c(path_row_order1[[1]])), ## factor to force oncoprint order
+         sample_id = factor(.$sample_id, levels = c(rev(df$sample_id))))
+
+onco_color <- c("0" = "grey", "1" = "firebrick3") ## color scheme for oncoprint
+
+fig2_test <- ggplot(data = union_pathways_analysis, aes(y=sample_id, x=path_name)) + ## ggplot code
+  geom_tile(aes(fill = as.character(mutation_status))) +
+  scale_fill_manual(values = onco_color) +
+  theme_classic() +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        legend.position = "none") +
+  facet_grid(clust_knn ~ ., scales = "free", space = "free", switch = "y")
+ggsave("../data/fig2_test.png")
+
+
+```
+
