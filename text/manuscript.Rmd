@@ -57,6 +57,7 @@ library(doRNG)
 library(uwot)
 library(janitor)
 library(FactoMineR)
+library(seriation)
 ```
 
 ## Abstract

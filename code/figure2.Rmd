@@ -45,6 +45,55 @@ onco_ggplot <- gdc_reactome_path_analysis %>% .[rownames(.) %in% path_row_order,
          sample_id = factor(.$sample_id, levels = c(clust_col_order)))
 save(onco_ggplot, file = "onco_ggplot.Rda")
 
+###################
+## barplot panel ##
+###################
+
+load("../data/kelly.colours.rda")
+load("../data/moderate_enrich_prob.Rda")
+
+enrich_pathways <- moderate_enrich_prob %>%
+  group_by(clust) %>%
+  filter(difference > 0.3 & signif <= 2500) %>%
+  mutate(pathway = make_clean_names(path)) %>%
+  rename(clust_knn = "clust") %>%
+  select(clust_knn, pathway) %>%
+  mutate(clust_knn = as.numeric(clust_knn)) %>%
+  mutate(specific = TRUE)
+
+pathway_counts <- tumor_clusters %>%
+  left_join(t(gdc_reactome_path_analysis) %>% 
+              as.data.frame() %>% 
+              clean_names() %>% 
+              rownames_to_column("sample_id")) %>% 
+  group_by(clust_knn) %>%
+  summarise(total = n(), across(intrinsic_pathway_for_apoptosis:signaling_by_the_b_cell_receptor_bcr, sum)) %>%
+  mutate(across(intrinsic_pathway_for_apoptosis:signaling_by_the_b_cell_receptor_bcr, ~ .x / total)) %>%
+  select(-total) %>%
+  pivot_longer(-clust_knn, names_to = "pathway", values_to = "proportion") %>%
+  group_by(clust_knn) %>%
+  filter(pathway %in% enrich_pathways$pathway) %>%
+  left_join(enrich_pathways %>% select(clust_knn, pathway, specific), by = c("clust_knn", "pathway"))
+
+pathway_counts[is.na(pathway_counts$specific), ]$specific <- FALSE
+
+pathway_mat <- pathway_counts %>%
+  select(-specific) %>%
+  pivot_wider(names_from = pathway, values_from = proportion) %>%
+  ungroup() %>%
+  select(-clust_knn) %>%
+  as.matrix()
+
+pathway_dist <- dist(t(pathway_mat))
+pathway_clust <- as.hclust(rev(as.dendrogram(seriate(pathway_dist, method = "OLO_ward")[[1]])))
+pathway_counts$pathway <- factor(pathway_counts$pathway, levels = colnames(pathway_mat)[pathway_clust$order])
+bp.cluster.colors <- c(kelly.colours[3:12], "gray15")
+names(bp.cluster.colors) <- 1:11
+
+pathway_counts <- pathway_counts %>%
+  mutate(color = case_when(specific ~ clust_knn, TRUE ~ 11)) %>%
+  mutate(color = factor(color))
+save(pathway_counts, bp.cluster.colors, file = "barplot_pathways_fig2b.rda")
 
 #####################
 ## oncoprint panel ##
@@ -103,6 +152,44 @@ fig2A <- ggplot(data = onco_ggplot, aes(x=sample_id, y=path_name)) +
         axis.ticks = element_blank(),
         axis.line = element_blank(),
         legend.position = "none") 
+
+load("../barplot_pathways_fig2b.rda")
+fig2B <- pathway_counts %>% ggplot(aes(x = pathway, y = proportion, fill = color)) +
+  geom_col() +
+  facet_wrap(~clust_knn, ncol = 1, strip.position = "right") +
+  ylab("Proportion of samples mutated in pathway") +
+  xlab("Pathways enriched with mutations within clusters") +
+  theme_classic() +
+  scale_fill_manual(values = bp.cluster.colors) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.title.x = element_text(size = 12),
+    axis.title.y = element_text(size = 12),
+    axis.ticks = element_blank(),
+    strip.text.y = element_text(size = 12, hjust = .5),
+    strip.text.y.right = element_text(angle = 0),
+    strip.background = element_blank(),
+    legend.position = "none"
+  )
+
+fig2B_rotate <- pathway_counts %>% ggplot(aes(y = pathway, x = proportion, fill = color)) +
+  geom_col() +
+  facet_wrap(~clust_knn, nrow = 1, strip.position = "top") +
+  xlab("Proportion of samples mutated in pathway") +
+  ylab("Pathways enriched with mutations within clusters") +
+  theme_classic() +
+  scale_fill_manual(values = bp.cluster.colors) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.title.x = element_text(size = 12),
+    axis.title.y = element_text(size = 12),
+    axis.ticks = element_blank(),
+    strip.text.x = element_text(size = 12, hjust = .5),
+    strip.background = element_blank(),
+    legend.position = "none"
+  )
 
 ## top10 pathways for each cluster
 load("../data/onco_clust.Rda") ## load in data

@@ -1,18 +1,11 @@
 ### Supplementary Figure S1
-```{r}
-library(data.table)
-library(ggplot2)
-library(kableExtra)
-library(tidyverse)
-```
-
 ```{r supplementary-figure-s1, out.width = '90%', fig.align='center'}
-umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv") ## load data
+umap_cancertype <- fread("../data/umap_3d_coors.tsv") ## load data
 
 umap_bg <- umap_cancertype[,-"project_code"] ## get background data for facet
   
-ggplot(umap_cancertype, aes(x = x_2d, y = y_2d, colour = project_code)) + 
-  geom_point(data = umap_bg, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.25) +
+ggplot(umap_cancertype, aes(x = plot_y, y = plot_x, colour = project_code)) + 
+  geom_point(data = umap_bg, aes(x = plot_y, y = plot_x), colour = "grey", size = 0.25) +
   geom_point(size = 0.25) +
   theme_classic() +
   coord_fixed() +
@@ -32,11 +25,11 @@ ggplot(umap_cancertype, aes(x = x_2d, y = y_2d, colour = project_code)) +
 ### Supplementary Figure S2
 
 ```{r supplementary-figure-s2-data-generation, out.width = '90%', fig.align = "center"}
-umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv") ## load data
+umap_cancertype <- fread("../data/umap_3d_coors.tsv") ## load data
 umap_bg <- umap_cancertype[,-"project_code"] ## get background data for facet
 
-ggplot(umap_cancertype, aes(x = x_2d, y = y_2d, colour = Subtype_Selected)) + 
-  geom_point(data = umap_bg, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.25) +
+ggplot(umap_cancertype, aes(x = plot_y, y = plot_x, colour = Subtype_Selected)) + 
+  geom_point(data = umap_bg, aes(x = plot_y, y = plot_x), colour = "grey", size = 0.25) +
   geom_point(size = 0.25) +
   theme_classic() +
   coord_fixed() +
@@ -85,24 +78,24 @@ selected_mut <- gene_data %>% dplyr::select(external_gene_name, ensembl_gene_id)
 selected_mut <- gdc_mut_count_patient %>% filter(rownames(.) %in% selected_mut$ensembl_gene_id) %>% ## filter by ensembl ids
   rownames_to_column(var = "ensembl_gene_id") %>% left_join(., selected_mut, by = "ensembl_gene_id") %>% ## replace ensembl ids with gene name 
   column_to_rownames(var = "external_gene_name") %>% dplyr::select(-ensembl_gene_id) %>%
-  t() %>% as.data.frame() %>% rownames_to_column(var = "V1")  ## prep for left_join
+  t() %>% as.data.frame() %>% rownames_to_column(var = "sample_id")  ## prep for left_join
 
 
-selected_mut <- umap_cancertype %>% dplyr::select(V1, x_2d, y_2d) %>% ## select relevant columns
-  left_join(., selected_mut, by = "V1") %>%
-  melt(data = ., id.vars = c("V1", "x_2d", "y_2d")) %>%
+selected_mut <- umap_cancertype %>% dplyr::select(sample_id, plot_x, plot_y) %>% ## select relevant columns
+  left_join(., selected_mut, by = "sample_id") %>%
+  melt(data = ., id.vars = c("sample_id", "plot_x", "plot_y")) %>%
   filter(value != 0)
 
-save(selected_mut, file = "selected_mut.Rda")
+save(selected_mut, file = "../data/selected_mut.Rda")
 ```
 
 ```{r supplementary-figure-s3, out.width='77%', fig.align = "center"}
 load("../data/selected_mut.Rda")
-umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv") ## load data
+umap_cancertype <- fread("../data/umap_3d_coors.tsv") ## load data
 umap_bg <- umap_cancertype[,-"project_code"] ## get background data for facet
 
-ggplot(selected_mut, aes(x = x_2d, y = y_2d, colour = as.character(value))) + 
-  geom_point(data = umap_bg, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.25) +
+ggplot(selected_mut, aes(x = plot_y, y = plot_x, colour = as.character(value))) + 
+  geom_point(data = umap_bg, aes(x = plot_y, y = plot_x), colour = "grey", size = 0.25) +
   geom_point(size = 0.25) +
   theme_classic() +
   coord_fixed() +
@@ -127,23 +120,23 @@ ggplot(selected_mut, aes(x = x_2d, y = y_2d, colour = as.character(value))) +
 <div style="text-align: right"> Supplementary Figure S4 Data </div>
 ```{r supplementary-figure-s4-data-generation, eval = FALSE}
 load("../data/gdc_reactome_path_analysis.Rda") ## load data
-umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv") 
+umap_cancertype <- fread("../data/umap_3d_coors.tsv") 
 n_path <- 377 ## how many pathways do we want to look at starting from the most to least mutated pathway
 
 toppath <- gdc_reactome_path_analysis %>% rowSums() %>% as.data.frame() %>% rownames_to_column(var = "path_name") %>% arrange(desc(.)) %>% .[1:n_path,] %>% .[, "path_name"] ## order pathway by most to least mutated pathway
 
-selected_path <- gdc_reactome_path_analysis %>% t() %>% as.data.frame() %>% rownames_to_column(var = "V1") ## prepare pathway for left_join
+selected_path <- gdc_reactome_path_analysis %>% t() %>% as.data.frame() %>% rownames_to_column(var = "sample_id") ## prepare pathway for left_join
 
-selected_path <- umap_cancertype %>% dplyr::select(V1, x_2d, y_2d) %>% ## select relevant columns
-  left_join(., selected_path, by = "V1") %>%
-  melt(data = ., id.vars = c("V1", "x_2d", "y_2d")) %>%
+selected_path <- umap_cancertype %>% dplyr::select(sample_id, plot_x, plot_y) %>% ## select relevant columns
+  left_join(., selected_path, by = "sample_id") %>%
+  melt(data = ., id.vars = c("sample_id", "plot_x", "plot_y")) %>%
   filter(value != 0)
 
 save(selected_path, file = "../data/selected_path.Rda")
 
 load("../data/selected_path.Rda") ## load data
 load("../data/gdc_reactome_path_analysis.Rda")
-umap_cancertype <- fread("../data/umap_2d_3d_coors.tsv")
+umap_cancertype <- fread("../data/umap_3d_coors.tsv")
 umap_bg <- umap_cancertype[,-"project_code"] ## get background data for facet
 
 n_path <- 377 ## number of pathways we want to see
@@ -160,9 +153,9 @@ for(n in 1:nrow(figs4_layout)) {
   pathway_layout <- toppath[pathway_layout$start:pathway_layout$end] ## filtering those pathways from toppath
   filtered_path <- selected_path %>% filter(variable %in% pathway_layout) %>% ## filtering our data to only include those pathways
     mutate(variable = factor(variable, levels = c(pathway_layout)))
-  ggplot_umap <- ggplot(filtered_path, aes(x = x_2d, y = y_2d, colour = as.character(value))) + 
-    geom_point(data = umap_bg, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.1) +
-    geom_point(size = 0.1) +
+  ggplot_umap <- ggplot(filtered_path, aes(x = plot_y, y = plot_x, colour = as.character(value))) + 
+    geom_point(data = umap_bg, aes(x = plot_y, y = plot_x), colour = "grey", size = 0.25) +
+    geom_point(size = 0.25) +
     theme_classic() +
     coord_fixed() +
     xlab("UMAP 1") + ylab("UMAP 2") +
@@ -270,9 +263,10 @@ for(n in toppath) {
     rownames(.)
   top_mut_gene <- gene_mutation %>% .[rownames(.) %in% gene_in_path, ] %>% ## only include genes in paths
       rowSums() %>% as.data.frame() %>% 'colnames<-' ("obs_count") %>% ## sum the pathway mutation
+    rownames_to_column(var = "gene") %>%
       mutate(n_sample = length(gene_mutation),
              perc_mut = round((obs_count / length(gene_mutation)) * 100, digits = 1)) %>% 
-      rownames_to_column(var = "gene") %>% arrange(desc(obs_count))
+       arrange(desc(obs_count))
   top_gene_in_path <- list()
   for(p in mutated_gene_position) {
     message(p)
@@ -291,7 +285,7 @@ for(n in toppath) {
   table_st1[[n]] <- cbind(spec_path, top_gene_in_path)
 }
 table_st1 <- as.data.frame(do.call(rbind, table_st1))
-save(table_st1, file = "table_st1.Rda")  
+save(table_st1, file = "../data/table_st1.Rda")  
 rm(list = ls(all.names = T))  
 gc()
 ```
