@@ -74,11 +74,15 @@ library(seriation)
  
 ### A taxonomy of tumors based on disrupted molecular pathways
  
-To study cancer pathways we obtained a set of 7,607 tumor samples from GDC. We
-chose to start with somatic mutations in exome sequencing data because the
-affected gene is known almost unambiguously. Therefore, we focused on all
-missense, nonsense, frameshift, and splicing mutations. In order to minimize
-bias from well-studied diseases and processes, we selected 377 Reactome pathways
+To study cancer pathways we obtained a set of 7,607 solid tumor samples from The
+Cancer Genome Atlas (TCGA) through the [Genomic Data Commons (GDC)](gdc.cancer.gov)
+portal. TCGA data because were
+most appropriate for our study given the relative completeness of the patient
+metadata, particularly for survival and staging. We chose to start with somatic
+mutations in exome sequencing data because the affected target gene is known 
+unambiguously. Therefore, we focused on all missense, nonsense, frameshift, and
+splicing mutations. In order to minimize bias from well-studied diseases and
+processes, we selected 377 Reactome pathways
 [reactome.org](https://reactome.org/) of interest corresponding to basic
 cellular processes and biochemical pathways, excluding gene sets that correspond
 to miscellaneous categories ( _e.g._ “transcription factors”) or disease
