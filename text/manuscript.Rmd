@@ -283,10 +283,6 @@ enrichment levels of the three, having mutations in hedgehog signaling,
 $\beta$-catenin degradation, cellular response to hypoxia, regulation of cell
 cycle and apoptosis among others. As cluster groups 9-12 and 6-7 were the most
 distinct of the 12, we chose to investigate these two groups further.
-<div style="text-align: right"> Figure 3 data </div>
-
-```{r child='../code/figure3.Rmd'}
-```
 
 ### Gene-Pathway redundancy contributes to cluster identity
 
