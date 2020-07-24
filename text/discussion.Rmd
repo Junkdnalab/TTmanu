@@ -5,8 +5,8 @@ comprising ~20,000 protein-coding genes is comparable with the number of tumor
 samples, even with multiple mutations per sample. And that is not accounting for
 the fact that ~30k non-coding genes and hundreds of thousands of non-coding
 regulatory elements exist with oncogenic or tumor suppressor potential
-[@deesMuSiC2012;
-@tamboreroOncodriveCLUST2013; @lawrenceDiscoverySaturationAnalysis2014;
+[@deesMuSiC2012; @tamboreroOncodriveCLUST2013;
+@lawrenceDiscoverySaturationAnalysis2014;
 @kumarStatisticallyIdentifyingTumor2015; @jiangWITER2019;
 @zhaoModelingPositive2019; @non-coding-mutations-Zhang]. Hence, we sought to
 investigate cancer as a disease of basic cellular and biochemical pathways,
@@ -68,34 +68,52 @@ tissue-of-origin remains the most important driver of tumor characteristics at
 every scale and by every measure. Our observations contrast with this view, and
 instead support an interpretation of publicly available data in which all tumors
 manifest one of a limited number of metastable phenotypes resulting from
-disruptions in basic pathways represented by our classes (**figure 1a-k**). Each
+disruptions in basic pathways represented by our classes (**figure 1**). Each
 of these classes may represent unique combinations of pathway disruptions with
 increased fitness regardless of tissue of origin, which then converge on end
 stage cancer by accumulating complementary mutations to the other classes
-(**figure 1l** and **Table 2**).
+(**figures 1L and M** and **Table 2**).
 
 We find that most tumors segregate into one of twelve biologically distinct
-clusters, regardless of the cancer type (**figure 1h** and **supplementary
+clusters, regardless of the cancer type (**figure 1G,I** and **supplementary
 figure S1**). Some cancer types ( _e.g._ pancreatic adenocarcinomas in the RAS
-arm clusters 9 and 10, and breast cancers being excluded from the same cluster,
-see **supplementary figure S1**) are unevenly distributed, though we could not
-identify cancer type that was exclusive to a single tumor class. Somewhat
+arm clusters 8 and 9, and Kidney Chromophobe in cluster 1, see **supplementary
+figure S1**) are unevenly distributed, though we could not identify cancer type
+that was exclusive to a single tumor class. Only cancer types with the fewest
+samples were found to be absent from one or more classes at all. Somewhat
 surprisingly to us, this finding extends to histological subtypes of breast,
-head and neck cancers, leukemias, _etc._ (see **Figure 1i** and **Supplemental
-Figure S2**). Indeed, it would be surprising if we did not observe bias for some
-cancers, as it has long been known that certain treatment regimens are likely to
-work for a significant fraction of patients of a given cancer type. Nonetheless,
-the basis for some tumors being treatment-refractory in spite of clinical
-indications remains elusive. Our analysis suggests the possibility of
-identifying more informative molecular, histological or cellular subtypes and
-could form a basis for future separation of patients into different precision
-treatment regimens.
+head and neck cancers, leukemias, _etc._ (see **Figure 1J** and **Supplemental
+Figure S2**). This result implies that many, if not most, histological subtypes
+primarily reflect differences in cell-of-origin, rather than fundamental
+differences in proximal cause. It has been hypothesized that differences in the
+molecular regulators of development in the array of cell types present in the
+breast epithelium drive the various histological phenotypes [@breast-subtypes].
+Consistent with this view we found that breast tumor samples of the Luminal A
+subtype were heavily biased toward membership in clusters 1 and 7, and basal
+tumor samples were biased toward cluster 6 (**figure 1J**). However, both
+subtypes contained samples in every other class without exception, and Luminal B
+and Her2 positive samples are distributed across clusters. We interpret these
+data to mean that cell-of-origin molecular machinery can predispose certain cell
+types within the breast epithelium to forming tumors of one class or another but
+is not determinative; this view is compatible with the previously stated
+hypothesis but opens the way for a more granular view of individual tumors.
+Indeed, it would be surprising if we did not observe bias for some cancers and
+subtypes amongst our classes, since some treatment regimens have greater
+efficacy for a significant fraction of patients of a given cancer/histological
+subtype. Nonetheless, the basis for some tumors being treatment-refractory in
+spite of receiving the standard of clinical care for diagnostic markers remains
+elusive. Doubtless some of this is due to bad luck, as tumors can metastasis and
+remain dormant years before they are detected at distal sites [@hallmarks_II], or
+resistant clones may have already arisen at undetectable levels, but our
+analysis suggests the possibility of identifying more informative molecular,
+histological or cellular subtypes that could form a basis for future separation
+of patients into different precision treatment regimens.
 
 It could be that the classes we identified are consistent with a signature of
 overall disease progression, such that successive, adjacent classes on the UMAP
 projection exhibit increasing specificity. We identified no such trend (see
-**figure 1k**) and each class instead was associated with unique combinations of
-pathways (as in **figure 3**). In our view, these observations suggest that
+**figure 1H**) and each class instead was associated with unique combinations of
+pathways (as in **figures 2B, C**). In our view, these observations suggest that
 cancers have available to them a limited number of stable configurations with
 respect to pathway disruption which are consistent with increased fitness and
 therefore positive selection.
@@ -103,31 +121,33 @@ therefore positive selection.
 ### Incompleteness of the pathway disruption data
 
 Finally, we must remark on the limitations of our work exemplified in two of the
-classes, 1 and 8, which for which we did not find distinctive associations with
-pathways. Class 1 has a relatively low level of mutated pathways overall,
-although it is broadly enriched in many of the same tumor-promoting pathways
-common to the other groups. This likely does not reflect a true difference in
-stages of tumor evolution, as our data show clearly that this class is as likely
-to contain stage IV metastatic tumors as it is to contain those of stage I. We
-speculate this class represents a group of tumors with large aberrations in
-methylation, copy number or other genome rearrangements which we excluded from
-the present analysis. In the future, we hope to incorporate these other data
-into a pathway-centric analysis as we have done here for point mutations and
-indels. Now that we have established this as a feasible and potentially fruitful
-approach to understanding the cancer genome, it may be worth expanded effort in
-this area. In addition, Class 8 represents a group of hyper-mutated tumors that
-harbor so many mutations that virtually no pathway is unaffected. It seems
-likely that a significant fraction of the samples flagged as “mutant” for each
-pathway are actually unaffected, consistent with those samples have low
-information content. Similar to class 1 we speculate that a future analysis of
-other data types, including improved filtering of mutations across all classes,
-may resolve these tumors into improved classifications.
+classes, 1 and 10, which for which we did not find distinctive associations with
+pathways (**figure 2B, C**). Class 1 has a relatively low proportion of mutated
+pathways across the board, although it is broadly enriched in many of the same
+tumor-promoting pathways common to the other groups. This likely does not
+reflect a true difference in stages of tumor evolution, as our data show clearly
+that this class is as likely to contain stage IV metastatic tumors as it is to
+contain those of stage I (**figure 1L, M**). This class likely represents a
+group of tumors with large aberrations in methylation, copy number alterations,
+structural variants, or combinations thereof which we excluded from our
+analysis. Consistent with this, kidney chromophobe and thyroid cancers have high
+proportions of SVs _vs._ other variant types [@PCAWG-MAIN] and are heavily
+skewed to cluster 1 membership (**Supplementary figure S1**). Likewise, Class 8
+represents a group of hyper-mutated tumors that harbor so many mutations that
+virtually no pathway is unaffected. It seems likely that a significant fraction
+of the samples flagged as “mutant” for each pathway are actually unaffected,
+consistent with those samples have low information content. This could be
+addressed with application of ever-increasingly sophisticated bioinformatics
+algorithms for filtering likely passenger mutations [ _e.g._ @spliceAI;
+@deep-learning-clinical-variants]. In the future, we hope to incorporate these
+other data into a pathway-centric analysis as we have done here for point
+mutations and indels.
 
 ### Estimates of survival reveal pathway-dependent differences
 
 By modeling CDC longevity data as a baseline risk function we showed that each
 of our pathway disruption classes exhibit cancer-type specific effects on
-expected survival (**figure 5**). Contrary to what one might expect at the
+expected survival (**figure 4**). Contrary to what one might expect at the
 outset, we found that models assuming different survival based on class _and_
 cancer type fit better than models in which these variables are independent
 factors. However, considering that within each cancer type there are different
@@ -141,7 +161,7 @@ standard of care for one cancer and class could produce different outcomes than
 the same class of a different cancer type under the circumstances.
 Unfortunately, given the diversity drug classes and treatments (including
 non-chemical treatments such as surgery and palliative care), we lack sufficient
-power in the current study to explore these variables in the GDC data. It is our
+power in the current study to explore these variables in the TCGA data. It is our
 hope that more focused future studies will help to distinguish between
 treatment-specific effects or survival given different pathway disruption
 classes.
@@ -153,23 +173,29 @@ that can be broadly thought of as general cancer promoting, class-specific
 mutations and metastasis. General cancer promoting processes must include
 factors that relate to genome stability and immortality, as "enabling
 characteristics" of the cancer phenotype [@hallmarks_II]. Such pathways are
-disrupted in all or most of the defined classes (see **figures 2** and
-**supplementary figure S1**) and often are the result of aberrations involving
-common driver genes such as BRCA1/2, MMR genes, mitotic checkpoints, Cohesion
-complexes, _etc._ (**supplementary figure S3** and **supplemental file 1**).
-Class-specific evolution must involve the acquisition of combinatorial
-disruptions to pathways that may individually be harmful but together produce
-more specialized cancer phenotypes and increased fitness (as in **figure 4** and
-**tables 1** and **ST2**). Importantly, our work does not distinguish between
-the order in which these mutations should accumulate. However, since many of the
-genes in the non-specific pathways involve genome stability, it is reasonable to
-hypothesize that such mutations promote the acquisition of class specific
-defects, and natural selection produces the classes we observed.
+disrupted in all or most of the defined classes (**supplementary figure S1**)
+and often are the result of aberrations involving common driver genes such as
+BRCA1/2, MMR genes, mitotic checkpoints, Cohesion complexes, _etc._
+(**supplementary figure S3** and **supplemental file 1**). Class-specific
+evolution must involve the acquisition of combinatorial disruptions to pathways
+that may individually be harmful but together produce more specialized cancer
+phenotypes and increased fitness (as in **figure 4** and **tables 1** and
+**ST2**). Importantly, our work does not distinguish between the order in which
+these mutations should accumulate. This could be addressed in a future study by
+integrating our analysis with evolutionary analysis of clonality, drawing
+inferences from variant allele frequencies as in @PCAWG-EVO. However, since many
+of the genes in the non-cluster-specific pathways involve genome stability, it
+is reasonable to hypothesize that such mutations promote the acquisition of
+class-specific defects via random mutation and natural selection, thus producing
+the classes we observed. Indeed, a subset of known oncogenic driver mutations
+are highly enriched in early arising clones, whereas later arising clones have
+much greater diversity in driver mutations [@PCAWG-EVO]. Moreover, driver genes
+that are known to be responsible for discrete mutation signatures such as
+APOBEC, BRCA1 and BRCA2 produce mutational hotspots reflecting the varying
+selective pressures in different tissues [@PCAWG-MAIN].
 
 One of the drawbacks of bulk tumor whole genome sequencing data is the problem
-of tumor heterogeneity, both in terms of evolving subclones with different or
-passively diverging mutation profiles which then serve as a substrate for futher
-selection [@PCAWG-MAIN; @PCAWG-EVO]. Moreover consortium samples are likely to
+of tumor heterogeneity, thus consortium samples are likely to
 contain contamination from support tissue and inflammatory and immune cells of
 the innate and adaptive immune systems, potentially harboring cancer supporting
 mutations [@bhowmick_review]. We think it will be instructive to explore these
@@ -177,26 +203,34 @@ ideas in the context of single cell experiments.
 
 ### On metastasis as a convergence of phenotypes
 
-We report that pathway enrichment across all classes (pooled) yielded generally
-lower effect sizes and larger p-values than the cluster specific analysis,
-suggesting that signal is diluted when the samples are analyzed this way, and
-supporting the view that metastasis has class-specific requirements. It should
-be noted, however, that in spite of this lack of global enrichment, some of the
-cluster specific pathways reflect known metastatic associations, _e.g._ pathways
-associated with asparagine and aspartate metabolism in class 10
-[@knott_asparagus]. Since the number of metastatic tumors is relatively low this
-part of our analysis is likely underpowered and subject to expanded analysis
-with larger cohorts. Nonetheless, the class-specific metastatic pathway
+We report that pathway enrichment in metastatic tumors across all classes
+(pooled) yielded generally lower effect sizes and larger p-values than the
+cluster specific analysis, suggesting that signal is diluted when the samples
+are analyzed this way, and supporting the view that metastasis has
+class-specific requirements. Since the number of metastatic tumors is relatively
+low this part of our analysis is likely underpowered and subject to expanded
+analysis with larger cohorts. Nonetheless, the class-specific metastatic pathway
 enrichment we observe (in **table 2**) could be a result of the pathways
 directly promoting metastatic phenotypes in these classes, or because they
-acquire a stronger or more complete oncogenic phenotype, since (again) we don’t
-know the order in which they were acquired in individual tumor samples. The fact
-that most metastatic enrichment is cluster-specific and has a tendency to
-overlap with cluster-specific pathways from non-metastatic tumors of neighboring
+acquire a stronger or more complete oncogenic phenotype, since we don’t know the
+order in which they were acquired in individual tumor samples. The fact that
+most metastatic enrichment is cluster-specific and has a tendency to overlap
+with cluster-specific pathways from non-metastatic tumors of neighboring
 clusters favors the latter interpretation, and suggests a mechanism of
 complementarity, in which newly acquired mutations result in similar classes
 converging on a single deadly phenotype that captures most or all of the
-critical features of end-stage cancer. This is consistent with the observation
-that tumors increase diversity of driver mutations in later stages [@PCAWG-EVO].
-When we discover the requirements of each cluster with respect to metastasis we
-can target them therapeutically and prevent further adaptation.
+critical features of end-stage cancer. Some clusters were characterized by
+cluster-specific pathways that seem superficially unrelated; for example cluster
+3 has mutations impacting protein translation and turnover, whereas cluster 5
+has defects in RNA metabolism and clusters 7, 8 and 9 have defects in the more
+traditional extra-cellular signaling pathways (as exemplified in **table 1**).
+It may be that the primary effects of mutations in polymer metabolism in cluster
+3 and 5 point to currently unappreciated mechanisms impacting hallmark pathways.
+Clusters 3 and 5 are also marked by a decidedly different set of pathways in
+metastasis. Clusters 3 and 5 notably have (in addition to EGFR signaling)
+mutations in glucagon and glycogen metabolism, respectively, in their metastases
+(**table 2**), consistent with energy metabolism as one of the new hallmarks
+[@hallmarks_II], but also distinguishing these classes from the others in the
+order or nature of hallmark acquisition. We submit that when we discover the
+requirements of each cluster with respect to metastasis we may be able to target
+them therapeutically and prevent further adaptation.
