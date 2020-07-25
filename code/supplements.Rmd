@@ -71,7 +71,7 @@ gdc_mut_count_patient[gdc_mut_count_patient > 0] <- 1 ## booleanize data, anythi
 ##oncogene
 oncogene <- c("AKT2","BCL2","CTNNB1","ERBB2","KRAS","MDM2","MYC","PIK3CA","TET2","USP6") ## list of selected oncogene
 ##tumor_supressor
-tumor_suppressor <- c("APC","BRIP1","CDKN2C","CHEK2","MSH2","PTEN","RB1","SMARCA4","TP53","VHL") ## list of selected tumor suppressor
+tumor_suppressor <- c("APC","BRIP1","CDKN2C","CHEK2","MSH2","PTEN","RB1","SMARCA4","TP53","VHL", "APOBEC3B") ## list of selected tumor suppressor
 
 selected_mut <- gene_data %>% dplyr::select(external_gene_name, ensembl_gene_id) %>% filter(external_gene_name %in% c(oncogene, tumor_suppressor)) ## getting ensembl_id for the oncogenes for filtering gdc data
 
