@@ -83,30 +83,33 @@ samples were found to be absent from one or more classes at all. Somewhat
 surprisingly to us, this finding extends to histological subtypes of breast,
 head and neck cancers, leukemias, _etc._ (see **Figure 1J** and **Supplemental
 Figure S2**). This result implies that many, if not most, histological subtypes
-primarily reflect differences in cell-of-origin, rather than fundamental
-differences in proximal cause. It has been hypothesized that differences in the
-molecular regulators of development in the array of cell types present in the
-breast epithelium drive the various histological phenotypes [@breast-subtypes].
-Consistent with this view we found that breast tumor samples of the Luminal A
-subtype were heavily biased toward membership in clusters 1 and 7, and basal
-tumor samples were biased toward cluster 6 (**figure 1J**). However, both
-subtypes contained samples in every other class without exception, and Luminal B
-and Her2 positive samples are distributed across clusters. We interpret these
-data to mean that cell-of-origin molecular machinery can predispose certain cell
-types within the breast epithelium to forming tumors of one class or another but
-is not determinative; this view is compatible with the previously stated
-hypothesis but opens the way for a more granular view of individual tumors.
-Indeed, it would be surprising if we did not observe bias for some cancers and
-subtypes amongst our classes, since some treatment regimens have greater
-efficacy for a significant fraction of patients of a given cancer/histological
-subtype. Nonetheless, the basis for some tumors being treatment-refractory in
-spite of receiving the standard of clinical care for diagnostic markers remains
-elusive. Doubtless some of this is due to bad luck, as tumors can metastasize
-and remain dormant years before they are detected at distal sites, or resistant
-clones may have already arisen at undetectable levels [@hallmarks_II], but our
-analysis suggests the possibility of identifying more informative molecular,
-histological or cellular subtypes that could form a basis for future separation
-of patients into different precision treatment regimens.
+could reflect differences in cell-of-origin, rather than fundamental differences
+in proximal cause. The five major subtypes of breast cancer have histological
+and molecular correlates that define them and how they respond to experimental
+stimuli [@breast-subtypes2]. It has been hypothesized that differences in the
+molecular regulators of development in the precursor cell types present in the
+breast epithelium drive the various histological phenotypes [@breast-subtypes;
+@breast-subtypes3]. Consistent with this view we found that breast tumor samples
+of the Luminal A subtype were heavily biased toward membership in clusters 1 and
+7, and basal tumor samples were biased toward cluster 6 (**figure 1J**).
+However, both subtypes also contained samples in every other class (without
+exception), and Luminal B and Her2 positive samples are distributed across
+clusters. We interpret these data to mean that inherited cell-of-origin
+molecular profiles may predispose certain precursor cell types within the breast
+epithelium to forming tumors of one class or another but is not determinative;
+this view is compatible with the previously stated hypothesis but opens the way
+for a more granular view of individual tumors. It would be surprising if we did
+not observe bias for some cancers and subtypes amongst our classes, since some
+treatment regimens have greater efficacy for a significant fraction of patients
+of a given cancer/histological subtype [@breast-subtypes2]. Nonetheless, the
+basis for some tumors being treatment-refractory in spite of receiving the
+standard of clinical care for diagnostic markers remains elusive. Doubtless some
+of this is due to bad luck, as tumors can metastasize and remain dormant years
+before they are detected at distal sites, or resistant clones may have already
+arisen at undetectable levels [@hallmarks_II], but our analysis suggests the
+possibility of identifying more informative molecular, histological or cellular
+subtypes that could form a basis for future separation of patients into
+different precision treatment regimens.
 
 It could be that the classes we identified are consistent with a signature of
 overall disease progression, such that successive, adjacent classes on the UMAP
