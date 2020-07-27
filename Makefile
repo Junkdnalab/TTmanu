@@ -8,6 +8,6 @@ prereqs.R :
 
 
 text/manuscript.html : text/manuscript.Rmd
-	echo 'library(knitr)\nknit("text/manuscript.Rmd","text/manuscript.html")' > rcmd.R;  R CMD BATCH rcmd.R
+	echo 'library(rmarkdown)\nrender("text/manuscript.Rmd","html_document")' > rcmd.R;  R CMD BATCH rcmd.R
 
 
