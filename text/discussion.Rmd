@@ -34,33 +34,35 @@ drivers). Rather than evaluating the burden of mutations on each pathway within
 or across tumors, which can be biased by the number of genes or the coverage of
 pathway-linked genes in the genome, and which we find to be relatively uniformly
 distributed, we scored each pathway in binary fashion, allowing one mutation or
-multiple mutations to count equally for each sample. To our knowledge, this
-approach has not previously been attempted in the literature in spite of its
-relative simplicity. We limited our analysis to mutations with likely
-deleterious effects, including missense, nonsense, frame-shift, stop-gain and
-splice site mutations in genes that are actively expressed in each cancer type,
-thus avoiding bias from transcription coupled repair. Our method of filtration
-differs from the "rank-and-cut" method of [@PCAWG-MAIN] but represents a
-reasonable attempt to account for the same biases. We also filtered genes on the
-basis of pathway membership in biochemical pathways, excluding curated genesets
-related to diseases, syndromes, or classes of proteins ( _e.g._ transcription
-factors). We chose this approach to limit redundancy, which is already high in
-the remaining pathways for some driver genes, and to exclude biologically
-unrelated collections of genes. We do not account for non-coding mutations,
-amplification events or structural variants, though we hope to include them in
-subsequent studies (see below). Our pathway-centric analysis also allows us to
-circumvent the problem that some cancer-promoting mutations likely occur at low
-enough frequencies as to be indistinguishable from background. Previous attempts
-to capture these associations better using Bayesian networks have yielded
-important new insights into this problem and new genes
-[@hornNetSigNetworkbasedDiscovery2018] that would not have been possible with
-traditional analysis, supporting the case that pathway-centric approaches like
-ours have the potential to increase statistical power.
+multiple mutations to count equally for each sample.
+
+To our knowledge, this approach has not previously been attempted in the
+literature in spite of its relative simplicity. We limited our analysis to
+mutations with likely deleterious effects, including missense, nonsense,
+frame-shift, stop-gain and splice site mutations in genes that are actively
+expressed in each cancer type, thus avoiding bias from transcription coupled
+repair. Our method of filtration differs from the "rank-and-cut" method of
+[@PCAWG-MAIN] but represents a reasonable attempt to account for the same
+biases. We also filtered genes on the basis of pathway membership in biochemical
+pathways, excluding curated genesets related to diseases, syndromes, or classes
+of proteins ( _e.g._ transcription factors). We chose this approach to limit
+redundancy, which is already high in the remaining pathways for some driver
+genes, and to exclude biologically unrelated collections of genes. We do not
+account for non-coding mutations, amplification events or structural variants,
+though we hope to include them in subsequent studies (see below). Our
+pathway-centric analysis also allows us to circumvent the problem that some
+cancer-promoting mutations likely occur at low enough frequencies as to be
+indistinguishable from background. Previous attempts to capture these
+associations better using Bayesian networks have yielded important new insights
+into this problem and new genes [@hornNetSigNetworkbasedDiscovery2018] that
+would not have been possible with traditional analysis, supporting the case that
+pathway-centric approaches like ours have the potential to increase statistical
+power.
 
 The hypothesis that cancer is the result of dysfunction from
 a limited number of basic cellular processes common to all living human cells
 was first introduced and later expanded on in a pair of classic essays by
-Hanahan and Weinberg [@weinberg200; @hallmarks_II]. In this view, all tumors
+Hanahan and Weinberg [@weinberg2000; @hallmarks_II]. In this view, all tumors
 regardless of tissue of origin acquire six essential phenotypes; sustaining
 proliferative signaling, evading growth suppressors, replicative immortality,
 evading apoptosis, supportive angiogenesis, tissue invasion and metastasis
@@ -69,7 +71,7 @@ inclusion of new tumor promoting processes, namely deregulation of cellular
 energy cycle, tumor promoting inflammation, evasion of the immune system, genome
 instability, and on top of these acquired traits a new appreciation for the
 concept of the tumor microenvironment and its contribution to the evolution and
-promotion of metastatic tumorigenesis [@hallmarks_II]. 
+promotion of metastatic disease [@hallmarks_II]. 
 
 An alternative hypothesis is that every tumor belongs to one of a large number
 of syndromes which are unique to each tissue-of-origin, that share some
@@ -115,7 +117,7 @@ However, both subtypes also contained samples in every other class (without
 exception), and Luminal B and Her2 positive samples are distributed across
 clusters. We interpret these data to mean that inherited cell-of-origin
 molecular profiles may predispose certain precursor cell types within the breast
-epithelium to forming tumors of one class or another but is not determinative;
+epithelium to forming tumors of one class or another but are not determinative;
 this view is compatible with the previously stated hypothesis but opens the way
 for a more granular view of individual tumors. It would be surprising if we did
 not observe bias for some cancers and subtypes amongst our classes, since some
@@ -133,7 +135,7 @@ different precision treatment regimens.
 ### Incompleteness of the pathway disruption data 
 
 Finally, we must remark on the limitations of our work exemplified in two of the
-classes, 1 and 10, which for which we did not find distinctive associations with
+classes, 1 and 10, for which we did not find distinctive associations with
 pathways (**figure 2B, C**). Class 1 has a relatively low proportion of mutated
 pathways across the board, although it is broadly enriched in many of the same
 tumor-promoting pathways common to the other groups. This likely does not
@@ -191,12 +193,12 @@ BRCA1/2, MMR genes, mitotic checkpoints, Cohesion complexes, _etc._
 evolution must involve the acquisition of disruptions to pathways that may
 individually be harmful ( _e.g._ highly proliferative cells are more likely to
 senesce) but together produce more specialized cancer phenotype and increased
-fitness (as in **figure 4** and **tables 1** and **ST2**). Importantly, our work
-does not distinguish between the order in which these mutations should
-accumulate. This could be addressed in a future study by integrating our
-analysis with evolutionary analysis of clonality, drawing inferences from
-variant allele frequencies as in @PCAWG-EVO. However, since many of the genes in
-the non-cluster-specific pathways involve genome stability, it is reasonable to
+fitness (as in **figure 4** and **tables 1** and **ST2**). Importantly, our
+observations do not imply the order in which these mutations should accumulate.
+This could be addressed in a future study by integrating our analysis with
+evolutionary analysis of clonality, drawing inferences from variant allele
+frequencies as in @PCAWG-EVO. However, since many of the genes in the
+non-cluster-specific pathways involve genome stability, it is reasonable to
 hypothesize that these mutations promote or enable the acquisition of
 class-specific defects via random mutation and natural selection, thus producing
 the classes we observed. In support of this, the pan-cancer analysis of whole
@@ -209,8 +211,8 @@ varying selective pressures in different tissues [@PCAWG-MAIN].
 
 One of the drawbacks of bulk tumor whole genome sequencing data is the problem
 of tumor heterogeneity. Consortium samples are likely to contain contamination
-from support tissue and inflammatory and immune cells of the innate and adaptive
-immune systems, potentially harboring cancer supporting mutations
+from support tissue, stroma, inflammatory, and immune cells of the innate and
+adaptive immune systems, all potentially harboring cancer supporting mutations
 [@bhowmick_review]. We think it will be instructive to explore these ideas in
 the context of single cell experiments.
 
@@ -219,40 +221,41 @@ the context of single cell experiments.
 We report that pathway enrichment in metastatic tumors across all classes
 (pooled) yielded generally lower effect sizes and larger p-values than the
 cluster specific analysis, suggesting that signal is diluted when the samples
-are analyzed this way, and supporting the view that metastasis has
-class-specific requirements. Since the number of metastatic tumors is relatively
-low this part of our analysis is likely underpowered and subject to expanded
-analysis with larger cohorts. Nonetheless, the class-specific metastatic pathway
-enrichment we observe (in **table 2**) could be a result of the pathways
-directly promoting metastatic phenotypes in these classes, or because they
-acquire a stronger or more complete oncogenic phenotype, as we don’t know the
-order in which they were acquired in individual tumor samples. The fact that
-most metastatic enrichment is cluster-specific and has a tendency to overlap
-with cluster-specific pathways from non-metastatic tumors of neighboring
-clusters favors the latter interpretation, and suggests a mechanism of
-complementarity, in which newly acquired mutations result in similar classes
-converging on a single deadly phenotype that captures most or all of the
-critical features of end-stage cancer. One explanation for this could be that
-tumors must accumulate mutations in a certain order or face elimination due to
-any of the selective bottlenecks they face (senescence, the immune system,
-_etc._) [@hallmarks_II]. Some clusters were characterized by cluster-specific
-pathways that seem superficially unrelated; for example cluster 3 has mutations
-impacting protein translation and turnover, whereas cluster 5 has defects in RNA
-metabolism and clusters 7, 8 and 9 have defects in the more traditional
-extra-cellular signaling pathways (as exemplified in **table 1**). It may be
-that the primary effects of mutations in protein and RNA metabolism in clusters
-3 and 5 point to currently unappreciated mechanisms impacting hallmark pathways.
-Clusters 3 and 5 are also marked by a decidedly different set of pathways in
-metastasis. Clusters 3 and 5 notably have (in addition to signaling pathways)
-mutations in glucagon and glycogen metabolism, respectively, in their metastases
-(**table 2**), consistent with energy metabolism as one of the new hallmarks
-[@hallmarks_II], but also distinguishing these classes from the others in the
-order or nature of hallmark acquisition. Thus, even at relatively low power, our
-analysis of metastasis further supports pathway-centric analysis of tumors as
-indicative of real differences in underlying biology. As a major caveat to this,
-we acknowledge that many therapies _do_ target specific signaling pathways (
-_e.g._ EGFR or HER2), but understanding the broader context of the genetic
-background and pathway vulnerability of tumors containing such markers may aid
-in creating smarter combination therapies. We submit that when we discover the
-requirements of each cluster with respect to pathway disruptions and metastasis
-we may be able to target them therapeutically and prevent further adaptation.
+are analyzed together, and supporting the view that metastasis has
+class-specific requirements. Since the number of metastatic samples is
+relatively low this part of our analysis is likely underpowered and subject to
+expanded analysis with larger cohorts. Nonetheless, the class-specific
+metastatic pathway enrichment we observe (in **table 2**) could be a result of
+the pathways directly promoting metastatic phenotypes in these classes, or
+because they acquire a stronger or more complete oncogenic phenotype, as we
+don’t know the order in which they were acquired. The fact that most metastatic
+enrichment is cluster-specific and has a tendency to overlap with
+cluster-specific pathways from non-metastatic tumors of neighboring clusters
+favors the latter interpretation, and suggests a mechanism of complementarity,
+in which newly acquired mutations result in similar classes converging on a
+single deadly phenotype that captures most of the critical features of end-stage
+cancer. One explanation for this could be that tumors must accumulate mutations
+in a certain order or face elimination due to any of the selective bottlenecks
+they face (senescence, the immune system, _etc._) [@hallmarks_II]. Some clusters
+were characterized by cluster-specific pathways that seem superficially
+unrelated; for example cluster 2 has mutations in the proteasome subunits,
+cluster 3 has mutations impacting protein translation, whereas cluster 5 has
+defects in RNA metabolism and clusters 7, 8 and 9 have defects in the more
+traditional extra-cellular signaling pathways (as exemplified in **table 1**).
+It may be that the primary effects of mutations in protein and RNA metabolism in
+clusters 3 and 5 point to currently unappreciated mechanisms impacting hallmark
+pathways. Clusters 3 and 5 are also marked by a decidedly different set of
+pathways in metastasis. Clusters 3 and 5 notably have (in addition to signaling
+pathways) mutations in glucagon and glycogen metabolism, respectively, in their
+metastases (**table 2**), consistent with energy metabolism as one of the new
+hallmarks [@hallmarks_II], but also distinguishing these classes from the others
+in the order or nature of hallmark acquisition. Thus, even at relatively low
+power, our analysis of metastasis further supports the pathway-centric approach
+as a fruitful way to uncover real differences in underlying biology. As a major
+caveat to this, we acknowledge that many therapies _do_ target highly-specific
+driver genes, markers, and signaling pathways ( _e.g._ TP53, EGFR or HER2), but
+understanding the broader context of the genetic background and pathway
+vulnerability of tumors containing such markers may aid in creating smarter
+combination therapies. We submit that when we discover the requirements of each
+cluster with respect to pathway disruptions and metastasis we may be able to
+target them therapeutically and prevent further adaptation.
