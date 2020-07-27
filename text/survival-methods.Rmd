@@ -1,0 +1,84 @@
+
+In order to understand how the diagnosis of cancer changes the expectation for
+longevity of patients, we first began by modeling the longevity of the overall
+population of the US based on CDC life tables. Although childhood cancers exist
+and are tragic, most cancer patients have diagnosis later in life. We modeled
+baseline longevity using a risk rate function:
+
+$$R(t) = R_{20}\exp(a(A-20) + D(t) k a (\frac{t}{365}))$$ 
+
+Time is split into two components. $A$ going from 0 up to the age of the patient
+at diagnosis and then remaining fixed, whereas $t$ starts at 0 upon diagnosis
+and represents the days since diagnosis, a field recorded in the dataset. $D(t)$
+is an indicator for whether diagnosis has occurred or not (before diagnosis D(t)
+= 0, after it equals 1). The model essentially assumes that the risk of dying
+per year at age 20 years is $R_{20}$ and that it increases exponentially with a
+constant rate $a$ up to diagnosis, and then with a new rate $ka$
+thereafter. Though the model does extend back to earlier ages, relatively few
+patients were under age 20.
+
+Given this risk per unit time, the probability to die at time $T+dT$ is the
+probability to survive to time $T$ which is $(1-P(T))$ and then die in the
+remaining interval which is $R(T)dT$
+
+$$dP = (1-P(T)) R(T) dT$$
+
+leading to the differential equation for the cumulative probability of death
+$P(T)$
+
+$$\frac{dP}{dT} = R(T)(1-P(T))$$
+
+The solution of this ODE is:
+
+$$P(T) = 1 - \exp(-\int_0^T R(t) dt)$$
+
+And the density of deaths per unit time is the derivative with respect to T:
+
+$$p(T) = R(T) \exp(-\int_0^T R(t)dt)$$
+
+The $R(T)$ function has two important parameters, the $a$ value which represents
+the background risk rates, and the $k$ value, which is a function of both cancer
+tissue type, and the cancer genomic class.
+
+$$k = k_{tis} k_{cl}$$
+
+The product $k_{tis}k_{cl}$ is obviously symmetric between the two factors. To
+disambiguate the meaning of the two, the prior distribution of $k_{cl}$ has peak
+probability at 1 and a relatively narrow width, due to the fact that it is a
+tissue specific multiplicative modifying factor, this allows the overall
+magnitude of k to be primarily determined by the $k_{tis}$ value whose prior is
+significantly less constrained so that there is a wider range of dangers across
+tissue types.
+
+The $k$ in our model can be taken as, roughly, the aging rate relative to the
+baseline rates as depicted in **supplementary figure S5**. Thus, a value of
+$k=2$ means that a given cancer causes you to experience the same risk in time
+$dt$ as a non-cancer patient would experience at the same age, in time $2dt$.
+
+Using this model, we split the data by Male/Female sex, and by White, vs Black
+race as these were the main well-identified categories available to us in the
+dataset. Sex is known to be a risk factor for death, with males dying at
+slightly higher rates for all ages of interest in our dataset. Black vs White
+race is an important category due to differences in access to care and other
+socioeconomic and education related factors.
+
+Using the model described above we fit the data using Stan via the rstan package
+in R. Posterior inferences are shown in **FIXME WHICH FIGURE?**.
+
+**supplementary figure S5** gives a comparison on log-scale between the post-fit
+survival curves and the CDC data it is based on. For demonstration purposes we
+also illustrate some examples of the expected survival for a population that
+receives a diagnosis with doubled risk of death at ages 40, 50, 60, 70, and 80
+(**supplementary figure S6**).
+
+As an aside, we did not explicitly account for stage at diagnosis in our model
+for the following reasons. In the tumor sample data, stage at diagnosis is
+confounded with cancer type because some cancers are screened aggressively (
+_e.g._ colorectal and prostate cancers) while others are diagnosed typically
+after they become problematic for the patient's lifestyle ( _e.g._ ovarian and
+pancreatic cancers). Secondly, such a model specification would suffer from
+added noise because the staging data are not well standardized across cancer
+types, have different criteria, and because it is unclear what the relationship
+between stage and advancement of disease is (for example some sub-stage 4 tumors
+are metastatic). To compound this latter issue, our tumor set is vastly
+under-powered given the uneven representation of stage across cancer types.
