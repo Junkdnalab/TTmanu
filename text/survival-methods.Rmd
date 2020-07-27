@@ -1,0 +1,38 @@
+
+
+We modeled baseline longevity in the U.S. with these different factors.
+<mark>Key assumptions? (Room here for further descriptions and equations)</mark>
+Using this base survival model, we constructed a likelihood function with
+parameters describing the overall lethality of each cancer type as a modifier
+$k_{tissue}$ of the rate parameter $r_{0}$, and cluster specific modifiers of
+$k$ and optimized model fit using stan[@stanref]. The $k$ in our model can be
+taken as, roughly, the death rate relative to the baseline rates as depicted in
+**supplementary figure S5**. Thus, a value of $k=2$ means that a given cancer is
+twice as deadly.
+
+With an accurate model for baseline longevity in place, we sought to model
+cancer as an event based modifier of long-term survival. Thus any factors or
+events such as cancer would modify the baseline risk function as a multiplier.
+The resulting coefficients can thus be interpreted as increasing baseline risk
+by <mark>x-fold.</mark> Baseline risk was modeled as cumulative survival for
+female vs. male caucasians, blacks and asians (hispanics are not clearly marked
+in the tumor data; see **supplementary figure S5** for comparisons of raw CDC
+data and baseline risk models). Thus we are able to accurately model baseline
+risk of death taking these factors into account. The data themselves encompass
+all other causes of death for these populations including cancer, thus freeing
+our model from concerns about other confounding factors ( _e.g._ Diabetes). For
+demonstration purposes we also illustrate some examples of the expected survival
+for a population that receives a diagnosis with doubled risk of death at ages
+40, 50, 60, 70, and 80 (**supplementary figure S6**).
+
+As an aside, we did not explicitly account for stage at diagnosis in our model
+for the following reasons. In the tumor sample data, stage at diagnosis is
+confounded with cancer type because some cancers are screened agressively (
+_e.g._ colorectal and prostate cancers) while others are diagnosed typically
+after they become problematic for the patient's lifestyle ( _e.g._ ovarian and
+pancreatic cancers). Secondly, such a model specification would suffer from
+added noise because the staging data are not well standardized across cancer
+types, have different criteria, and because it is unclear what the relationship
+between stage and advancement of disease is (for example some sub-stage 4 tumors
+are metastatic). To compound this latter issue, our tumor set is vastly
+under-powered given the uneven representation of stage across cancer types.
