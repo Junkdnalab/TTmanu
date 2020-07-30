@@ -1,3 +1,11 @@
+```{r}
+library(data.table)
+library(ggplot2)
+library(tidyverse)
+library(kableExtra)
+```
+
+
 ### Supplementary Figure S1
 ```{r supplementary-figure-s1, out.width = '90%', fig.align='center'}
 umap_cancertype <- fread("../data/umap_3d_coors.tsv") ## load data
@@ -68,12 +76,18 @@ rm(missense, splice, frameshdel, frameshins, utr3, utr5, nonstop, nonsense)
 gc()
 gdc_mut_count_patient[gdc_mut_count_patient > 0] <- 1 ## booleanize data, anything greater than 1 is equal to 1
 
-##oncogene
-oncogene <- c("AKT2","BCL2","CTNNB1","ERBB2","KRAS","MDM2","MYC","PIK3CA","TET2","USP6") ## list of selected oncogene
-##tumor_supressor
-tumor_suppressor <- c("APC","BRIP1","CDKN2C","CHEK2","MSH2","PTEN","RB1","SMARCA4","TP53","VHL", "APOBEC3B") ## list of selected tumor suppressor
+## MMR genes
+genes <- c("MSH2", "MSH6", "MLH1", "MLH3", "PMS1", "PMS2", "BRIP1", "RAD51", "CHEK2", "APC",
+           "TET2", "TET3", "TERT", "TEP1", "DKC1")
 
-selected_mut <- gene_data %>% dplyr::select(external_gene_name, ensembl_gene_id) %>% filter(external_gene_name %in% c(oncogene, tumor_suppressor)) ## getting ensembl_id for the oncogenes for filtering gdc data
+selected_mut <- gene_data %>% dplyr::select(external_gene_name, ensembl_gene_id) %>% filter(external_gene_name %in% genes) ## getting ensembl_id for the mmr genes for filtering gdc data
+
+# ##oncogene
+# oncogene <- c("AKT2","BCL2","CTNNB1","ERBB2","KRAS","MDM2","MYC","PIK3CA","TET2","USP6") ## list of selected oncogene
+# ##tumor_supressor
+# tumor_suppressor <- c("APC","BRIP1","CDKN2C","CHEK2","MSH2","PTEN","RB1","SMARCA4","TP53","VHL", "APOBEC3B") ## list of selected tumor suppressor
+# 
+# selected_mut <- gene_data %>% dplyr::select(external_gene_name, ensembl_gene_id) %>% filter(external_gene_name %in% c(oncogene, tumor_suppressor)) ## getting ensembl_id for the oncogenes for filtering gdc data
 
 selected_mut <- gdc_mut_count_patient %>% filter(rownames(.) %in% selected_mut$ensembl_gene_id) %>% ## filter by ensembl ids
   rownames_to_column(var = "ensembl_gene_id") %>% left_join(., selected_mut, by = "ensembl_gene_id") %>% ## replace ensembl ids with gene name 
@@ -108,9 +122,7 @@ ggplot(selected_mut, aes(x = plot_y, y = plot_x, colour = as.character(value))) 
     axis.ticks = element_blank(),
     axis.line = element_blank(),
     legend.position = "none") +
-  facet_wrap(~ factor(variable, levels = c("AKT2","BCL2","CTNNB1","ERBB2","KRAS","MDM2","MYC","PIK3CA","TET2","USP6", 
-                                  "APC","BRIP1","CDKN2C","CHEK2","MSH2","PTEN","RB1","SMARCA4","TP53","VHL")),
-                      ncol = 5) ## facet by gene
+  facet_wrap(~ factor(variable, levels = c("MSH2", "MSH6", "MLH1", "MLH3", "PMS1", "PMS2", "BRIP1", "RAD51", "CHEK2", "APC", "TET2", "TET3", "TERT", "TEP1", "DKC1")), ncol = 5) ## facet by gene
 ```
 
 ![**Supplementary Figure S3. Common oncogenic mutations.** _Each panel shows one of 20 commonly mutated oncogenic genes projected on the UMAP from **Figure 1A of the main text.**_]

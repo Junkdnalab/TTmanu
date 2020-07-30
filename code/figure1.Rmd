@@ -1088,10 +1088,10 @@ mut_median <- mut_order %>%
 ## Need to add 50 pseudo samples front and end of data so they don't touch the y-axis
 mut_order <- mut_order[,c("sample_id", "clust_knn", "log10mut")] ## selecting relevant column
 
-begin_NA <- data.frame(sample_id = paste0("sample", 1:50), 
+begin_NA <- data.frame(sample_id = paste0("sample", 1:100), 
                        clust_knn = min(as.numeric(mut_order$clust_knn)), ## put lowest cluster to prevent a new facet
                        log10mut = NA) ## put NA values so they don't get plotted
-end_NA <- data.frame(sample_id = paste0("sample", 51:100), ## repeat the step for the ends
+end_NA <- data.frame(sample_id = paste0("sample", 101:200), ## repeat the step for the ends
                        clust_knn = max(as.numeric(mut_order$clust_knn)),
                        log10mut = NA)
 mut_order <- rbind(begin_NA, mut_order, end_NA) ## rbind the data in a specfic order
@@ -1270,19 +1270,21 @@ fig1A + fig1B + fig1C + fig1D + fig1E + fig1F + fig1G + fig1H + fig1I + fig1J + 
 Classification of tumors by pathway disruptions.** a) Each of 377 selected
 Reactome pathways (columns) is classified as disrupted if one or more genes is
 mutated in the tumor sample (rows). Tumors are grouped by tissue of origin using
-standardized abrreviations from the TCGA project. b) MCA analysis was performed
-restricted to the 36 informative components. c) The resulting MCA was projected
-down to 3 dimensions for the purpose of density based clustering (only the first
-2 dimensions are shown). Each dot represents a tumor d) HDBSCAN was used to
-perform hierarchical density based clustering tuned to minimize the fraction of
-unassigned tumors. e) HDBSCAN clustered tumors were visualized on the UMAP
+standardized abbreviations from the TCGA project. b) MCA analysis was performed to 
+determine the eigenvalue with the most explanatory power from the categorical data.
+Average of 100 permutations of the data was used as a baseline. c) The p-value of
+each eigenvalue was plotted and the max eigenvalue with a pvalue < 0.05 was selected. 
+d) The resulting MCA was projected down to 3 dimensions for the purpose of density 
+based clustering (only the first 2 dimensions are shown). Each dot represents a tumor 
+e) HDBSCAN was used to perform hierarchical density based clustering tuned to minimize
+the fraction of unassigned tumors. f) HDBSCAN clustered tumors were visualized on the UMAP
 projection; tumors are colored by cluster membership (see legend). This results
-in some tumors remaining unclassified (grey points). f) kNN was used to assign
-membership to the remaining tumors. g) Violin plots of sample mutation counts
-for tumors in each class. h) Projection of cancer type identity onto UMAP.
-Abbrevs: BRCA = Breast cancer, COAD = Colorectal adenocarcinoma, HNSC = Head and
-Neck Squamous Cell, PAAD = Pancreatic adenocarcinoma. i) Projection of breast
-cancer subtypes onto the UMAP. j) projection of BRCA1/2 somatic mutation onto the
-UMAP. k) projection of tumor stage onto the UMAP,
-regardless of cancer type. l) Projection of metastatic status onto the UMAP.
-Abbrevs: M0 = non-metastatic tumors, M1 = metastatic tumors.</p>
+in some tumors remaining unclassified (grey points). g) kNN was used to assign
+membership to the remaining tumors. h) Mutational burden plot where each dot corresponds
+to the sample mutation counts for tumors in each class. i) Projection of cancer 
+type identity onto UMAP. Abbrevs: BRCA = Breast cancer, COAD = Colorectal adenocarcinoma,
+HNSC = Head and neck squamous cell, PAAD = Pancreatic adenocarcinoma. j) Projection of breast
+cancer subtypes onto the UMAP. k) Projection of BRCA1/2 somatic mutation onto the
+UMAP. l) Projection of tumor stage onto the UMAP, regardless of cancer type. m) 
+Projection of metastatic status onto the UMAP. Abbrevs: M0 = non-metastatic tumors, 
+M1 = metastatic tumors.</p>
