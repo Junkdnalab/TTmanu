@@ -58,6 +58,8 @@ library(uwot)
 library(janitor)
 library(FactoMineR)
 library(seriation)
+library(rtracklayer)
+library(poibin)
 ```
 
 ## Abstract
@@ -80,21 +82,21 @@ Cancer Genome Atlas (TCGA) through the [Genomic Data Commons
 study given the relative completeness of the patient metadata, particularly for
 survival and staging. We chose to start with somatic mutations in exome
 sequencing data because the affected target gene is known unambiguously.
-Therefore, we focused on all missense, nonsense, frameshift, and splicing
-mutations. In order to minimize bias from well-studied diseases and processes,
-we selected 377 Reactome pathways [reactome.org](https://reactome.org/) of
-interest corresponding to basic cellular processes and biochemical pathways,
+Therefore, we focused on all missense, nonsense, frameshift, stop-gain, untranslated
+region, and splicing mutations. In order to minimize bias from well-studied diseases
+and processes, we selected 377 Reactome pathways [reactome.org](https://reactome.org/) 
+of interest corresponding to basic cellular processes and biochemical pathways,
 excluding gene sets that correspond to miscellaneous categories ( _e.g._
 “transcription factors”) or disease associations ( _e.g._ “mutated in colon
-cancer”) and filtered our gene list on membership in these pathways (<mark>total
-of x genes;</mark> see methods for details).
+cancer”) and filtered our gene list on membership in these pathways (total
+of 9040 genes; see methods for details).
 
 It does not matter for our purposes whether a single tumor is “enriched” for
 mutations of individual pathways, chiefly because such metrics favor larger
 pathways ( _i.e._ pathways with more member genes) over smaller ones. Data
 binarized by pathway are likely to be noisy for several reasons. First, point
 mutations can be deleterious (attenuating or hypomorphic) or activating
-(neomorphic) in genes that act functionally as either activators or repressors.
+(neomorphic or hypermorphic) in genes that act functionally as either activators or repressors.
 Within the scope of this study we accept this uncertainty and assume mutations
 are generically disruptive to the pathway regardless of whether they are
 activating or deactivating or whether they affect a gene that we might classify
@@ -104,8 +106,8 @@ mutations at a higher rate due to transcription coupled repair
 [@kandothMutationalLandscapeSignificance2013; @kimPancancerAnalysisSomatic2018;
 @Pervasive_lesion_segregation; @expression-aware-annotation]. To address this
 issue, we identified genes with low expression in each type of cancer and
-eliminated them for that cancer type only (see methods for details).
-<strike>Highly expressed genes could also have high mutation rates owing to
+eliminated them for that cancer type only (see methods for details). 
+<strike> Highly expressed genes could also have high mutation rates owing to
 transcription induced mutagenesis [@parkGenomicEvidenceElevated2012]. We felt
 that this mechanism results in cell-type-specific biases that might be
 biologically meaningful for predisposition to different classes of cancer
@@ -113,13 +115,13 @@ however, and therefore chose not to exclude these genes from our analysis. After
 selecting our pathways and genes, we then compiled a matrix of the pathways,
 assigning a Boolean value (a 1 or 0, indicating whether any pathway member gene
 carries a mutation) to the pathway regardless of the number of genes carrying
-mutations (**figure 1A**).
+mutations (**figure 1A**). </strike>
 
 ```{r child='../code/figure1.Rmd'}
 ```
 In order to classify tumors using this dataset, we used multiple correspondence
-analysis (MCA) [@JSSv025i01]. First we determined the number of dimensions
-containing useful information (**figures 1B, C**). Then we performed a UMAP
+analysis (MCA) [@JSSv025i01]. First, we determined the number of dimensions
+containing useful information. (**figures 1B, C**). Then we performed a UMAP
 analysis, both in order to summarize the MCA graphically, and as a preprocessing
 step to boost the performance of density based clustering. The resulting map was
 notable for its lobed structure, with several large, robust projections
@@ -133,10 +135,10 @@ to several parameters; key for our analysis are the minimum number of tumor
 samples in a cluster that capture the maximum number of tumor samples, measured
 by probability of membership of $\geq 5\%$ in at least one class. Thus, we
 created a score metric as the fraction of classified tumors with max probability
-$< 5\%$ in one class and chose a cluster size of 95 to minimize the score
-function (**figure 1E**). HDBSCAN with these settings resulted in 12 distinct
+$< 5\%$ in one class and chose a cluster size of 92 to minimize the score
+function (**figure 1E**). HDBSCAN with these settings resulted in ten distinct
 high-density clusters which we then projected onto the UMAP (**figure 1F**).
-This classified <mark>x out of 7,607 tumors</mark> but still resulted in a
+This classified 6,038 out of 7,607 tumors but still resulted in a
 significant fraction of unclassified tumor samples. Since we ultimately wish to
 be able to classify any tumor using this scheme, we performed k Nearest
 Neighbors (kNN) analysis, which computes a similarity metric to every tumor in
@@ -157,9 +159,9 @@ media from **supplementary file 1 (html)**), suggesting that, in principle at
 least, our novel pathway-disruption classification method identifies molecular
 pathologies largely independent of tissue-of-origin considerations. As an
 example of one type of cancer that does have a biased pathway profile,
-pancreatic adenocarcinoma (PAAD) was biased in class 8 & 9, which is
-distinguished  by KRAS mutations among others (**supplementary figure S3**). But even PAAD comprises tumors
-from <mark>check; 7 out of 10 of the remaining classes</mark>, meaning that
+pancreatic adenocarcinoma (PAAD) was biased in class 8, which is
+distinguished  by KRAS mutations among others (**supplementary figure S3**). 
+But even PAAD comprises tumors from the nine remaining classes, meaning that 
 patients hosting these tumors have potentially different underlying molecular
 pathologies.
 
@@ -175,7 +177,7 @@ proxies for molecular pathology sub-typing. To our surprise, we find a similar
 result to the previous analysis of cancer types projected onto the UMAP of
 pathway disruptions. For example we projected annotations for each of the breast
 cancer subtypes, composed of Triple-negative/Basal-like, Her2 positive,
-normal-like, and lumenal A and B subtypes onto the UMAP. These are among the
+normal-like, and luminal A and B subtypes onto the UMAP. These are among the
 most heavily studied molecular subtypes in cancer, which each have different
 prognoses and standards of care. We did not observe any exclusive segregation by
 pathway for these subtype annotations (**Figure 1J** and **supplemental
@@ -203,12 +205,12 @@ breast, prostate and ovarian cancers. The mechanism of risk is thought to
 involve loss of heterozygosity [@brca-loh], so we projected the somatic
 mutations for _BRCA1_ and _-2_ genes onto the UMAP, but did not observe
 segregation of these mutations into specific clusters (**figure 1K**). We made
-similar projections for the mismatch repair (MMR) genes _MSH2_, _MSH6_, _MLH_,
-_PMS1_ and _PMS2_; _BRIP1_, _RAD15_, _CHEK2_ and _APC_. None of these genes
+similar projections for the mismatch repair (MMR) genes _MSH2_, _MSH6_, _MLH1_,
+_MLH3_, _PMS1_ and _PMS2_; _BRIP1_, _RAD51_, _CHEK2_ and _APC_. None of these genes
 except for _APC_ exhibited any remarkable specificity with respect to cluster
 assignment (**supplementary figure S3**). To look at other risk factors such as
-maintenance of DNA methylation levels and telomere length we projected somatic
-mutations of the _TET2_ and _TET3_ genes, plus telomerases 1, 2, and 3, and
+maintenance of DNA methylation levels and telomere length, we projected somatic
+mutations of the _TET2_ and _TET3_ genes, plus _TERT_, _TEP1_, and _DKC1_, and
 observed similar lack of segregation by cluster (**supplementary figure S3**).
 
 #### Independence of stage, mutation count and mutation profile.
