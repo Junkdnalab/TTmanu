@@ -56,7 +56,7 @@ More recently, attempts have been made to consider pan-cancer mutations and
 other data outside the context of enrichment at the gene level. Horn _et al._
 [@hornNetSigNetworkbasedDiscovery2018] introduce approaches to address the
 sparseness of mutations, allowing the potential importance of a gene to be
-influenced by the aggregate of positive selection in its nearest network
+influenced by the aggregate of mutations in its nearest network
 neighbors. This method is powerful especially when applied to a small number (on
 the order of hundreds) of tumors. However, the larger problem of cancer etiology
 remains: what mutations are required, in what order, and are there specific
@@ -68,6 +68,6 @@ In this study, we attempt to address these questions by focusing on discrete
 molecular pathways as the unit of disruption in cancer. Our approach strips all
 cell-type-specific information from the mutation data and generalizing
 gene-level information to non-tissue specific cell-biological pathway
-phenotypes. We use this rubric to evaluate all cancers and show that,
+phenotypes. We use this statistic to evaluate all cancers and show that,
 surprisingly, tumors may have distinct phenotypes completely independent of
 their tissues of origin.

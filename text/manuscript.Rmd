@@ -27,39 +27,41 @@ editor_options:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(rstan)
-library(foreach)
-library(sqldf)
-library(tidyverse)
-library(ggthemes)
-library(data.table)
-library(biomaRt)
-library(dplyr)
-library(GenomicRanges)
-library(SummarizedExperiment)
-library(reactome.db)
-library(plyr)
-library(cluster)
-library(pheatmap)
-library(clusterProfiler)
-library(org.Hs.eg.db)
-library(dbscan)
-library(class)
-library(TCGAbiolinks)
-library(patchwork)
-library(ggplotify)
-library(ComplexHeatmap)
-library(knitr)
-library(kableExtra)
-library(UpSetR)
-library(cowplot)
-library(doRNG)
-library(uwot)
-library(janitor)
-library(FactoMineR)
-library(seriation)
-library(rtracklayer)
-library(poibin)
+suppressPackageStartupMessages(
+  library(rstan),
+  library(foreach),
+  library(sqldf),
+  library(tidyverse),
+  library(ggthemes),
+  library(data.table),
+  library(biomaRt),
+  library(dplyr),
+  library(GenomicRanges),
+  library(SummarizedExperiment),
+  library(reactome.db),
+  library(plyr),
+  library(cluster),
+  library(pheatmap),
+  library(clusterProfiler),
+  library(org.Hs.eg.db),
+  library(dbscan),
+  library(class),
+  library(TCGAbiolinks),
+  library(patchwork),
+  library(ggplotify),
+  library(ComplexHeatmap),
+  library(knitr),
+  library(kableExtra),
+  library(UpSetR),
+  library(cowplot),
+  library(doRNG),
+  library(uwot),
+  library(janitor),
+  library(FactoMineR),
+  library(seriation),
+  library(rtracklayer),
+  library(poibin)
+)
 ```
 
 ## Abstract

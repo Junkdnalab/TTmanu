@@ -7,3 +7,12 @@ TTmanu.Rproj
 text/newitem.bib
 data/
 figures/
+*.html
+*.log
+*.pdf
+*.tex
+*.png
+*.tgz
+*.tar.gz
+*.tar
+.gitignore
