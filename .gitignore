@@ -6,3 +6,12 @@ text/manuscript.html
 TTmanu.Rproj
 text/newitem.bib
 figures/
+*.html
+*.log
+*.pdf
+*.tex
+*.png
+*.tgz
+*.tar.gz
+*.tar
+.gitignore
