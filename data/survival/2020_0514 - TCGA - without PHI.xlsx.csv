@@ -1,0 +1,57 @@
+ID - TCGA,Language,"Language, Other",Religion,Ethnicity,Race,Age of Ovarian cancer diagnosis,Ovarian cancer Histology,Ovarian cancer Grade,Ovarian cancer Stage,Age at Death,OS,Last status,Age at last follow-up,PFS
+23-1021,English,,Presbyterian,Non-Hispanic,White,45,serous,3,4,49,48,Dead,49,48
+unk,English,,Jewish,Non-Hispanic,White,45,serous,3,3C,51,68,Dead,51,68
+unk,English,,Jewish,Non-Hispanic,White,56,serous,3,,66,123,Dead,66,123
+23-1120,Other,Armenian,Christian,Non-Hispanic,White,60,serous,3,3C,,,Alive,71,132
+23-1107,English,,Jewish,Non-Hispanic,White,58,serous,3,4,58,11,Dead,58,11
+23-1022,English,,Lutheran,Non-Hispanic,White,67,serous,3,3C,72,49,Dead,72,49
+23-1023,Other,Armenian,Christian,Non-Hispanic,White,65,serous,3,3C,70,68,Dead,70,68
+unk,English,,Buddhist,Non-Hispanic,Asian,56,serous,3,3C,67,126,Dead,67,126
+unk,English,,Jewish,Non-Hispanic,White,57,serous,3,3C,60,30,Dead,60,30
+23-1109,English,,Catholic,Non-Hispanic,White,62,serous,3,4,67,51,Dead,67,51
+23-1110,English,,Catholic,Hispanic,White,42,serous,3,3C,47,,Dead,47,
+23-1111,English,,Christian,Non-Hispanic,White,63,serous,3,3C,72,,Dead,72,
+23-1024,English,,Jewish,Non-Hispanic,White,,serous,3,4,63,,Dead,63,
+unk,English,,None,Non-Hispanic,White,43,serous,3,3C,49,,Dead,49,
+23-1026,English,,Christian,Non-Hispanic,White,45,serous,3,3C,,,Alive,47,34
+23-1027,English,,Jewish,Non-Hispanic,White,48,serous,3,3C,50,,Dead,50,
+unk,English,,Catholic,Non-Hispanic,Asian,59,serous,3,3C,60,,Dead,60,
+23-2645,English,,Catholic,Non-Hispanic,Asian,54,serous,3,3C,,,Alive,64,
+23-2649,English,,Buddhist,Non-Hispanic,White,60,serous,3,3C,62,16,Dead,62,16
+unk,English,,Jewish,Non-Hispanic,White,66,serous,3,3 NOS,68,22,Dead,68,22
+unk,English,,Declines to State,"Other, unknown",Black or African American,58,serous,3,3C,59,9,Dead,59,9
+23-1028,English,,Catholic,Hispanic,White,43,serous,3,3C,48,,Dead,48,
+23-1809,English,,Jehovah's Witness,Non-Hispanic,Black or African American,63,serous,3,2C,70,,Dead,70,
+unk,English,,Jewish,Non-Hispanic,White,72,serous,3,3 NOS,76,45,Dead,76,45
+23-2078,English,,Jewish,Non-Hispanic,White,66,serous,3,3 NOS,,,Alive,85,225
+23-1113,English,,Christian,Non-Hispanic,White,48,serous,3,3 NOS,51,31,Dead,51,31
+unk,English,,Catholic,Non-Hispanic,White,72,serous,3,3C,73,,Dead,73,
+23-1114,English,,Presbyterian,Non-Hispanic,White,55,serous,3,3 NOS,61,68,Dead,61,68
+23-2077,English,,Christian,Non-Hispanic,White,45,serous,3,1 NOS,,,Alive,65,239
+unk,English,,Jewish,Non-Hispanic,White,82,serous,3,3 NOS,84,34,Dead,84,34
+unk,English,,None,Non-Hispanic,White,72,serous,3,3C,76,,Dead,76,
+23-1029,English,,Jewish,Non-Hispanic,White,46,serous,3,3C,54,97,Dead,54,97
+unk,English,,Protestant,Non-Hispanic,White,63,serous,3,3C,67,53,Dead,67,53
+23-2079,English,,Jewish,Non-Hispanic,White,46,serous,3,3 NOS,,,Alive,65,226
+23-2072,English,,Jewish,Non-Hispanic,White,58,serous,3,3 NOS,61,24,Dead,61,24
+23-2081,English,,Declines to State,Non-Hispanic,White,49,serous,3,3C,56,76,Dead,56,76
+23-1116,English,,Jewish,Non-Hispanic,White,,,,,85,,Dead,85,
+23-2084,English,,Jewish,Non-Hispanic,White,45,serous,3,3 NOS,49,49,Dead,49,49
+23-1117,English,,Declines to State,Non-Hispanic,White,42,serous,3,3 NOS,45,33,Dead,45,33
+23-1118,Other,Russian,Christian,Non-Hispanic,White,45,serous,3,3 NOS,55,119,Dead,55,119
+23-1030,English,,Episcopalian,Non-Hispanic,White,64,serous,3,3C,68,,Dead,68,
+unk,English,,Jewish,Non-Hispanic,White,59,serous,3,3 NOS,65,65,Dead,65,65
+23-1119,English,,Jewish,Non-Hispanic,White,64,serous,3,3 NOS,81,200,Dead,81,200
+23-1031,English,,Jewish,Non-Hispanic,White,60,serous,3,3 NOS,62,18,Dead,62,18
+23-2641,English,,None,Non-Hispanic,White,85,serous,3,3C,87,,Dead,87,
+23-1121,English,,Catholic,Non-Hispanic,White,51,serous,3,3C,,,Alive,58,
+23-1032,English,,Baptist,Non-Hispanic,Black or African American,73,serous,3,4,73,2,Dead,73,2
+23-1122,English,,Jewish,Non-Hispanic,White,53,serous,3,3 NOS,56,39,Dead,56,39
+unk,English,,Jewish,Non-Hispanic,White,62,,,,,,Alive,91,350
+unk ,English,,Protestant,Non-Hispanic,White,53,serous,3,3C,57,,Dead,57,
+23-1123,English,,Protestant,Non-Hispanic,White,59,serous,3,3 NOS,61,32,Dead,61,32
+23-2643,English,,Catholic,Hispanic,White,74,serous,3,3C,76,,Dead,76,
+23-1124,English,,Protestant,Non-Hispanic,White,62,serous,3,3 NOS,67,53,Dead,67,53
+unk,English,,Declines to State,Non-Hispanic,White,43,serous,3,3C,,,Alive,45,21
+23-2647,English,,Buddhist,Non-Hispanic,Asian,49,serous,3,3C,51,,Dead,51,
+unk ,English,,None,Hispanic,White,73,serous,3,4,77,51,Dead,77,51

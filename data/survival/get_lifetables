@@ -1,0 +1,8 @@
+#!/bin/bash
+
+wget -r -nd -P lifetables ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Publications/NVSR/68_07/
+
+for i in lifetables/*xlsx; do
+	     ssconvert $i lifetables/$(basename $i .xlsx).csv
+      done
+
