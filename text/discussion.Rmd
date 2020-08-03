@@ -133,6 +133,10 @@ possibility of identifying more informative molecular, histological or cellular
 subtypes that could form a basis for future separation of patients into
 different precision treatment regimens.
 
+### Tissue specific manifestation of pathway-centric disruptions
+
+Our results illustrate how unique combinations of mutations in pan-cancer driver genes with tissue-specific pathway disruptions result in common categories when viewed at the level of the pathway knowledge-base. For example, in table 1 we find that `snRNP assembly`, one of the unique driver pathways of cluster 5, the top gene in breast cancer is represented by TPR (mutated in 26% of samples). By contrast the top gene for head and neck and lower grade gliomas is RANBP (20% and 13% of samples, respectively). For some other clusters, _e.g._ 7, 8 & 9, the top genes are known drivers such as TP53, PIK3CA and KRAS. None of these genes is 100% mutated in any cluster however, and therefore it is the combinations with secondary mutations, many of which are tissue-specific, that round out the complement of pathways in all clusters. These top genes are found in most of the clusters (supplemental figure S5), and in spite of the fact that they contribute to many cluster-specific pathways. This can only be explained as a result of other less common driver genes complementing the pathway disruption of the unique combination of driver genes that are disrupted in each tumor, and we speculate that many of these are relatively tissue-specific in terms of their sensitivity to mutation. Consistent with our observations, @moonlight showed how tissue- and cancer-specific driver genes and druggable targets of pathway moduli can be discovered by machine learning on integrated multi-omics datasets. Marrying these approaches in future work will greatly enhance our understanding of tumor biology.
+
 ### Incompleteness of the pathway disruption data 
 
 Finally, we must remark on the limitations of our work exemplified in two of the
@@ -199,11 +203,11 @@ observations do not imply the order in which these mutations should accumulate.
 This could be addressed in a future study by integrating our analysis with
 evolutionary analysis of clonality, drawing inferences from variant allele
 frequencies as in @PCAWG-EVO. However, since many of the genes in the
-non-cluster-specific pathways involve genome stability, it is reasonable to
-hypothesize that these mutations promote or enable the acquisition of
+non-cluster-specific pathways involve the known driver genes, it is reasonable to
+hypothesize that these mutations promote or enable the subsequent acquisition of
 class-specific defects via random mutation and natural selection, thus producing
 the classes we observed. In support of this, the pan-cancer analysis of whole
-genomes consortium (PCAWG) found that a subset of known oncogenic driver
+genomes consortium (PCAWG) found that oncogenic driver
 mutations are highly enriched in early arising clones, whereas later arising
 clones have much greater diversity in driver mutations [@PCAWG-EVO]. Moreover,
 driver genes that are known to be responsible for discrete mutation signatures

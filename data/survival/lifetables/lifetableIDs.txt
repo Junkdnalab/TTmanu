@@ -1,0 +1,53 @@
+==> Table01.csv <==
+"Table 1. Life table for the total population: United States, 2017",,,,,,
+
+==> Table02.csv <==
+"Table 2. Life table for males: United States, 2017",,,,,,
+
+==> Table03.csv <==
+"Table 3. Life table for females: United States, 2017",,,,,,
+
+==> Table04.csv <==
+"Table 4. Life table for the white population: United States, 2017",,,,,,
+
+==> Table05.csv <==
+"Table 5. Life table for white males: United States, 2017",,,,,,
+
+==> Table06.csv <==
+"Table 6. Life table for white females: United States, 2017",,,,,,
+
+==> Table07.csv <==
+"Table 7. Life table for the black population: United States, 2017",,,,,,
+
+==> Table08.csv <==
+"Table 8. Life table for black males: United States, 2017",,,,,,
+
+==> Table09.csv <==
+"Table 9. Life table for black females: United States, 2017",,,,,,
+
+==> Table10.csv <==
+"Table 10. Life table for the Hispanic population: United States, 2017",,,,,,
+
+==> Table11.csv <==
+"Table 11. Life table for Hispanic males: United States, 2017",,,,,,
+
+==> Table12.csv <==
+"Table 12. Life table for Hispanic females: United States, 2017",,,,,,
+
+==> Table13.csv <==
+"Table 13. Life table for the non-Hispanic white population: United States, 2017",,,,,,
+
+==> Table14.csv <==
+"Table 14. Life table for non-Hispanic white males: United States, 2017",,,,,,
+
+==> Table15.csv <==
+"Table 15. Life table for non-Hispanic white females: United States, 2017",,,,,,
+
+==> Table16.csv <==
+"Table 16. Life table for the non-Hispanic black population: United States, 2017",,,,,,
+
+==> Table17.csv <==
+"Table 17. Life table for non-Hispanic black males: United States, 2017",,,,,,
+
+==> Table18.csv <==
+"Table 18. Life table for non-Hispanic black females: United States, 2017",,,,,,

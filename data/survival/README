@@ -1,0 +1,70 @@
+Data files go here. We have the following data:
+
+Filename here: clincal_plus_cluster.csv [Header = T]
+Column	Column Title		Description
+A	x			x-coordinate of UMAP
+B	y			y-coordinate of UMAP
+C	tumor_id		tcga barcode (short version - 13 character)
+D	dna_mutation_id		tcga barcode (long version - 22 character)
+E	clust			tumor class (0 = outlier; 1 = cluster 1, 2 = cluster 2, etc)
+F	member_prob		individual point membership probabilities range: 0-1
+G	patient_id		tcga barcode (shorter version - 10 character)
+H	type			tissue-of-origin
+I	age at initial patho..	age of diagnosis in years
+J	gender			gender
+K	race			race		
+L	histological_type	disgnosis of a disease based on the type of tissue; determined by pathology
+M	histological_grade	description of a tumor based on how abnormal the cancer cell looks; determined by pathology
+N	initial_pathologic_d..	year of cancer diagnosis
+O	menopause_status	menopause status
+P	birth_days_to		age in days
+Q	vital_status		state of being living or deceased
+R	tumor_status		state of tumor at a particular time
+S	last_contact_days_to	time interval from the date of last follow up to the date of initial diagnosis in days	
+T	death_days_to		number of days from the date of diagnosis to death
+U	cause_of_death		cause of death
+V	new_tumor_event_type	type of newly developed neoplasm after initial treatment has finished
+W	new_tumor_event_site	anatomic site of newly developed neoplasm
+X	new_tumor_event_site_ot	alternative anatomic site of a newly developed neoplasm not listed in column W
+Y	new_tumor_event_dx_days	time interval from initial treatment has finished to newly developed neoplasm diagnosis
+Z	treatment_outcome_first tumor status after initial treatment
+AA	OS			overall survival 1 = dead 0 = alive
+AB	OS.time			overall survival in days
+AC	DSS			disease-specific survival
+AD	DSS.time		disease-specific survival in days
+AE	DFI			disease-free interval
+AF	DFI.time		disease-free interval in days
+AG	PFI			progression-free interval 1 = reoccurence 0 = no event
+AH	PFI.time		progression-free interval in day
+AI	Redaction		removal of cases from the data due to incorrect info (wrong cancer,genotype,etc)
+AJ	ajcc_pathologic_tumor_s tumor stage
+AK	ajcc_pathologic_tumor_p	tumor size
+AL	ajcc_metastasis_patho.. presence of metastasis (M0=not metastatic;M1=metastatic;MX=cannot be measured)
+AM	subtype_selected	classification based on genomics (iCluster, CIN, Basal-like, etc)
+
+Filename2 here: tcga_clinical_data.csv [Headers = T]
+Column  Column Title            Description
+A       patient_id              TCGA barcode
+B       pharmaceutical_therapy_ Unedited drug name from TCGAbiolink (contains brand name and generic names)
+C	generic_name		Generic name of drug from column B
+D	drug_class		Treatment classification
+E	clinical_trail_drug_cla	Clinical phase
+F	pharmaceutical_therapy_	Type of treatment
+G	pharmaceutical_tx_start	Tx start date from diagnosis
+H	pharmaceutical_tx_ended	Tx end date from diagnosis
+I	treatment_best_response	Response to treatment
+J	prescribed_dose		Numerical value
+K	pharmaceutical_tx_dose	Dose units
+L	route_of_administration	Drug route of administration
+M       clust                   tumor class (0 = outlier; 1 = cluster 1, 2 = cluster 2, etc)
+N       type                    tissue-of-origin
+O       vital_status            state of being living or deceased
+P       last_contact_days_to    time interval from the date of last follow up to the date of initial diagnosis in day$
+Q       death_days_to           number of days from the date of diagnosis to death
+
+Filename3: tcga_survival_data.csv [Header = T]
+Column  Column Title            Description
+A       bcr_patient_barcode	TCGA barcode (12 char)
+B	procedure		Surgery performed
+C	surgery_type		Initial method of dx means surgery doctors used to characterize tumors
+ 
