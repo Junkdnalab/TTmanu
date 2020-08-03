@@ -98,7 +98,7 @@ associated with unique combinations of pathways (as in **figures 2B, C**).
 We find that most tumors segregate into one of ten biologically distinct
 clusters, regardless of the cancer type (**figure 1G,I** and **supplementary
 figure S1**). Some cancer types ( _e.g._ pancreatic adenocarcinomas in the RAS
-mutant clusters 8, and Kidney Chromophobe in cluster 1, see **supplementary
+mutant cluster 8, and Kidney Chromophobe in cluster 1, see **supplementary
 figure S1**) are unevenly distributed, though we could not identify any cancers
 that were exclusive to a single tumor class. Only cancer types with the fewest
 samples were found to be absent from one or more classes at all. Somewhat
