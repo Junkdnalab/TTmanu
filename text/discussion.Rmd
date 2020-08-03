@@ -40,7 +40,7 @@ each sample.
 To our knowledge, this approach has not previously been attempted in the
 literature in spite of its relative simplicity. We limited our analysis to
 mutations with likely deleterious effects, including missense, nonsense,
-frame-shift, stop-gain and splice site mutations in genes that are actively
+frame-shift, stop-gain, untranslated region and splice site mutations in genes that are actively
 expressed in each cancer type, thus avoiding bias from transcription coupled
 repair. Our method of filtration differs from the "rank-and-cut" method of
 [@PCAWG-MAIN] but represents a reasonable attempt to account for the same
@@ -95,10 +95,10 @@ trend in the number of mutations (see **figure 1H**), the relative staging
 (**figure 1L**) or metastasis (**figure 1M**); and each class instead was
 associated with unique combinations of pathways (as in **figures 2B, C**).
 
-We find that most tumors segregate into one of twelve biologically distinct
+We find that most tumors segregate into one of ten biologically distinct
 clusters, regardless of the cancer type (**figure 1G,I** and **supplementary
 figure S1**). Some cancer types ( _e.g._ pancreatic adenocarcinomas in the RAS
-mutant clusters 8 and 9, and Kidney Chromophobe in cluster 1, see **supplementary
+mutant cluster 8, and Kidney Chromophobe in cluster 1, see **supplementary
 figure S1**) are unevenly distributed, though we could not identify any cancers
 that were exclusive to a single tumor class. Only cancer types with the fewest
 samples were found to be absent from one or more classes at all. Somewhat
@@ -150,8 +150,8 @@ contain those of stage I (**figure 1L, M**). This class likely represents a
 group of tumors with aberrations in methylation, copy number alterations,
 structural variants, or combinations thereof which we excluded from our
 analysis. Consistent with this, kidney chromophobe and thyroid cancers have high
-proportions of SVs _vs._ other variant types [@PCAWG-MAIN] and are heavily
-skewed to cluster 1 membership (**Supplementary figure S1**). Likewise, Class 8
+proportions of structural variations _vs._ other variant types [@PCAWG-MAIN] and are heavily
+skewed to cluster 1 membership (**Supplementary figure S1**). Likewise, Class 10
 represents a group of hyper-mutated tumors that harbor so many mutations that
 virtually no pathway is unaffected. It seems likely that a significant fraction
 of the samples flagged as “mutant” for each pathway are actually unaffected,

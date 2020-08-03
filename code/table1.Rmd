@@ -105,7 +105,7 @@ save(cluster_spec_enrich_table, file = "../data/cluster_spec_enrich_table.Rda")
 rm(list = ls(all.names = T))
 gc()
 ```
-
+<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Table 1: Most frequently mutated gene in class-specific enriched pathways (effect size >= 0.30) for specific cancer**</p>
 ```{r table-1}
 load("../data/cluster_spec_enrich_table.Rda")
 tumor_clusters <- fread("../data/umap_3d_coors.tsv") ## load in data
@@ -114,8 +114,7 @@ tumor_clusters <- fread("../data/umap_3d_coors.tsv") ## load in data
 n_tumor <- as.data.frame(table(tumor_clusters$project_code))
 n_tumor <- n_tumor %>% arrange(desc(Freq)) %>% .[1:10, "Var1"] %>% as.character() %>% .[order(.)]
 
-cluster_spec_enrich_table %>% .[, c("Pathway", "Class", n_tumor)] %>% kable(caption = "Table 1: Most mutated gene in class-specific pathways (enrichment score >= 0.30) for specific cancer", row.names = FALSE) %>%
+cluster_spec_enrich_table %>% .[, c("Pathway", "Class", n_tumor)] %>% knitr::kable(format = "html", row.names = FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 12) %>%
   column_spec(1, bold = T)
 ```
-<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Table 1:** The numbers in this table are completely wrong, it is just a place holder, please ignore</p>

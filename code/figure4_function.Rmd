@@ -143,6 +143,7 @@ oncoprint_style <- function(filtered_class, n_path, enrich_cutoff = 0.30) {
         axis.ticks = element_blank(),
         strip.text.y = element_blank(),
         strip.background = element_blank(),
+        plot.margin = unit(c(0,0,0,0), "cm"),
         legend.position = "none") +
     ggtitle(paste0("Class ", filtered_class))
   ## left annotatoin data generation
@@ -201,10 +202,26 @@ oncoprint_style <- function(filtered_class, n_path, enrich_cutoff = 0.30) {
     path_legend[[n]] <- get_legend(path_ggplot) ## extract legend from plot
     l_anno_ggplot[[n]] <- path_ggplot + theme(legend.position = "none") ## remove legend from plot
   }
+  
+  proteasome_r_anno <- data.frame(gene = gene_order, 
+                                psm_gene = 0)
 
-  plotlist <- c(l_anno_ggplot, list(heatmap_ggplot)) ## make a list of plots for cowplot
+  proteasome_r_anno[grep(pattern = "PSM|SEM|UBE2|UBB|UBC", x = proteasome_r_anno$gene), "psm_gene"] <- 1
 
-  plot <- plot_grid(plotlist = plotlist, align = "h", ncol = 11, axis = "tb", rel_widths = c(rep(0.1, length(l_anno_ggplot)), 5))
+  r_anno_color <- c("0" = "white", "1" = "black")
+  proteasome_r_anno$gene <- factor(proteasome_r_anno$gene, levels = c(rev(gene_order)))
+  r_anno <- ggplot(proteasome_r_anno) +
+    geom_bar(mapping = aes(x = 1, y = gene, fill = as.character(psm_gene)), 
+             stat = "identity", 
+            width = 1) +
+    scale_fill_manual(values = r_anno_color, breaks = "1", name = "", labels = "PSM Gene") +
+    theme_void() 
+  legend <- plot_grid(get_legend(r_anno), ncol = 1)
+  r_anno <- r_anno + theme(legend.position = "none")
+  
+  plotlist <- c(l_anno_ggplot, list(heatmap_ggplot), list(r_anno)) ## make a list of plots for cowplot
+
+  plot <- plot_grid(plotlist = plotlist, align = "h", ncol = 12, axis = "tb", rel_widths = c(rep(0.1, length(l_anno_ggplot)), 5, 0.1))
   plot_legend <- plot_grid(plotlist = path_legend, ncol = 1, align = "v")
 
 return(plot_grid(plot, plot_grid(NULL, plot_legend, NULL, ncol = 1, rel_heights = c(1, 1, 1)), ncol = 2, rel_widths = c(2.5, 2), axis = "tbl"))
@@ -216,8 +233,9 @@ rm(list = ls(all.names = T))
 gc()
 ```
 
-```{r figure-4-plot, out.width= '90%', fig.cap="**Figure 4: Some genes with multiple pathway memberships drive clustering.** Each column is a tumor in class 6 or 7, each row represents a gene with mutation (red) or not mutated (grey). The genes are organized according to which of the top distinguishing pathways for this class that they effect. Some genes affect multiple pathways, as indicated by the bars at left. The highlighted genes at right are all proteasomal subunits."}
+```{r figure-4-plot, out.width= '90%'}
 load("../data/class_spec_fig4.Rda")
 class_spec_fig4
 ```
 
+<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Figure 3: Mutations in proteasomes found in Class 2 affect multiple enriched pathways.** a) Each column is a tumor in cluster 2, each row represents a gene with mutation (red) or not mutated (grey). The genes are organized according to which of the top distinguishing pathways for this class that they effect. Some genes affect multiple pathways, as indicated by the bars at left. The highlighted genes at right are all proteasomal subunits.</p>
