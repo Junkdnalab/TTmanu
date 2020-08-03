@@ -27,7 +27,7 @@ editor_options:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-suppressPackageStartupMessages(
+suppressPackageStartupMessages(c(
   library(rstan),
   library(foreach),
   library(sqldf),
@@ -61,7 +61,7 @@ suppressPackageStartupMessages(
   library(seriation),
   library(rtracklayer),
   library(poibin)
-)
+))
 ```
 
 ## Abstract
@@ -91,7 +91,7 @@ of interest corresponding to basic cellular processes and biochemical pathways,
 excluding gene sets that correspond to miscellaneous categories ( _e.g._
 “transcription factors”) or disease associations ( _e.g._ “mutated in colon
 cancer”) and filtered our gene list on membership in these pathways (total
-of 9040 genes; see methods for details).
+of 8940 genes; see methods for details).
 
 It does not matter for our purposes whether a single tumor is “enriched” for
 mutations of individual pathways, chiefly because such metrics favor larger
@@ -293,9 +293,9 @@ tumors in each class  have multiple mutations across signaling pathways, or
 whether a small number of driver genes account for enrichment. The split between
 clusters 7 and 8 is largely driven by mutations in _PI3K_ and its
 homologs and _Ras_ genes, respectively (compare _PIK3CA_ and _KRAS_ panels of
-**supplementary figure S4**). Furthermore, cluster 1 is distinguished
+**supplementary figure S5**). Furthermore, cluster 1 is distinguished
 from clusters 2-10 by general lack of P53 mutations (compare **Figure 1f** with the
-_TP53_ panel of **Supplementary Figure S4**).
+_TP53_ panel of **Supplementary Figure S5**).
  
 Cluster 2 exhibited the highest pathway enrichment scores of the ten major
 classes, although there is a significant number of tumors spatially distributed
@@ -365,39 +365,37 @@ wherein etc etc</mark>
 ### Enrichment of pathways in metastasis is class-specific
 
 Following the same logic we used to investigate cluster-specific enrichment of
-pathways (**figure 3**) we applied this method to metastatic vs non-metastatic
-tumors, as we find that metastatic tumors are distributed across all 12 clusters
-( _e.g._ **figure 1l**). Using all non-metastatic tumors as background, we found
+pathways (**figure 2**) we applied this method to metastatic vs non-metastatic
+tumors, as we find that metastatic tumors are distributed across all ten clusters
+( _e.g._ **figure 1m**). Using all non-metastatic tumors as background, we found
 very low levels of enrichment, less than $10\%$, in a handful of pathways. We
 reasoned that the individual clusters might be too different to detect global
 metastasis enrichment signal given the small sample size (n = 215 metastatic
 tumor samples).
 
 Therefore, we calculated cluster-specific enrichment in metastatic tumors and
-found 99 enriched pathways across all clusters (**table 2**). A number of
+found a total of 27 enriched pathways across all clusters (**table 2**). A number of
 enrichments were found in multiple clusters represented by pathways that were
 already shown to be enriched in a neighboring cluster. For example,
-“Beta-catenin independent WNT signaling” is enriched in non-metastatic samples
-of clusters 6, 7, 11 and 12 (see **supplementary figure S4**) but not in 9 and
-10. This pathway is enriched in metastatic tumors of clusters 9 and 10, plus the
-union of 9+10 (p < 10-3, **table 2**). This is also true of “Erythropoietin
-activates RAS”, which is enriched in clusters 11 and 12 (**supplementary figure
-S4**) and also in metastatic tumors of clusters 9 and 10, plus cluster 7.
-Cluster 1, one of two clusters for which we could not identify any
-distinguishing pathways (cluster 8 being the other), had enrichment in two
-pathways that were otherwise specific to non-metastatic tumors of other
+“Signaling by PTK6” is enriched in non-metastatic samples of cluster 8 (see 
+**supplementary figure S4**) but not in 7 and 9. This pathway is enriched in
+metastatic tumors of clusters 7 and 9 (p < 10-3, **table 2**). This is also true of 
+“Erythropoietin activates RAS”, which is enriched in cluster 8 (**supplementary figure
+S4**) and also in metastatic tumors of clusters 7 and 9. <strike>Cluster 1, one of two clusters 
+for which we could not identify any distinguishing pathways (cluster 8 being the other), 
+had enrichment in two pathways that were otherwise specific to non-metastatic tumors of other
 clusters. These include “Cellular response to hypoxia” (enriched in clusters 6 &
-7) and “TNFR2 non-canonical NF-kB pathway” (cluster 6 & 7). Cluster 5 metastatic
-samples were enriched for two key neutrophil pathways, “Neutrophil
-Degranulation” and “Fc epsilon receptor (FCERI) signaling” which are specific to
-cluster 9 & 10 non-metastatic tumors. Thus, pathway lesions specific to
-metastases tend toward complementary mutations that are otherwise specific to
+7) and “TNFR2 non-canonical NF-kB pathway” (cluster 6 & 7).</strike> Cluster 4 metastatic
+samples was enriched for “Fc epsilon receptor (FCERI) signaling”, a key neutrophil pathways, 
+which are specific to clusters 2, 7 and 8 non-metastatic tumors. Thus, pathway lesions 
+specific to metastases tend toward complementary mutations that are otherwise specific to
 non-metastatic tumors of other clusters.
 
 ```{r child='../code/table2.Rmd'}
 ```
-
-There were also a number of pathways that were enriched with lower specificity
+<mark>Statement does not apply anymore. The highest # of enriched path is 3. Not many are in 
+metastasis. Only 2. “Fc epsilon receptor (FCERI) signaling” and "Signaling by SCF-KIT" </mark>
+<strike>There were also a number of pathways that were enriched with lower specificity
 (among 4 or more clusters) which were found to be enriched in metastases. We
 identified 18 such pathways of which 12 had significantly higher mutation rates
 in cluster-specific metastases, including “G1/S DNA Damage Checkpoints”,
@@ -405,7 +403,7 @@ in cluster-specific metastases, including “G1/S DNA Damage Checkpoints”,
 dependent signaling in response to WNT”, “Class I MHC mediated antigen
 processing & presentation”, “Chaperonin-mediated protein folding”, “Intrinsic
 Pathway for Apoptosis”, “Cellular Senescence”, “DNA Double-Strand Break
-Response”, and “Pre-NOTCH Expression and Processing” (**Table 2**).
+Response”, and “Pre-NOTCH Expression and Processing” (**Table 2**). </strike>
 
 ### Pathway disruption classes vary in short-term prognosis of survival
 
