@@ -60,7 +60,10 @@ race as these were the main well-identified categories available to us in the
 dataset. Sex is known to be a risk factor for death, with males dying at
 slightly higher rates for all ages of interest in our dataset. Black vs White
 race is an important category due to differences in access to care and other
-socioeconomic and education related factors.
+socioeconomic and education related factors. However, due to the low number of
+Black patient tumors, we use ethnicity only to identify the baseline risk
+function, while the tissue and class specific multipliers are not ethnicity
+specific.
 
 Using the model described above we fit the data using Stan via the rstan package
 in R. Posterior inferences are shown in **FIXME WHICH FIGURE?**.
