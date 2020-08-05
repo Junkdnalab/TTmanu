@@ -426,23 +426,23 @@ locations on the distributed version control site GitHub
 
 ### Selection of pathways
 
-Pathway analysis provides additional information that genes and gene ontologies
-alone lack: 1) it aggregates molecular events across multiple genes in the same
-pathway and 2) the results, interpretable as genetic alterations, are related 
-to molecular functions such as “intrinsic pathway for apoptosis” or “cellular 
-response to hypoxia”. Using the Reactome Pathway Database, we selected the 
-second sub-pathways for each pathway (e.g. ‘Beta-catenin independent WNT 
-signaling’ in ‘Signal Transduction’) which we believed was a suitable 
-representation of the basic cellular processes and biochemical pathways. 
-We also excluded pathways categorized under cancer, disease, gene defect, 
-disorder, infection, reproduction, and muscle contraction (e.g. ‘PI3K/AKT 
-Signaling in Cancer’). While some of the excluded pathways have been shown
-to play an important role in the cancer, they focus on a specific point 
-mutations. In addition, for most of the excluded pathways, there is a global
-pathway (e.g. ‘PIP3 activates Akt signaling’) that exist. Finally, we mapped
-the 18,577 Ensembl IDs from the GDC dataset to the highly selected pathways.
-This operation produced a lookup table that consisted of 377 pathways mapped 
-to 9,910 genes.  
+To understand the molecular mechanism of cancer at a pathway level, our pathway
+analysis approach focused on Reactome (https://reactome.org/), a pathway knowledge-based 
+database. The mapping files of ENSEMBL to pathways, pathway hierarchy relationship,
+and complexes to top pathways were downloaded from the download page 
+(https://reactome.org/download-data). Using the data, we imposed pathway criteria to
+meet the basic cellular processes and biochemical pathways: (1) human-derived pathways
+(_“HSA”_) (2) limited to grandchild node for each parent pathway (_e.g._ ‘Beta-catenin 
+independent WNT signaling’ in ‘Signal Transduction’) (3) exclusion of pathways in the
+parent pathway: Disease, Muscle contraction, and Reproduction or pathway names that 
+include any of the following keywords: disease, defect, cancer, oncogenic, disorder, 
+mutant, loss, infection, bacteria, or listeria. While some of the excluded pathways 
+have been shown to play an important role in cancer, they are highly specialized 
+(_e.g._ ‘PI3K/AKT Signaling in Cancer’). Additionally, for most of the excluded pathways,
+a neutral version pathway of the pathway exist (_e.g._ ‘PIP3 activates Akt signaling’). 
+Finally, we mapped the 18,577 Ensembl IDs from the TCGA dataset to the highly selected
+Reactome pathways. This operation produced a lookup table that consisted of 377 pathways
+mapped to 8,940 genes.  
 
 ### <mark>Filtering genes <- Peter to write</mark>
 
