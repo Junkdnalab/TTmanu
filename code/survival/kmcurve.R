@@ -8,6 +8,9 @@ install.packages("devtools")
 devtools::install_github("sachsmc/ggkm")
 library(ggkm)
 
+
+set.seed(20200805) #a date based seed for reproducibility
+
 ## read in estimates from the stan runs, and then generate pseudo K-M curves
 
 
