@@ -1,18 +1,13 @@
 ---
 title: "A molecular taxonomy of tumors independent of tissue-of-origin"
-author: "Peter T. Nguyen$^{1}$, Simon G. Coetzee$^{1}$, Daniel L. Lakeland$^{2}$, and Dennis J. Hazelett$^{1,3}$"
-output: 
-  bookdown::html_document2:
-    fig_captions: TRUE
-    number_sections: FALSE
-    toc: TRUE
-    toc_float: TRUE
-    toc_depth: 3
-    code_folding: hide
-    theme: flatly
-    smart: true
+author: Peter T. Nguyen$^{1}$, Simon G. Coetzee$^{1}$, Daniel L. Lakeland$^{2}$, and
+  Dennis J. Hazelett$^{1,3}$
 bibliography: references.bib
-editor_options: 
+output:
+  word_document:
+    reference_docx: word-style-reference-ttmanu.docx
+always_allow_html: TRUE
+editor_options:
   chunk_output_type: console
 ---
 
@@ -23,6 +18,24 @@ editor_options:
     number_sections: FALSE
     toc: FALSE
     keep_tex: yes
+    
+output:
+  word_document:
+    reference_docx: word-styles-reference-01.docx
+  number_sections: FALSE
+  toc: FALSE
+  
+output: 
+bookdown::html_document2:
+  fig_captions: TRUE
+  number_sections: FALSE
+  toc: TRUE
+  toc_float: TRUE
+  toc_depth: 3
+  code_folding: hide
+  theme: flatly
+  smart: true
+
 ```
 
 ```{r setup, include=FALSE}
