@@ -1,13 +1,7 @@
-```{r}
-library(data.table)
-library(ggplot2)
-library(tidyverse)
-library(kableExtra)
-```
-
-
 ### Supplementary Figure S1
-```{r supplementary-figure-s1, out.width = '90%', fig.align='center'}
+
+```{r supplementary-figure-s1, fig.width = 9, fig.height= 8, fig.align='center'}
+#out.width = '90%',
 umap_cancertype <- fread("../data/umap_3d_coors.tsv") ## load data
 
 umap_bg <- umap_cancertype[,-"project_code"] ## get background data for facet
@@ -32,7 +26,7 @@ ggplot(umap_cancertype, aes(x = plot_y, y = plot_x, colour = project_code)) +
 
 ### Supplementary Figure S2
 
-```{r supplementary-figure-s2-data-generation, out.width = '90%', fig.align = "center"}
+```{r supplementary-figure-s2-data-generation, fig.width = 9, fig.height= 8, fig.align = "center"}
 umap_cancertype <- fread("../data/umap_3d_coors.tsv") ## load data
 umap_bg <- umap_cancertype[,-"project_code"] ## get background data for facet
 
@@ -56,7 +50,6 @@ ggplot(umap_cancertype, aes(x = plot_y, y = plot_x, colour = Subtype_Selected)) 
 
 ### Supplementary Figure S3
 
-<div style="text-align: right"> Supplementary Figure S3 Data </div>
 ```{r supplementary-figure-s3-data-generation, eval = FALSE}
 load("../data/gdc_tumor_coding_complete.Rdata")
 load("../data/gene_data.Rda")
@@ -103,7 +96,8 @@ selected_mut <- umap_cancertype %>% dplyr::select(sample_id, plot_x, plot_y) %>%
 save(selected_mut, file = "../data/selected_mut.Rda")
 ```
 
-```{r supplementary-figure-s3, out.width='77%', fig.align = "center"}
+```{r supplementary-figure-s3, fig.width = 7, fig.height= 5, fig.align = "center"}
+# out.width = '77%'
 load("../data/selected_mut.Rda")
 umap_cancertype <- fread("../data/umap_3d_coors.tsv") ## load data
 umap_bg <- umap_cancertype[,-"project_code"] ## get background data for facet
@@ -129,7 +123,6 @@ ggplot(selected_mut, aes(x = plot_y, y = plot_x, colour = as.character(value))) 
 
 ### Supplementary Figure S4
 
-<div style="text-align: right"> Supplementary Figure S4 Data </div>
 ```{r supplementary-figure-s4-data-generation, eval = FALSE}
 load("../data/gdc_reactome_path_analysis.Rda") ## load data
 umap_cancertype <- fread("../data/umap_3d_coors.tsv") 
@@ -189,7 +182,7 @@ for(n in 1:nrow(figs4_layout)) {
 save(ggplot_umap_1,ggplot_umap_2,ggplot_umap_3,ggplot_umap_4,ggplot_umap_5,ggplot_umap_6,ggplot_umap_7,ggplot_umap_8,ggplot_umap_9,ggplot_umap_10,ggplot_umap_11,ggplot_umap_12,ggplot_umap_13,ggplot_umap_14,ggplot_umap_15,ggplot_umap_16, file = "../data/fig_s4_ggplot.Rda")
 ```
 
-```{r supplementary-figure-s4, message = FALSE, echo = FALSE, out.width = '90%', fig.align= 'center'}
+```{r supplementary-figure-s4, message = FALSE, echo = FALSE, out.width = '90%', fig.align= 'center', eval = FALSE}
 load("../data/fig_s4_ggplot.Rda")
 
 ggplot_umap_1
@@ -375,7 +368,6 @@ umap_clust178 + pik3ca + kras + tp53 + plot_layout(design = layout)
 
 ### Supplementary Table ST1
 
-<div style="text-align: right"> Supplementary Figure ST1 Data </div>
 ```{r supplemental-table-st1-data-generation, eval = FALSE}
 load("../data/gdc_tumor_coding_complete.Rdata")
 load("../data/gdc_reactome_path_analysis.Rda")
@@ -445,15 +437,41 @@ rm(list = ls(all.names = T))
 gc()
 ```
 
-```{r supplemental-table-st1}
+```{r supplemental-table-st1, eval = FALSE}
 load("../data/table_st1.Rda")
+## for html only
+# table_st1 %>% dplyr::select(-Pathway) %>% knitr::kable() %>%
+#   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 12) %>%
+#   column_spec(1, bold = T, color = "black")
 
-table_st1 %>% dplyr::select(-Pathway) %>% knitr::kable(format = "html") %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 12) %>%
-  column_spec(1, bold = T, color = "black")
+## for word doc
+# table_st1 %>% flextable() %>% 
+#   set_caption(caption = "") %>%
+#   align(part = "all") %>% 
+#   width(., width = c(4,0.5,0.5,0.5,0.5)) %>% 
+#   fontsize(size = 8, part = "body")
+
+write.xlsx(table_st1, file = "../data/table_st1.xlsx", row.names = FALSE)
 ```
 
-![**Supplementary Table ST1. Frequency of pathway disruption and top genes within pathways.** _A complete list of pathway disruptions with percent mutatied samples and top genes_]
+```{r enrich-pathway-in-clust}
+## docx friendly
+load("../data/moderate_enrich_prob.Rda")
+
+st1 <- moderate_enrich_prob %>% filter(difference >= 0.30 & signif <= 2500) %>% ## filter effect size >= 0.20 and enrichment at a 95% CI
+  dplyr::select(path, clust, signif, difference) %>% 'colnames<-' (c("Pathway", "Cluster", "Signif", "Enrichment_Score")) ## select relevant column and rename col
+
+st1$log10pvalue <- round(-log10((st1$Signif + 1) / 1E5), digits = 2) ## Getting p value ## adding 1 for pseudo count.. 1E5 is the n simulations performed
+st1$Enrichment_Score <- round(st1$Enrichment_Score, digits = 2)
+st1$Signif <- NULL ## we don't need this anymore
+
+st1 %>% flextable() %>% 
+  set_caption(caption = "") %>%
+  align(part = "all") %>% 
+  width(., width = c(4,0.75,1,1)) %>% 
+  fontsize(size = 10, part = "body")
+```
+
 
 
 ![**Supplemental figure S6. Survival fit independent of disease status.** _The red and blue curves show the survival of people in the US by female and male, respectively. The orange and green curves show the model fits._](../figures/fig6A.png)

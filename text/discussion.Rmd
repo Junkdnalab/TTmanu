@@ -1,18 +1,3 @@
----
-title: "Discussion"
-output: 
-  bookdown::html_document2:
-    fig_captions: TRUE
-    number_sections: FALSE
-    toc: FALSE
-    code_folding: hide
-    theme: flatly
-    smart: true
-bibliography: references.bib
-editor_options: 
-  chunk_output_type: console
----
-
 ### Classification of tumors independent of tissue-of-origin 
 
 One of the biggest hurdles in cancer research is the size of the search space;

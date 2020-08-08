@@ -59,6 +59,3 @@ treatments typical used for each tissue.
 
 ```
 
-![**Figure 6B**](../figures/fig6B.png)
-
-![**Figure 6C**](../figures/fig6C.png)

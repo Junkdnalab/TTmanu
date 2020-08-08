@@ -1,14 +1,3 @@
----
-title: "Introduction"
-output: 
-  bookdown::html_document2:
-    fig_captions: TRUE
-    number_sections: FALSE
-    toc: FALSE
-    theme: flatly
-bibliography: references.bib
----
-
 Recent advances in technology have made the study of cancer possible at
 unprecedented levels of detail and scale. Array and next-generation sequencing
 technologies have made it possible to assay germline and somatic mutations,
