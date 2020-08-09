@@ -32,7 +32,7 @@ bibliography: references.bib
 ```
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, dpi=600)
+knitr::opts_chunk$set(echo = FALSE, dpi=600, warning = FALSE)
 suppressPackageStartupMessages(c(
   library(rstan),
   library(foreach),
@@ -126,8 +126,6 @@ assigning a Boolean value (a 1 or 0, indicating whether any pathway member gene
 carries a mutation) to the pathway regardless of the number of genes carrying
 mutations (**figure 1A**). </strike>
 
-```{r child='../code/figure1.Rmd'}
-```
 In order to classify tumors using this dataset, we used multiple correspondence
 analysis (MCA) [@JSSv025i01]. First, we determined the number of dimensions
 containing useful information. (**figures 1B, C**). Then we performed a UMAP
@@ -267,11 +265,6 @@ samples), _etc._ . The top third of pathways drop off gradually in overall
 mutation frequency (**figure 1A** and **supplementary table ST1**), possibly
 owing to relative diversity among all tumors.
 
-```{r child='../code/figure2.Rmd'}
-
-```
-
-
 To discover what pathways drive the UMAP clustering, we calculated enrichment
 for each pathway _in-class_ relative to all other classes combined (see methods)
 and ranked pathways for each class from highest to lowest enrichment. We
@@ -352,11 +345,6 @@ subunits are more widespread in cancer than previously appreciated and may
 represent a targetable category of tumors.
 </strike>
 
-```{r child = '../code/figure4.Rmd'}
-
-```
-
-
 ### A combination of common driver mutations and tissue-specific pathway genes create tissue-specific class signatures
 
 As discussed previously, prior efforts to extract common signatures from
@@ -412,8 +400,6 @@ which are specific to clusters 2, 7 and 8 non-metastatic tumors. Thus, pathway l
 specific to metastases tend toward complementary mutations that are otherwise specific to
 non-metastatic tumors of other clusters.
 
-```{r child='../code/table2.Rmd'}
-```
 <mark>Statement does not apply anymore. The highest # of enriched path is 3. Not many are in 
 metastasis. Only 2. “Fc epsilon receptor (FCERI) signaling” and "Signaling by SCF-KIT" </mark>
 <strike>There were also a number of pathways that were enriched with lower specificity
@@ -431,6 +417,10 @@ Response”, and “Pre-NOTCH Expression and Processing” (**Table 1**). </stri
 ```{r child='survival.Rmd'}
 ```
 
+## Discussion
+ 
+```{r child='discussion.Rmd'}
+```
 
 ## Materials & Methods
 
@@ -498,10 +488,20 @@ biologically relevant.
 ```{r child='survival-methods.Rmd'}
 ```
 
-## Discussion
- 
-```{r child='discussion.Rmd'}
+```{r child='../code/figure1.Rmd'}
 ```
+
+```{r child='../code/figure2.Rmd'}
+```
+
+```{r child = '../code/figure4.Rmd'}
+```
+
+```{r child='../code/table2.Rmd'}
+```
+
+![](../figures/fig6B.png)
+![](../figures/fig6C.png)
 
 ## Supplementary Information
 

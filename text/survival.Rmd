@@ -31,8 +31,6 @@ magnitude (**figure 5a**). A rate of 1 represents patients who die relatively
 close to the age predicted purely from their demographics independent of the
 information that they have the given cancer.
 
-![](../figures/fig6B.png)
-![](../figures/fig6C.png)
 <p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Figure 5: relative survival of pathway clusters. a) Posterior distributions of estimated relative age-dependent survival by cancer type. b) Posterior distributions of estimated class-dependent survival for each cancer type. See methods for model details.</p>
 
 Our estimates of tissue-specific class effects, in contrast, ranged from 0-3,
