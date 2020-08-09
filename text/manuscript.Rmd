@@ -452,20 +452,16 @@ mapped to 8,940 genes.
 
 ### Filtering genes
 
-One of the limitations of knowledge-based pathway analysis is that it heavily relies on 
-experimental results for the curation and validation of its pathways. The resulting 
-pathways are therefore not specific to a particular tissue type but provides information
-for all tissue type. Before utilizing the gene to pathway lookup table, we considered the
-impact of deleterious passenger mutations for a given cancer (non-specific genes that are
-not expressed) as they may introduce biases in our pathway analysis. We addressed this by
-identifying genes that are lowly/not expressed in a tissue type. Using the TCGA RNA 
-sequencing data adjusted for batch effect dataset (https://pancanatlas.xenahubs.net), we 
-filtered the genes and tumor samples that were not included in our analysis, grouped the 
-tumor samples by tissue type and computed the mean expression value for each gene. A minimum
-threshold of 10 transcripts per million was set for expressed genes based on an inflection
-point observed when plotting the mean expression values of genes ranked by increasing 
-expression values for each tissue type. Genes that did not meet this threshold were 
-considered not expressed. This operation produced a lookup table for gene expression
+We filtered likely erroneous mutations due to transcription coupled repair. Our approach
+was to determine the status of each gene (expressed or not expressed) per tissue type in
+order to exclude gene mutations that we have evidence for no expression. To do this, we 
+obtained the TCGA RNA sequencing data adjusted for batch effect dataset (https://pancanatlas.xenahubs.net).
+Using the data, we removed the genes and tumor samples that were not included in our analysis, 
+grouped the tumor samples by tissue type and computed the mean expression value for each 
+gene. A minimum threshold of 10 transcripts per million was set for expressed genes based 
+on an inflection point observed when plotting the mean expression values of genes ranked 
+by increasing expression values for each tissue type. Genes that did not meet this threshold 
+were considered not expressed. This operation produced a lookup table for gene expression
 status in each tumor sample for 18,127 genes.  
 
 ### Class and stage-specific Enrichment Calculations
