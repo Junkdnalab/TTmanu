@@ -233,7 +233,8 @@ rm(list = ls(all.names = T))
 gc()
 ```
 
-```{r figure-4-plot, out.width= '90%'}
+```{r figure-4-plot, fig.width = 9, fig.height=8}
+#out.width= '90%'
 load("../data/class_spec_fig4.Rda")
 class_spec_fig4
 ```

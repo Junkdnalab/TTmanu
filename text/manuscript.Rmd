@@ -18,7 +18,7 @@ editor_options:
     number_sections: FALSE
     toc: FALSE
     keep_tex: yes
-    
+
 output:
   word_document:
     reference_docx: word-styles-reference-01.docx
@@ -35,11 +35,10 @@ bookdown::html_document2:
   code_folding: hide
   theme: flatly
   smart: true
-
 ```
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, dpi=600, warning = FALSE)
 suppressPackageStartupMessages(c(
   library(rstan),
   library(foreach),
@@ -73,7 +72,8 @@ suppressPackageStartupMessages(c(
   library(FactoMineR),
   library(seriation),
   library(rtracklayer),
-  library(poibin)
+  library(poibin),
+  library(flextable)
 ))
 ```
 
@@ -132,8 +132,6 @@ assigning a Boolean value (a 1 or 0, indicating whether any pathway member gene
 carries a mutation) to the pathway regardless of the number of genes carrying
 mutations (**figure 1A**). </strike>
 
-```{r child='../code/figure1.Rmd'}
-```
 In order to classify tumors using this dataset, we used multiple correspondence
 analysis (MCA) [@JSSv025i01]. First, we determined the number of dimensions
 containing useful information. (**figures 1B, C**). Then we performed a UMAP
@@ -273,10 +271,6 @@ samples), _etc._ . The top third of pathways drop off gradually in overall
 mutation frequency (**figure 1A** and **supplementary table ST1**), possibly
 owing to relative diversity among all tumors.
 
-```{r child='../code/figure2.Rmd'}
-```
-
-
 To discover what pathways drive the UMAP clustering, we calculated enrichment
 for each pathway _in-class_ relative to all other classes combined (see methods)
 and ranked pathways for each class from highest to lowest enrichment. We
@@ -299,6 +293,7 @@ enrichment levels of the three, having mutations in hedgehog signaling,
 "$\beta$-catenin degradation", "cellular response to hypoxia", "regulation of
 cell cycle" and "apoptosis" among others.
 
+<strike>
 ### Gene-Pathway redundancy contributes to cluster identity
 
 Since pathways share some common driver genes, we investigated whether
@@ -334,8 +329,7 @@ clustering. These data could explain how tissue-specific gene mutation
 signatures might result in general cancer phenotypes by converging at the
 pathway level.
 
-```{r child='../code/figure4_function.Rmd'}
-```
+
 
 The proteasome plays key roles in the transduction of signals from the p53, WNT
 and NFkB pathways and it and proteasomal inhibitors have been approved for
@@ -355,25 +349,33 @@ dysregulation of the proteasomal complex activities that target cancer-promoting
 pathways. Taken together, our data suggest that mutations in proteasomal
 subunits are more widespread in cancer than previously appreciated and may
 represent a targetable category of tumors.
+</strike>
 
 ### A combination of common driver mutations and tissue-specific pathway genes create tissue-specific class signatures
 
-<mark>As discussed previously, prior efforts to extract common signatures from
+As discussed previously, prior efforts to extract common signatures from
 pan-cancer datasets met with difficulty in distinguishing tumor samples from
 their tissue-specific -omics data signatures. Given our pathway-disruption based
 classification, this raises the question, are tumor phenotypes driven entirely
 by common driver genes, or by "silent" tissue-specific effectors ( _i.e._ too
 few samples to detect above statistical significance thresholds), or a
-combination of both? To answer this question, we ranked the top cluster-specific
-pathways for each cluster, and then tabulated the most frequently mutated genes
-for each pathway as a function of cancer type (**Table 1** and **Supplementary tables ST2-ST13**). 
-We find that in most clusters the top pathways are
-determined by mutations in a handful of driver genes, TP53, PIK3CA, KRAS etc.
-However in many cancers we find divergence outside these top driver mutations,
-wherein etc etc</mark>
-
-```{r child='../code/table1.Rmd'}
-```
+combination of both? To answer this question, we compared each cluster relative
+to the background to find deferentially mutated genes. We ranked the odd ratios 
+and selected the top ten enriched and depleted genes (pvalue < 0.01) for each 
+cluster (**Figure 4**; odds ratios plot). We find that the clusters possess 
+unique gene sets. Cluster 2 is enriched for genes responsible for protein
+homeostasis. Cluster 4 is enriched for genes responsible for nucleosome 
+structure. Clusters 7 and 8, which shared multiple enrichment in signaling
+pathways, are largely driven by mutations in _PI3K_ and its homologs and _Ras_ 
+genes, respectively (compare _PIK3CA_ and _KRAS_ panels of **Supplementary figure S5**). 
+Interestingly, cluster 9 is enriched for both _PIK3CA_ and _KRAS_ which may
+suggest tumors in this cluster derived from either clusters 7 or 8. Next, we 
+investigated the proportion of samples per cancer type for the significant genes 
+within a cluster (**Figure 4**; heatmap). Surprisingly, cluster-specific tumors 
+were not predominated by one or more highly mutated genes across all cancers. 
+Instead, some cancer-specific tumors in these classes had mutation profiles that
+differ from one another (_e.g._ In cluster 2, LIHC was enriched for _PSME4_, KIRC
+was enriched for _UBC_, and PAAD was enriched for _PSMA1_).
 
 ### Enrichment of pathways in metastasis is class-specific
 
@@ -387,12 +389,12 @@ metastasis enrichment signal given the small sample size (n = 215 metastatic
 tumor samples).
 
 Therefore, we calculated cluster-specific enrichment in metastatic tumors and
-found a total of 27 enriched pathways across all clusters (**table 2**). A number of
+found a total of 27 enriched pathways across all clusters (**table 1**). A number of
 enrichments were found in multiple clusters represented by pathways that were
 already shown to be enriched in a neighboring cluster. For example,
 “Signaling by PTK6” is enriched in non-metastatic samples of cluster 8 (see 
 **supplementary figure S4**) but not in 7 and 9. This pathway is enriched in
-metastatic tumors of clusters 7 and 9 (p < 10-3, **table 2**). This is also true of 
+metastatic tumors of clusters 7 and 9 (p < 10-3, **table 1**). This is also true of 
 “Erythropoietin activates RAS”, which is enriched in cluster 8 (**supplementary figure
 S4**) and also in metastatic tumors of clusters 7 and 9. <strike>Cluster 1, one of two clusters 
 for which we could not identify any distinguishing pathways (cluster 8 being the other), 
@@ -404,8 +406,6 @@ which are specific to clusters 2, 7 and 8 non-metastatic tumors. Thus, pathway l
 specific to metastases tend toward complementary mutations that are otherwise specific to
 non-metastatic tumors of other clusters.
 
-```{r child='../code/table2.Rmd'}
-```
 <mark>Statement does not apply anymore. The highest # of enriched path is 3. Not many are in 
 metastasis. Only 2. “Fc epsilon receptor (FCERI) signaling” and "Signaling by SCF-KIT" </mark>
 <strike>There were also a number of pathways that were enriched with lower specificity
@@ -416,18 +416,17 @@ in cluster-specific metastases, including “G1/S DNA Damage Checkpoints”,
 dependent signaling in response to WNT”, “Class I MHC mediated antigen
 processing & presentation”, “Chaperonin-mediated protein folding”, “Intrinsic
 Pathway for Apoptosis”, “Cellular Senescence”, “DNA Double-Strand Break
-Response”, and “Pre-NOTCH Expression and Processing” (**Table 2**). </strike>
+Response”, and “Pre-NOTCH Expression and Processing” (**Table 1**). </strike>
 
 ### Pathway disruption classes vary in short-term prognosis of survival
 
 ```{r child='survival.Rmd'}
 ```
 
-```{r umap-global-trends, fig.cap="Placeholder for figure 1", results=FALSE, eval=FALSE}
-set.seed(21)
-plot(x=rnorm(1000), y=rnorm(1000))
+## Discussion
+ 
+```{r child='discussion.Rmd'}
 ```
-
 
 ## Materials & Methods
 
@@ -457,7 +456,19 @@ Finally, we mapped the 18,577 Ensembl IDs from the TCGA dataset to the highly se
 Reactome pathways. This operation produced a lookup table that consisted of 377 pathways
 mapped to 8,940 genes.  
 
-### <mark>Filtering genes <- Peter to write</mark>
+### Filtering genes
+
+We filtered likely erroneous mutations due to transcription coupled repair. Our approach
+was to determine the status of each gene (expressed or not expressed) per tissue type in
+order to exclude gene mutations that we have evidence for no expression. To do this, we 
+obtained the TCGA RNA sequencing data adjusted for batch effect dataset (https://pancanatlas.xenahubs.net).
+Using the data, we removed the genes and tumor samples that were not included in our analysis, 
+grouped the tumor samples by tissue type and computed the mean expression value for each 
+gene. A minimum threshold of 10 transcripts per million was set for expressed genes based 
+on an inflection point observed when plotting the mean expression values of genes ranked 
+by increasing expression values for each tissue type. Genes that did not meet this threshold 
+were considered not expressed. This operation produced a lookup table for gene expression
+status in each tumor sample for 18,127 genes.  
 
 ### Class and stage-specific Enrichment Calculations
 
@@ -479,10 +490,20 @@ biologically relevant.
 ```{r child='survival-methods.Rmd'}
 ```
 
-## Discussion
- 
-```{r child='discussion.Rmd'}
+```{r child='../code/figure1.Rmd'}
 ```
+
+```{r child='../code/figure2.Rmd'}
+```
+
+```{r child = '../code/figure4.Rmd'}
+```
+
+```{r child='../code/table2.Rmd'}
+```
+
+![](../figures/fig6B.png)
+![](../figures/fig6C.png)
 
 ## Supplementary Information
 

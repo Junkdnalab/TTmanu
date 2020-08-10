@@ -1,4 +1,3 @@
-<div style="text-align: right"> Table 2 Data </div>
 ```{r table-2-data-generation, eval = FALSE}
 tumor_clusters <- fread("../data/umap_3d_coors.tsv") ## load in data
 load("../data/gdc_reactome_path_analysis.Rda")
@@ -131,7 +130,11 @@ rm(list = ls(all.names = T))
 gc()
 ```
 
-```{r table-2}
+```{r table-2, eval = FALSE}
+## this is for html only
+library(kableExtra)
+library(tidyverse)
+knitr::opts_chunk$set(echo = FALSE, dpi=600)
 load("../data/m1_minus_m0_per_cluster_rbeta.Rda")
 
 table2 <- m1_minus_m0_per_cluster_rbeta %>% filter(difference >= 0.20 & signif <= 2500) %>% ## filter effect size >= 0.20 and enrichment at a 95% CI
@@ -141,7 +144,27 @@ table2$log10pvalue <- round(-log10((table2$Signif + 1) / 1E5), digits = 2) ## Ge
 table2$Enrichment_Score <- round(table2$Enrichment_Score, digits = 2)
 table2$Signif <- NULL ## we don't need this anymore
 
-table2 %>% knitr::kable(format = "html") %>%
+table2 %>% knitr::kable() %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 12) %>%
   column_spec(1, bold = T, color = "black")
 ```
+
+```{r, echo = FALSE}
+## docx friendly
+load("../data/m1_minus_m0_per_cluster_rbeta.Rda")
+
+table2 <- m1_minus_m0_per_cluster_rbeta %>% filter(difference >= 0.30 & signif <= 2500) %>% ## filter effect size >= 0.20 and enrichment at a 95% CI
+  dplyr::select(path, clust, signif, difference) %>% 'colnames<-' (c("Pathway", "Cluster", "Signif", "Enrichment_Score")) ## select relevant column and rename col
+
+table2$log10pvalue <- round(-log10((table2$Signif + 1) / 1E5), digits = 2) ## Getting p value ## adding 1 for pseudo count.. 1E5 is the n simulations performed
+table2$Enrichment_Score <- round(table2$Enrichment_Score, digits = 2)
+table2$Signif <- NULL ## we don't need this anymore
+
+table2 %>% flextable() %>% 
+  set_caption(caption = "") %>%
+  align(part = "all") %>% 
+  width(., width = c(4,0.75,1,1)) %>% 
+  fontsize(size = 10, part = "body")
+
+```
+
