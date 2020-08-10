@@ -31,7 +31,52 @@ magnitude (**figure 5a**). A rate of 1 represents patients who die relatively
 close to the age predicted purely from their demographics independent of the
 information that they have the given cancer.
 
-<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Figure 5: relative survival of pathway clusters. a) Posterior distributions of estimated relative age-dependent survival by cancer type. b) Posterior distributions of estimated class-dependent survival for each cancer type. See methods for model details.</p>
+```{r survfig}
+
+library(ggridges)
+library(patchwork)
+
+load("../code/survival/survmodel-ethbkd.stansave")
+
+cancerdat = read_csv("../data/survival/clinical_plus_cluster.csv");
+cancerdat$type = as.factor(cancerdat$type)
+
+
+dfsamps = as.data.frame(sampseth)
+
+kcancplot = function(dfsamps,tisnames){
+	ktisnames = grep("ktis",names(dfsamps),value=TRUE)
+	dfktis = dfsamps[,ktisnames]
+	dfktis = stack(dfktis) ## convert to two column "values" and "ind" with "ind" being the name of the variable
+	names(dfktis) = c("value","parname")
+	
+	dim(tisnames) = c(length(tisnames),1)
+
+	dfktis$cancname = sapply(dfktis$parname,function(x) tisnames[x])
+	ggplot(dfktis) + geom_density_ridges(aes_(~value,~cancname))+ theme_minimal() + scale_fill_brewer(palette="Paired") + xlim(0,22) + labs(x="ktis multiplier",y="Cancer Type",title="Tissue Specific Effects")
+}
+
+
+kclassplot = function(dfsamps,tisnames){
+	kclnames = grep("k\\[",names(dfsamps), value=TRUE)
+	dfclas = dfsamps[,kclnames]
+	dfclas = stack(dfclas)
+	names(dfclas) = c("value","coefname")
+	dfclas$class = as.numeric(gsub("k\\[(.*),(.*)\\]","\\2",dfclas$coefname))
+	dfclas$tiss = tisnames[as.numeric(gsub("k\\[(.*),(.*)\\]","\\1",dfclas$coefname))]
+	ggplot(dfclas) + geom_density_ridges(aes_(~value,~class)) +
+		facet_wrap(. ~ tiss,nrow=3) + theme_minimal() + scale_fill_brewer(palette = "Paired") +
+		xlim(0,3) + theme(legend.position = "none") + ggtitle("Class Specific Coefficients")
+}
+
+
+p1 = kcancplot(dfsamps,levels(cancerdat$type))
+p2 = kclassplot(dfsamps,levels(cancerdat$type))
+
+p1 + p2
+
+```
+
 
 Our estimates of tissue-specific class effects, in contrast, ranged from 0-3,
 reflecting that some classes are either less deadly or more deadly than other
@@ -51,9 +96,3 @@ affect longevity, and there is no reason to believe that class specific effects
 would necessarily remain constant across tissue types given how widely the
 patients vary across tissue types as well as the different drug and surgical
 treatments typical used for each tissue.
-
-
-```{r survival-model, eval=FALSE}
-
-```
-

@@ -2,10 +2,11 @@ library(survival)
 library(ggfortify)
 library(gridExtra)
 library(readr)
+library(sqldf)
 
-
-install.packages("devtools")
-devtools::install_github("sachsmc/ggkm")
+# run the following if you don't have ggkm
+# install.packages("devtools")
+# devtools::install_github("sachsmc/ggkm")
 library(ggkm)
 
 
@@ -75,10 +76,28 @@ asampseth = as.array(sampseth)
 
 cancerdat = read_csv("../../data/survival/clinical_plus_cluster.csv");
 cancerdat$type = as.factor(cancerdat$type) ## the tissue
+endpoints = sqldf("select case when death_days_to is NULL then last_contact_days_to else death_days_to end as finaltime, case when death_days_to is NULL then 0 else 1 end as finalstatus from cancerdat;")
+
+cancerdat = cbind(cancerdat,endpoints);
+sum(is.na(cancerdat$finaltime))
+cancerdat = cancerdat[!is.na(cancerdat$finaltime),]
+
+
+
+plotkmcomp = function(sim,ref,act,actstatus){
+    ggplot(data.frame(stime=sim,rtime=ref,acttime=act,status=rep(1,length(ref)),actstatus=actstatus)) +
+        geom_km(aes(time=stime,status=status),color="red") +
+        geom_km(aes(time=rtime,status=status),color="orange") +
+        geom_km(aes(time=acttime,status=actstatus),color="blue")
+}
+    
+
 
 plotcancertype = function(cancerdat,i){
-    agesw = cancerdat[cancerdat$type == i & cancerdat$gender=="FEMALE","age_at_initial_pathologic_diagnosis"]$age_at_initial_pathologic_diagnosis
-    agesm = cancerdat[cancerdat$type == i & cancerdat$gender=="MALE","age_at_initial_pathologic_diagnosis"]$age_at_initial_pathologic_diagnosis
+    women = cancerdat[cancerdat$type == i & cancerdat$gender=="FEMALE",]
+    men = cancerdat[cancerdat$type == i & cancerdat$gender=="MALE",]
+    agesw = women$age_at_initial_pathologic_diagnosis
+    agesm = men$age_at_initial_pathologic_diagnosis
     kmean = mean(asampseth[,,sprintf("ktis[%d]",j)])
     print(sprintf("Cancer %s kmean = %f\n",i,kmean))
     try(hist(agesw),silent=TRUE)
@@ -86,29 +105,31 @@ plotcancertype = function(cancerdat,i){
 
     survyrswf = sapply(agesw,function(a) tryCatch(simdeath(r20wf,ageratewf,a,kmean)/365,error= function(e) {0}))
     survyrswfref = sapply(agesw,function(a) tryCatch(simdeath(r20wf,ageratewf,a,1)/365,error= function(e) {0}))
+
     survyrswm = sapply(agesm,function(a) tryCatch(simdeath(r20wm,ageratewm,a,kmean)/365,error= function(e) {0}))
     survyrswmref = sapply(agesm,function(a) tryCatch(simdeath(r20wm,ageratewm,a,1)/365,error= function(e) {0}))
-#    kmf = try(survfit(Surv(survyrswf)~1),silent=TRUE)
-#    kmfref = try(survfit(Surv(survyrswfref)~1),silent=TRUE)
-#    kmm = try(survfit(Surv(survyrswm)~1),silent=TRUE)
-#    kmmref = try(survfit(Surv(survyrswmref)~1),silent=TRUE)
-    p1 = tryCatch(
-        ggplot(data.frame(stime=survyrswf,rtime=survyrswfref,status=rep(1,length(survyrswf)))) + geom_km(aes(time=stime,status=status),color="red") + geom_km(aes(time=rtime,status=status),color="orange") + coord_cartesian(xlim=c(0,80)) +
-        labs(x="Survival Time (years past diagnosis)",
-             y="Probability",
-             title=sprintf("Survival for %s simulated white female patients",i)) +
-        annotate("text",x=50, y=.8,label="General Population k=1",color="orange") +
-        annotate("text",x=50, y=.7,label=sprintf("Patient Population k=%.1f",kmean),color="red"),
-        error= function(e) {ggplot()})
-    p2 = tryCatch(
-        ggplot(data.frame(stime=survyrswm,rtime=survyrswmref,status=rep(1,length(survyrswm)))) + geom_km(aes(time=stime,status=status),color="red") + geom_km(aes(time=rtime,status=status),color="orange") + coord_cartesian(xlim=c(0,80)) +
-        labs(x="Survival Time (years past diagnosis)",y="Probability",
-             title=sprintf("Survival for %s simulated white male patients",i)) +
-        annotate("text",x=50, y=.8,label="General Population k=1",color="orange") +
-        annotate("text",x=50, y=.7,label=sprintf("Patient Population k=%.1f",kmean),color="red"),
-        error = function(e) {ggplot()})
+
+    p1 = tryCatch(plotkmcomp(survyrswf,survyrswfref,women$finaltime/365,women$finalstatus)+
+                  coord_cartesian(xlim=c(0,80)) +
+                  labs(x="Survival Time (years past diagnosis)",
+                       y="Probability",
+                       title=sprintf("Survival for %s simulated white female patients",i)) +
+                  annotate("text",x=50, y=.8,label="Simulated General Population k=1",color="orange") +
+                  annotate("text",x=50, y=.7,label=sprintf("Simulated Patient Population k=%.1f",kmean),color="red")+
+                  annotate("text",x=50, y=.6,label=sprintf("Actual Patient Population",kmean),color="blue")                  
+                 ,
+                  error= function(e) {print(e);ggplot()})
+    p2 = tryCatch(plotkmcomp(survyrswm,survyrswmref,men$finaltime/365,men$finalstatus)+
+                  coord_cartesian(xlim=c(0,80)) +
+                  labs(x="Survival Time (years past diagnosis)",y="Probability",
+                       title=sprintf("Survival for %s simulated white male patients",i)) +
+                  annotate("text",x=50, y=.8,label="Simulated General Population k=1",color="orange") +
+                  annotate("text",x=50, y=.7,label=sprintf("Simulated Patient Population k=%.1f",kmean),color="red")+
+                  annotate("text",x=50, y=.6,label=sprintf("Actual Patient Population",kmean),color="blue")                  
+                 ,
+                  error = function(e) {print(e);ggplot()})
     
-    tryCatch(print(grid.arrange(p1,p2)),error=function(e) {print(ggplot())})
+    tryCatch(print(grid.arrange(p1,p2)),error=function(e) {print(e); print(ggplot())})
     
 }
 
@@ -122,3 +143,10 @@ for (i in levels(cancerdat$type)){
     plotcancertype(cancerdat,i)
 }
 dev.off()
+
+## work on creating a plot using patchwork
+
+
+## plot STAD simulated/actual male/female
+## plot THCA simulated/actual male/female
+
