@@ -117,19 +117,17 @@ down_compare_plot <- all_compare %>%
   filter(or < 0) %>%
   filter(adjPval < 0.01) %>%
   arrange(-or) %>%
-  # filter(M1 > 5) %>%
   filter(is.finite(or)) %>%
   slice_max(order_by = or, n = 10) %>%
   arrange(cluster, or, .by.group = TRUE)
-down_compare_plot$Hugo_Symbol <- with(down_compare_plot, 
-                                      factor(as.character(Hugo_Symbol), 
+down_compare_plot$Hugo_Symbol <- with(down_compare_plot,
+                                      factor(as.character(Hugo_Symbol),
                                              levels = unique(as.character(Hugo_Symbol))))
 
 up_compare_plot <- all_compare %>%
   group_by(cluster) %>%
   filter(or > 0) %>%
   arrange(-or) %>%
-  # filter(M2 > 5) %>%
   filter(is.finite(or)) %>%
   slice_max(order_by = or, n = 10) %>%
   arrange(cluster, or, .by.group = TRUE)
@@ -137,11 +135,12 @@ up_compare_plot$Hugo_Symbol <- with(up_compare_plot,
                                     factor(as.character(Hugo_Symbol),
                                            levels = unique(as.character(Hugo_Symbol))))
 
-up_p <- ggplot(up_compare_plot, aes(x = or, 
-                                    y = Hugo_Symbol, 
-                                    color = cluster, 
-                                    group = cluster)) +
-  geom_vline(xintercept = 0, linetype = 2) + 
+up_p <- ggplot(up_compare_plot, 
+               aes(x = or,
+                   y = Hugo_Symbol,
+                   color = cluster,
+                   group = cluster)) +
+  geom_vline(xintercept = 0, linetype = 2) +
   geom_pointrange(aes(xmin = ci.low, xmax = ci.up)) +
   scale_color_manual(values = cluster_colors) +
   theme_classic() +
@@ -149,83 +148,97 @@ up_p <- ggplot(up_compare_plot, aes(x = or,
   xlim(c(0, 9)) +
   ylab("Gene") +
   facet_grid(cluster ~ ., scales = "free_y", drop = TRUE, space = "free_y", switch = "y") +
-  theme(panel.grid.major.y = element_line(colour = "#f0f0f0"),
-        axis.title.y = element_blank()) +
   ggtitle("Enriched")
+  theme(
+    panel.grid.major.y = element_line(colour = "#f0f0f0"),
+    axis.title.y = element_blank()
+  )
 
-dn_p <- ggplot(down_compare_plot, aes(x = or, y = Hugo_Symbol, color = cluster, group = cluster)) +
-  geom_vline(xintercept = 0, linetype = 2) + 
+dn_p <- ggplot(down_compare_plot, 
+               aes(x = or, 
+                   y = Hugo_Symbol, 
+                   color = cluster, 
+                   group = cluster)) +
+  geom_vline(xintercept = 0, linetype = 2) +
   geom_pointrange(aes(xmin = ci.low, xmax = ci.up)) +
   scale_color_manual(values = cluster_colors, guide = guide_none()) +
   theme_classic() +
   xlab("log odds ratio") +
-  xlim(c(-9, 0)) + 
+  xlim(c(-9, 0)) +
   ylab("Gene") +
   facet_grid(cluster ~ ., scales = "free_y", drop = TRUE, space = "free_y", switch = "y") +
-  theme(panel.grid.major.y = element_line(colour = "#f0f0f0")) +
-  ggtitle("Depleted")
+  ggtitle("Depleted") +
+  theme(panel.grid.major.y = element_line(colour = "#f0f0f0"))
 
 tdat_up <- all_muts %>%
   filter(Hugo_Symbol %in% up_compare_plot$Hugo_Symbol) %>%
   distinct(Tumor_Sample_Barcode, Hugo_Symbol, clust_knn_char, type) %>%
-  select(type, Hugo_Symbol) %>%
+  select(type, clust_knn_char, Hugo_Symbol) %>%
   table()
-
-tdat_up <- left_join(as.data.frame(tdat_up), 
-                  clinical_plus_cluster %>%
-                    select(Tumor_Sample_Barcode, type, clust_knn_char) %>% 
-                    distinct() %>% 
-                    group_by(type, clust_knn_char) %>% 
-                    summarise(ntumors = n())) %>% 
+tdat_up <- left_join(
+  as.data.frame(tdat_up),
+  clinical_plus_cluster %>%
+    select(Tumor_Sample_Barcode, type, clust_knn_char) %>%
+    distinct() %>%
+    group_by(type, clust_knn_char) %>%
+    summarise(ntumors = n())) %>%
   mutate(prop = Freq / ntumors) %>%
-  select(type, Hugo_Symbol, prop) %>%
-  left_join(up_compare_plot %>% select(Hugo_Symbol, cluster))
+  mutate(prop = ifelse(is.na(prop), 0, prop)) %>%
+  select(type, clust_knn_char, Hugo_Symbol, prop) %>%
+  rename(cluster = clust_knn_char)
 tdat_up$Hugo_Symbol <- factor(tdat_up$Hugo_Symbol, levels = levels(up_compare_plot$Hugo_Symbol))
+tdat_up <- up_compare_plot %>% left_join(tdat_up)
 
-
-tdat_up_p <- tdat_up %>% ggplot(aes(type, Hugo_Symbol, fill = prop)) + 
-  geom_tile() + 
-  scale_fill_viridis_c(option = "E", "Proportion of \nTumor Type \nMutated Within \nCluster", limits = c(0,1)) + 
+tdat_up_p <- tdat_up %>% ggplot(aes(type, Hugo_Symbol, fill = prop)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "E", "Proportion of \nTumor Type \nMutated Within Cluster", limits = c(0, 1)) +
   xlab("Tumor Type") +
   ylab("Gene Symbol") +
   facet_grid(cluster ~ ., scales = "free_y", drop = TRUE, space = "free_y") +
   theme_classic() +
-  theme(strip.text = element_blank(), 
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
-        axis.text.y = element_blank(),
-        axis.title.y = element_blank(),
-        panel.grid.major.y = element_line(colour = "#f0f0f0"))
+  theme(
+    strip.text = element_blank(),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+    axis.text.y = element_blank(),
+    axis.title.y = element_blank(),
+    panel.grid.major.y = element_line(colour = "#f0f0f0")
+  )
 
 tdat_dn <- all_muts %>%
   filter(Hugo_Symbol %in% down_compare_plot$Hugo_Symbol) %>%
   distinct(Tumor_Sample_Barcode, Hugo_Symbol, clust_knn_char, type) %>%
-  select(type, Hugo_Symbol) %>%
+  select(type, clust_knn_char, Hugo_Symbol) %>%
   table()
-tdat_dn <- left_join(as.data.frame(tdat_dn), 
-                     clinical_plus_cluster %>%
-                       select(Tumor_Sample_Barcode, type, clust_knn_char) %>% 
-                       distinct() %>% 
-                       group_by(type, clust_knn_char) %>% 
-                       summarise(ntumors = n())) %>% 
+tdat_dn <- left_join(
+  as.data.frame(tdat_dn),
+  clinical_plus_cluster %>%
+    select(Tumor_Sample_Barcode, type, clust_knn_char) %>%
+    distinct() %>%
+    group_by(type, clust_knn_char) %>%
+    summarise(ntumors = n())) %>%
   mutate(prop = Freq / ntumors) %>%
-  select(type, Hugo_Symbol, prop) %>%
-  left_join(down_compare_plot %>% select(Hugo_Symbol, cluster))
+  mutate(prop = ifelse(is.na(prop), 0, prop)) %>%
+  select(type, clust_knn_char, Hugo_Symbol, prop) %>%
+  rename(cluster = clust_knn_char)
 tdat_dn$Hugo_Symbol <- factor(tdat_dn$Hugo_Symbol, levels = levels(down_compare_plot$Hugo_Symbol))
+tdat_dn <- down_compare_plot %>% left_join(tdat_dn)
 
-tdat_dn_p <- tdat_dn %>% ggplot(aes(type, Hugo_Symbol, fill = prop)) + 
-  geom_tile() + 
-  scale_fill_viridis_c(option = "E", "Proportion of \nTumor Type \nMutated Within \nCluster", limits = c(0,1)) + 
+tdat_dn_p <- tdat_dn %>% ggplot(aes(type, Hugo_Symbol, fill = prop)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "E", "Proportion of \nTumor Type \nMutated Within Cluster", limits = c(0, 1)) +
   xlab("Tumor Type") +
   ylab("Gene Symbol") +
-  guides(fill = FALSE) +
   facet_grid(cluster ~ ., scales = "free_y", drop = TRUE, space = "free_y") +
   theme_classic() +
-  theme(strip.text = element_blank(), 
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
-        axis.text.y = element_blank(),
-        axis.title.y = element_blank(),
-        panel.grid.major.y = element_line(colour = "#f0f0f0"))
+  theme(
+    strip.text = element_blank(),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+    axis.text.y = element_blank(),
+    axis.title.y = element_blank(),
+    panel.grid.major.y = element_line(colour = "#f0f0f0")
+  )
 
 layout <- "ABBCDD"
+
 dn_p + tdat_dn_p + up_p + tdat_up_p + plot_layout(guides = 'collect', design = layout) & theme(legend.position = "bottom")
 ```
