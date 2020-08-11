@@ -240,5 +240,3 @@ AAACCCC
 
 fig2A + fig2B + fig2C + plot_layout(design = layout) + plot_annotation(tag_levels = "A")
 ```
-
-<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Figure 2: Pan-cancer enrichment of pathway disruptions.** a) Waterfall plot; columns represent tumors. Each row represents a pathway. The pathways are ranked such that the pathway with the most disruptions across all 7,607 tumors is the first row _etc._ and tumors are ordered to prioritize the top pathway disruptions successively. The top 100 most mutated pathways are shown. Red signifies pathway disrupted pathways, grey signifies not disrupted. b) Heatmap shows the relative enrichment of each pathway (columns) within each numbered cluster (rows). Effect size is displayed as colors (orange, enrichment; purple, depletion). c) Proportion of mutated samples in the each significant pathway (columns; union set of pathways with effect size >= 0.30 in each cluster) within each numbered cluster (rows).</p>

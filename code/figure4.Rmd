@@ -228,7 +228,4 @@ tdat_dn_p <- tdat_dn %>% ggplot(aes(type, Hugo_Symbol, fill = prop)) +
 
 layout <- "ABBCDD"
 dn_p + tdat_dn_p + up_p + tdat_up_p + plot_layout(guides = 'collect', design = layout) & theme(legend.position = "bottom")
-
 ```
-
-<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Figure 4: Gene level analysis reveals tissue-specific class signatures.** Odds ratio plot; Column uses a logarithmic axis to represent odds ratio with a 95% confidence interval. Row represents the significant genes from each cluster. Each cluster was compared against the background (all other clusters) to find deferentially mutated genes. Significant genes (pvalue < 0.01) were selected and limited to the top ten results for each clusters. Heatmap; Column represents the cancer type. Row represents the significant genes as described above. The heatmap shows the proportion of samples per cluster, per cancer type that is mutated for each of the significant genes. Depleted significant genes (left). Enriched significant genes (right).</p>

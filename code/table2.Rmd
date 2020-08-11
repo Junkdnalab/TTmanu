@@ -132,9 +132,6 @@ gc()
 
 ```{r table-2, eval = FALSE}
 ## this is for html only
-library(kableExtra)
-library(tidyverse)
-knitr::opts_chunk$set(echo = FALSE, dpi=600)
 load("../data/m1_minus_m0_per_cluster_rbeta.Rda")
 
 table2 <- m1_minus_m0_per_cluster_rbeta %>% filter(difference >= 0.20 & signif <= 2500) %>% ## filter effect size >= 0.20 and enrichment at a 95% CI
@@ -149,7 +146,7 @@ table2 %>% knitr::kable() %>%
   column_spec(1, bold = T, color = "black")
 ```
 
-```{r, echo = FALSE}
+```{r table2-docx-friendly}
 ## docx friendly
 load("../data/m1_minus_m0_per_cluster_rbeta.Rda")
 
@@ -160,11 +157,11 @@ table2$log10pvalue <- round(-log10((table2$Signif + 1) / 1E5), digits = 2) ## Ge
 table2$Enrichment_Score <- round(table2$Enrichment_Score, digits = 2)
 table2$Signif <- NULL ## we don't need this anymore
 
-table2 %>% flextable() %>% 
-  set_caption(caption = "") %>%
-  align(part = "all") %>% 
-  width(., width = c(4,0.75,1,1)) %>% 
-  fontsize(size = 10, part = "body")
+table2 <-table2 %>% flextable() %>% 
+   set_caption(caption = "") %>%
+   align(part = "all") %>% 
+   width(., width = c(4,0.75,1,1)) %>% 
+   fontsize(size = 10, part = "body")
 
+knitr::knit_print(table2)
 ```
-

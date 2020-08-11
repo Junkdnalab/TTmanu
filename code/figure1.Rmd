@@ -1251,26 +1251,3 @@ AAAAKKKLLL###
 fig1A + fig1B + fig1C + fig1D + fig1E + fig1F + fig1G + fig1H + fig1I + fig1J + fig1K + fig1L + plot_layout(design = layout) + plot_annotation(tag_levels = 'A')
 
 ```
-
-<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Figure 1:
-Classification of tumors by pathway disruptions.** a) Each of 377 selected
-Reactome pathways (columns) is classified as disrupted if one or more genes is
-mutated in the tumor sample (rows). Tumors are grouped by tissue of origin using
-standardized abbreviations from the TCGA project. b) MCA analysis was performed to 
-determine the eigenvalue with the most explanatory power from the categorical data.
-Average of 100 permutations of the data was used as a baseline. c) The p-value of
-each eigenvalue was plotted and the max eigenvalue with a pvalue < 0.05 was selected. 
-d) The resulting MCA was projected down to 3 dimensions for the purpose of density 
-based clustering (only the first 2 dimensions are shown). Each dot represents a tumor 
-e) HDBSCAN was used to perform hierarchical density based clustering tuned to minimize
-the fraction of unassigned tumors. f) HDBSCAN clustered tumors were visualized on the UMAP
-projection; tumors are colored by cluster membership (see legend). This results
-in some tumors remaining unclassified (grey points). g) kNN was used to assign
-membership to the remaining tumors. h) Mutational burden plot where each dot corresponds
-to the sample mutation counts for tumors in each class. i) Projection of cancer 
-type identity onto UMAP. Abbrevs: BRCA = Breast cancer, COAD = Colorectal adenocarcinoma,
-HNSC = Head and neck squamous cell, PAAD = Pancreatic adenocarcinoma. j) Projection of breast
-cancer subtypes onto the UMAP. k) Projection of BRCA1/2 somatic mutation onto the
-UMAP. l) Projection of tumor stage onto the UMAP, regardless of cancer type. m) 
-Projection of metastatic status onto the UMAP. Abbrevs: M0 = non-metastatic tumors, 
-M1 = metastatic tumors.</p>

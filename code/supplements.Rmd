@@ -1,5 +1,4 @@
 ### Supplementary Figure S1
-
 ```{r supplementary-figure-s1, fig.width = 9, fig.height= 8, fig.align='center'}
 #out.width = '90%',
 umap_cancertype <- fread("../data/umap_3d_coors.tsv") ## load data
@@ -22,10 +21,8 @@ ggplot(umap_cancertype, aes(x = plot_y, y = plot_x, colour = project_code)) +
     legend.position = "none") +
   facet_wrap(~ project_code, ncol = 5) ## facet by cancer_type
 ```
-![**Supplementary figure S1. Distribution of cancer type on UMAP clusters.** Each panel shows the identity of individual tumors by one of 23 cancer types projected onto the cluster UMAP identified in **Figure 1 A** of the main text._]
-
+\newpage
 ### Supplementary Figure S2
-
 ```{r supplementary-figure-s2-data-generation, fig.width = 9, fig.height= 8, fig.align = "center"}
 umap_cancertype <- fread("../data/umap_3d_coors.tsv") ## load data
 umap_bg <- umap_cancertype[,-"project_code"] ## get background data for facet
@@ -45,11 +42,8 @@ ggplot(umap_cancertype, aes(x = plot_y, y = plot_x, colour = Subtype_Selected)) 
     legend.position = "none") +
   facet_wrap(~ project_code, ncol = 5) ## facet by cancer type
 ```
-
-![**Supplementary Figure S2. Histological subtypes.** _Each panel shows the histological subtypes of one of the 23 cancers projected on to the tumors of the UMAP from **Figure 1A of the main text.**_]
-
+\newpage
 ### Supplementary Figure S3
-
 ```{r supplementary-figure-s3-data-generation, eval = FALSE}
 load("../data/gdc_tumor_coding_complete.Rdata")
 load("../data/gene_data.Rda")
@@ -118,11 +112,8 @@ ggplot(selected_mut, aes(x = plot_y, y = plot_x, colour = as.character(value))) 
     legend.position = "none") +
   facet_wrap(~ factor(variable, levels = c("MSH2", "MSH6", "MLH1", "MLH3", "PMS1", "PMS2", "BRIP1", "RAD51", "CHEK2", "APC", "TET2", "TET3", "TERT", "TEP1", "DKC1")), ncol = 5) ## facet by gene
 ```
-
-![**Supplementary Figure S3. Common oncogenic mutations.** _Each panel shows one of 20 commonly mutated oncogenic genes projected on the UMAP from **Figure 1A of the main text.**_]
-
+\newpage
 ### Supplementary Figure S4
-
 ```{r supplementary-figure-s4-data-generation, eval = FALSE}
 load("../data/gdc_reactome_path_analysis.Rda") ## load data
 umap_cancertype <- fread("../data/umap_3d_coors.tsv") 
@@ -220,9 +211,8 @@ ggplot_umap_16
 #                       ncol = 5) ## facet by pathways
 
 ```
-
-![**Supplementary Figure S4. Projection of pathway disruptions onto the UMAP.**_]
-
+\newpage
+### Supplementary Figure S5
 ```{r, supplemental-s5-data-generation, eval = FALSE}
 load("../data/gdc_tumor_coding_complete.Rdata")
 load("../data/gene_data.Rda")
@@ -364,10 +354,8 @@ AADD
 
 umap_clust178 + pik3ca + kras + tp53 + plot_layout(design = layout)
 ```
-
-
-### Supplementary Table ST1
-
+\newpage
+### Supplementary Table 1
 ```{r supplemental-table-st1-data-generation, eval = FALSE}
 load("../data/gdc_tumor_coding_complete.Rdata")
 load("../data/gdc_reactome_path_analysis.Rda")
