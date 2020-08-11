@@ -168,7 +168,7 @@ dn_p <- ggplot(down_compare_plot, aes(x = or, y = Hugo_Symbol, color = cluster, 
 tdat_up <- all_muts %>%
   filter(Hugo_Symbol %in% up_compare_plot$Hugo_Symbol) %>%
   distinct(Tumor_Sample_Barcode, Hugo_Symbol, clust_knn_char, type) %>%
-  select(type, Hugo_Symbol) %>%
+  select(type, clust_knn_char, Hugo_Symbol) %>%
   table()
 
 tdat_up <- left_join(as.data.frame(tdat_up), 
@@ -178,6 +178,7 @@ tdat_up <- left_join(as.data.frame(tdat_up),
                     group_by(type, clust_knn_char) %>% 
                     summarise(ntumors = n())) %>% 
   mutate(prop = Freq / ntumors) %>%
+  mutate(prop = ifelse(is.na(prop), 0, prop)) %>%
   select(type, Hugo_Symbol, prop) %>%
   left_join(up_compare_plot %>% select(Hugo_Symbol, cluster))
 tdat_up$Hugo_Symbol <- factor(tdat_up$Hugo_Symbol, levels = levels(up_compare_plot$Hugo_Symbol))
@@ -199,7 +200,7 @@ tdat_up_p <- tdat_up %>% ggplot(aes(type, Hugo_Symbol, fill = prop)) +
 tdat_dn <- all_muts %>%
   filter(Hugo_Symbol %in% down_compare_plot$Hugo_Symbol) %>%
   distinct(Tumor_Sample_Barcode, Hugo_Symbol, clust_knn_char, type) %>%
-  select(type, Hugo_Symbol) %>%
+  select(type, clust_knn_char, Hugo_Symbol) %>%
   table()
 tdat_dn <- left_join(as.data.frame(tdat_dn), 
                      clinical_plus_cluster %>%
@@ -208,6 +209,7 @@ tdat_dn <- left_join(as.data.frame(tdat_dn),
                        group_by(type, clust_knn_char) %>% 
                        summarise(ntumors = n())) %>% 
   mutate(prop = Freq / ntumors) %>%
+  mutate(prop = ifelse(is.na(prop), 0, prop)) %>%
   select(type, Hugo_Symbol, prop) %>%
   left_join(down_compare_plot %>% select(Hugo_Symbol, cluster))
 tdat_dn$Hugo_Symbol <- factor(tdat_dn$Hugo_Symbol, levels = levels(down_compare_plot$Hugo_Symbol))
