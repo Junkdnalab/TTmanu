@@ -1,3 +1,4 @@
+\newpage
 ### Supplementary Figure S1
 ```{r supplementary-figure-s1, fig.width = 9, fig.height= 8, fig.align='center'}
 #out.width = '90%',
@@ -21,7 +22,7 @@ ggplot(umap_cancertype, aes(x = plot_y, y = plot_x, colour = project_code)) +
     legend.position = "none") +
   facet_wrap(~ project_code, ncol = 5) ## facet by cancer_type
 ```
-\newpage
+\pagebreak
 ### Supplementary Figure S2
 ```{r supplementary-figure-s2-data-generation, fig.width = 9, fig.height= 8, fig.align = "center"}
 umap_cancertype <- fread("../data/umap_3d_coors.tsv") ## load data
@@ -42,7 +43,7 @@ ggplot(umap_cancertype, aes(x = plot_y, y = plot_x, colour = Subtype_Selected)) 
     legend.position = "none") +
   facet_wrap(~ project_code, ncol = 5) ## facet by cancer type
 ```
-\newpage
+\pagebreak
 ### Supplementary Figure S3
 ```{r supplementary-figure-s3-data-generation, eval = FALSE}
 load("../data/gdc_tumor_coding_complete.Rdata")
@@ -112,7 +113,7 @@ ggplot(selected_mut, aes(x = plot_y, y = plot_x, colour = as.character(value))) 
     legend.position = "none") +
   facet_wrap(~ factor(variable, levels = c("MSH2", "MSH6", "MLH1", "MLH3", "PMS1", "PMS2", "BRIP1", "RAD51", "CHEK2", "APC", "TET2", "TET3", "TERT", "TEP1", "DKC1")), ncol = 5) ## facet by gene
 ```
-\newpage
+\pagebreak
 ### Supplementary Figure S4
 ```{r supplementary-figure-s4-data-generation, eval = FALSE}
 load("../data/gdc_reactome_path_analysis.Rda") ## load data
@@ -211,7 +212,7 @@ ggplot_umap_16
 #                       ncol = 5) ## facet by pathways
 
 ```
-\newpage
+\pagebreak
 ### Supplementary Figure S5
 ```{r, supplemental-s5-data-generation, eval = FALSE}
 load("../data/gdc_tumor_coding_complete.Rdata")
@@ -354,7 +355,7 @@ AADD
 
 umap_clust178 + pik3ca + kras + tp53 + plot_layout(design = layout)
 ```
-\newpage
+\pagebreak
 ### Supplementary Table 1
 ```{r supplemental-table-st1-data-generation, eval = FALSE}
 load("../data/gdc_tumor_coding_complete.Rdata")

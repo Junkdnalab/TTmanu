@@ -133,7 +133,7 @@ alter_fun = list(
 save(clust_col_order, path_row_order, file = "onco_clust.Rda")
 ```
 
-```{r figure-2-plot, fig.align= 'center', fig.height= 7, fig.width = 7}
+```{r figure-5-plot, fig.align= 'center', fig.height= 7, fig.width = 7}
 #out.height='90%', out.width='90%'
 ## top100 pathways pancancer oncoprint
 load("../data/onco_ggplot.Rda") ## load data

@@ -73,7 +73,8 @@ suppressPackageStartupMessages(c(
   library(seriation),
   library(rtracklayer),
   library(poibin),
-  library(flextable)
+  library(flextable),
+  library(plot3D)
 ))
 ```
 
@@ -292,64 +293,6 @@ enrichment levels of the three, having mutations in hedgehog signaling,
 "$\beta$-catenin degradation", "cellular response to hypoxia", "regulation of
 cell cycle" and "apoptosis" among others.
 
-<strike>
-### Gene-Pathway redundancy contributes to cluster identity
-
-Since pathways share some common driver genes, we investigated whether
-tumors in each class  have multiple mutations across signaling pathways, or
-whether a small number of driver genes account for enrichment. The split between
-clusters 7 and 8 is largely driven by mutations in _PI3K_ and its
-homologs and _Ras_ genes, respectively (compare _PIK3CA_ and _KRAS_ panels of
-**supplementary figure S5**). Furthermore, cluster 1 is distinguished
-from clusters 2-10 by general lack of P53 mutations (compare **Figure 1f** with the
-_TP53_ panel of **Supplementary Figure S5**).
- 
-Cluster 2 exhibited the highest pathway enrichment scores of the ten major
-classes, although there is a significant number of tumors spatially distributed
-between cluster groupings 7-9 and 2 on the UMAP projection that have pathway
-characteristics of both. The top ten distinguishing pathways of class 2 tumors
-were "cellular response to hypoxia," "regulation of mitotic cell cycle,"
-"assembly of the pre-replicative complex," "metabolism of polyamines,"
-"degradation of $\beta$-catenin by the destruction complex", "tumor necrosis
-factor receptor 2 non-canonical _NF-$\kappa$B_ pathway", " _AUF1_ (hnRNP D0)
-binds and destabilizes RNA", "regulation of apoptosis" and 3 other pathways
-associated with aspects of hedgehog signaling. To determine once again whether
-the genes driving pathway enrichment were commonly shared among these pathways
-we plotted and performed unsupervised clustering on tumors with an individual
-mutation matrix using every gene in each of the ten pathways, grouped by shared
-pathway membership (**figure 3A**). Surprisingly, this class of tumors was not
-predominated by 1 or more highly mutated genes across all cancers. Instead,
-genes in the proteosomal pathway whose activity contributes to all the
-aforementioned pathways and the majority of tumors in these classes have a
-single mutation in one of these genes. We annotated the tumors in this class
-according to tissue of origin to determine whether proteasome mutations have a
-tissue-of-origin (or cancer-specific) bias, and indeed we could observe some
-clustering. These data could explain how tissue-specific gene mutation
-signatures might result in general cancer phenotypes by converging at the
-pathway level.
-
-
-
-The proteasome plays key roles in the transduction of signals from the p53, WNT
-and NFkB pathways and it and proteasomal inhibitors have been approved for
-clinical use in some patient populations [@proteasome_review_Jang]. To determine
-whether this class of proteins is broadly sensitive to cancer-promoting
-mutations, we tabulated each gene as prognostic or not in the human protein
-expression atlas [@protein_atlas] and found 49 positive and 10 negative
-associations ( _i.e._ higher expression associated with unfavorable outcomes is
-"positive" _etc._) for 31 out of 43 (72%) proteasome genes (**figure 3B**).
-Second we looked at survival in mutations (**figure 3C**). Only a handful of proteasome mutations were significantly associated with favorable or unfavorable outcomes, probably owing to lack of sufficient power.
-
-Third, we checked the mutation classes using MAFtools [@maftools] and found the overwhelming
-majority (x out of y) are missense _vs._ various other deleterious classes (see
-**figure 3D**), suggesting that, similar to other oncogenic driver classes such
-as KRAS and PIK3C, proteasomal subunit mutations may result in specific
-dysregulation of the proteasomal complex activities that target cancer-promoting
-pathways. Taken together, our data suggest that mutations in proteasomal
-subunits are more widespread in cancer than previously appreciated and may
-represent a targetable category of tumors.
-</strike>
-
 ### A combination of common driver mutations and tissue-specific pathway genes create tissue-specific class signatures
 
 As discussed previously, prior efforts to extract common signatures from pan-cancer 
@@ -369,13 +312,18 @@ that tumors in this cluster could be a derivative either cluster 7 or 8. Cluster
 5, defined by enrichment in metabolic pathways, had mutations in ribosomal proteins and 
 nuclear pore complex, respectively. Cluster 4 had mutations in genes responsible for 
 nucleosome structure. Cluster 2 had mutations in genes involved in protein degradation. 
-Next, we investigated the proportion of samples per cancer type for the significant genes
-within a cluster (**Figure 4**; heatmap). Surprisingly, cluster-specific tumors were not 
-predominated by one or more highly mutated genes across all cancers. Instead, several 
-cancer-specific tumors in these classes had mutation profiles that differ from one another 
-( _e.g._ In cluster 2, LIHC was enriched for _PSME4_, KIRC was enriched for _UBC_, and 
-PAAD was enriched for _PSMA1_). Taken together, our data identifies a framework cancer 
-type specific mutation associated with a specific cluster.  
+We also observed genes that were enriched for a cluster are depleted from others ( _e.g._ 
+_TP53_ is enriched in cluster 6, but depleted in cluster 7; _PIK3CA_ is enriched in cluster
+7, but depleted in clusters 3 and 8). Next, we investigated the proportion of samples per 
+cancer type for the significant genes within a cluster (**Figure 4**; heatmap). Surprisingly, 
+cluster-specific tumors were not predominated by one or more highly mutated genes across all 
+cancers. Instead, when observing the mutation rate for these genes within samples that belong
+to a cluster, the mutation rate is heterogeneous across tumors by tissue origin ( _e.g._ In 
+cluster 4, CESC was enriched for _H2AFX_, OV was enriched for _HIST1H2BD_, and UCEC was enriched
+for _HIST1H2AC_). Even among the top most mutationally enriched genes within clusters there is
+no global pattern, indicating that our classes are not driven by individual genes, but rather 
+networks as a whole. Taken together, our data identifies a framework of cancer type-specific 
+mutation associated with a specific cluster.  
 
 ### Enrichment of pathways in metastasis is class-specific
 
@@ -489,31 +437,74 @@ biologically relevant.
 
 ```{r child='survival-methods.Rmd'}
 ```
-\newpage
+
+```{r, results='asis'}
+cat("\\newpage")
+```
+
 ```{r child='../text/fig_legend.Rmd'}
 ```
 
-\newpage
-```{r child='../code/figure1.Rmd'}
+```{r, results='asis'}
+cat("\\newpage")
 ```
-\newpage
-```{r child='../code/figure2.Rmd'}
+#### Figure 1
+```{r child='../code/figure1v2.Rmd'}
 ```
-\newpage
+
+```{r, results='asis'}
+cat("\\newpage")
+```
+#### Figure 2
+```{r child='../code/figure2v2.Rmd'}
+```
+
+```{r, results='asis'}
+cat("\\newpage")
+```
+#### Figure 3
+```{r child = '../code/figure3v2.Rmd'}
+```
+
+```{r, results='asis'}
+cat("\\newpage")
+```
+#### Figure 4
+```{r child = '../code/figure4v2.Rmd'}
+```
+
+```{r, results='asis'}
+cat("\\newpage")
+```
+#### Figure 5
+```{r child = '../code/figure2.Rmd'}
+```
+
+```{r, results='asis'}
+cat("\\newpage")
+```
+#### Figure 6
 ```{r child = '../code/figure4.Rmd'}
 ```
-\newpage
-```{r child='../code/table2.Rmd'}
-```
-\newpage
 
+```{r, results='asis'}
+cat("\\newpage")
+```
+#### Table 1
+```{r child = '../code/table2.Rmd'}
+```
+
+```{r, results='asis'}
+cat("\\newpage")
+```
 ![](../figures/fig6B.png)
-\pagebreak
+\newpage
 ![](../figures/fig6C.png)
 
 ## Supplementary Information
 
-```{r child='../code/supplements.Rmd'}
+```{r }
+#child='../code/supplements.Rmd'
 ```
 
 ## References

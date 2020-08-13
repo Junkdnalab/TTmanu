@@ -1,0 +1,140 @@
+```{r figure-1-data-generation, eval = FALSE}
+###################
+## Figure 1 data ##
+###################
+load("../data/gdc_reactome_path_analysis.Rda")
+load("../data/gdc_tumor_coding_complete.Rdata")
+load("../data/gene2_level2_lookup.Rda")
+
+path_daisy <- daisy(t(gdc_reactome_path_analysis), type = list(symm  = c(1:col(gdc_reactome_path_analysis))))
+path_daisy <- as.dist(as.matrix(path_daisy))
+
+path_daisy_row <- daisy(gdc_reactome_path_analysis, type = list(symm  = c(1:nrow(gdc_reactome_path_analysis))))
+path_daisy_row <- as.dist(as.matrix(path_daisy_row))
+
+pathway_dendro <- pheatmap(gdc_reactome_path_analysis,
+         show_rownames = F,
+         show_colnames = F,
+         cellheight = 1,
+         cellwidth = 0.5,
+         clustering_distance_cols = path_daisy,
+         clustering_distance_rows = path_daisy_row,
+         cluster_cols = T,
+         cluster_rows = T,
+         cutree_cols = 19,
+         annotation_legend = F,
+         legend_breaks = c(0, 0.25, 0.75, 1),
+         legend_labels = c("","Not Mut", "Mut", ""),
+         color = c("grey", "firebrick3"),
+         clustering_method = "ward.D2",
+         legend = T)
+dev.off()
+pathway_dendro <- pathway_dendro$tree_row$order ## getting pathway row ordering
+df <- rownames(gdc_reactome_path_analysis)
+pathway_dendro <- df[pathway_dendro]
+
+tumor_samples <- gdc_tumor_coding_complete %>% colData(.) %>%  ## get sample_id data from gdc
+  as.data.frame(.) %>%
+  dplyr::select(project_code, submitted_sample_id, submitted_specimen_id) %>%  
+  mutate(project_code = gsub(pattern = "\\-.*", replacement = "", x = .$project_code))
+
+cancer_type <- tumor_samples %>% .$project_code %>% unique %>% .[order(.)] ## get unique cancer_type
+
+cancer_dendro <- list() ## getting cancer type specific tumor sample clustering info
+
+for(n in cancer_type) {
+  cancer_info <- tumor_samples %>% rownames_to_column(var = "sample_id") %>% ## move sample_id to column
+    filter(project_code == n) %>% ## filter for specific cancer type
+    .[, "sample_id"] ## retain only sample_id
+  cancer_path <- gdc_reactome_path_analysis %>% .[, names(.) %in% cancer_info] ## only including filtered sample_id
+  cancer_heatmap <- pheatmap(cancer_path[pathway_dendro,], ## using pathway row order 
+                          show_rownames = F,
+                          show_colnames = F,
+                          cellheight = 1,
+                          cellwidth = 0.5,
+                          cluster_cols = T,
+                          cluster_rows = F,
+                          annotation_legend = F,
+                          color = c("grey", "firebrick3"),
+                          clustering_method = "single", ## ordering is single linkage
+                          legend = T)
+  cancer_order <- cancer_heatmap$tree_col$order ## cancer order
+  cancer_path <- names(cancer_path) ## getting the sample_id original order 
+  cancer_dendro[[n]] <- cancer_path[cancer_order] ## reorder cancer by heatmap order
+  rm(cancer_info, cancer_path)
+  gc()
+}
+dev.off()
+
+for(n in cancer_type[1]) { ## getting the order of clustering by cancer type by alphabetical order
+  print(n)
+  cancer_order <- as.data.frame(do.call(cbind, cancer_dendro[n])) ## read in first list
+  names(cancer_order) <- "sample_id"
+  cancer_order$type <- n
+  for(p in cancer_type[-1]) {
+    print(p)
+    df1 <- as.data.frame(do.call(cbind, cancer_dendro[p])) ## read in rest of list in loop
+    names(df1) <- "sample_id"
+    df1$type <- p
+    cancer_order <- rbind(cancer_order, df1) ## combine the two df and repeat the loop until end of cancer_type
+    rm(df1)
+    gc()
+  }
+}
+
+cancer_dendro <- cancer_order %>% .[,"sample_id"] %>% as.character(.) ## sample_id ordering
+
+cancer_disrupt_heatmap <- gdc_reactome_path_analysis %>% rownames_to_column(var = "path_name") %>%  ## move rownames to column
+  gather(., key = "sample_id", value = "membership", -path_name) ## wide to long format
+cancer_disrupt_heatmap$membership <- as.character(cancer_disrupt_heatmap$membership) ## turn boolean values into categories
+
+## set levels based on clustering algorithm above
+cancer_disrupt_heatmap$path_name <- factor(cancer_disrupt_heatmap$path_name, levels = c(rev(pathway_dendro)))
+cancer_disrupt_heatmap$sample_id <- factor(cancer_disrupt_heatmap$sample_id, levels = c(cancer_dendro))
+
+cancer_disrupt_heatmap <- left_join(cancer_disrupt_heatmap, cancer_order, by = "sample_id") ## add in cancer type information for faceting
+save(cancer_disrupt_heatmap, file = "cancer_disrupt_heatmap.Rda") 
+```
+
+
+```{r, fig.width = 9, fig.height= 4}
+load("../data/cancer_disrupt_heatmap.Rda")
+umap_cancertype <- fread("../data/umap_3d_coors.tsv")
+
+kelly.colours <- c("gray95", "gray13", "gold2", "plum4", "darkorange1",
+                   "lightskyblue2", "firebrick", "burlywood3", "gray51", "springgreen4",
+                   "lightpink2", "deepskyblue4", "lightsalmon2", "mediumpurple4",
+                   "orange", "maroon", "yellow3", "brown4", "yellow4", "sienna4", "chocolate", "gray19")
+
+fig1A <- ggplot(data = cancer_disrupt_heatmap, aes(x=sample_id, y=path_name, fill = membership)) + 
+  geom_tile(size = 0.6) +
+  scale_fill_manual(values = c("grey", "firebrick3")) +
+  facet_grid(.~type, scales = "free", space = "free", switch = "x") +
+scale_y_discrete(position = "left") +
+  xlab("") +
+  ylab("377 Reactome Pathways") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
+        axis.ticks = element_blank(),
+        strip.text.y = element_text(size = 12, hjust = 0),
+        strip.text.y.left = element_text(angle = 0),
+        strip.text.x = element_text(angle = 90),
+        strip.background = element_blank(),
+        legend.position = "none") 
+
+## fixing the text cutoff in heatmap
+ fig1Ag <- ggplotGrob(fig1A)
+ 
+ for(i in which(grepl("strip-b", fig1Ag$layout$name))){
+   fig1Ag$grobs[[i]]$layout$clip <- "off"
+ }
+ 
+ fig1A <- as.ggplot(fig1Ag)
+ rm(fig1Ag)
+ 
+opar <- par(mfrow = c(3,3), mai = c(0.1, 0.1, 0.1, 0.1))
+ 
+fig1A
+```

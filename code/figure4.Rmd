@@ -148,7 +148,7 @@ up_p <- ggplot(up_compare_plot,
   xlim(c(0, 9)) +
   ylab("Gene") +
   facet_grid(cluster ~ ., scales = "free_y", drop = TRUE, space = "free_y", switch = "y") +
-  ggtitle("Enriched")
+  ggtitle("Enriched") +
   theme(
     panel.grid.major.y = element_line(colour = "#f0f0f0"),
     axis.title.y = element_blank()
