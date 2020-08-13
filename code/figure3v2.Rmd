@@ -1,0 +1,99 @@
+```{r figure-3-plot, message=FALSE, warning=FALSE, fig.width= 9, fig.height= 3}
+umap_cancertype <- fread("../data/umap_3d_coors.tsv")
+
+kelly.colours <- c("gray95", "gray13", "gold2", "plum4", "darkorange1",
+                   "lightskyblue2", "firebrick", "burlywood3", "gray51", "springgreen4",
+                   "lightpink2", "deepskyblue4", "lightsalmon2", "mediumpurple4",
+                   "orange", "maroon", "yellow3", "brown4", "yellow4", "sienna4", "chocolate", "gray19")
+## mutation burden plot
+mut_order <- list() ## store data in list 
+for(n in 1:max(as.numeric(as.character(umap_cancertype$clust_knn)))) { ## loop through all the clusters
+  message(n)
+  mut_order[[n]] <- umap_cancertype %>% filter(clust_knn == n) %>%  ## filter for specific class
+    dplyr::select(sample_id, plot_x, plot_y, clust_knn, mut_count) %>% ## select relevant columns
+    arrange(mut_count) ## arrange mutation in increasing order
+}
+mut_order <- mut_order %>% do.call(rbind, .) %>% as.data.frame() ## rbind list
+
+mut_order$sample_id <- factor(mut_order$sample_id, levels = mut_order$sample_id)
+mut_order$clust_knn <- factor(mut_order$clust_knn, levels = c(1:10))
+
+## Need the breaks positions for the x-axis
+previous_class <- 0 ## starting position 1
+position_of_previous_class <- 0 ## starting position 2
+xaxis_breaks <- list() ## list for for loop
+for(n in 1) { ## loop through 1 to 12 clusters
+  message(n)
+  class_spec <- round(mut_order %>% filter(clust_knn == n) %>% nrow(.) / 2, digits = 0) ## calculate halfway mark of class 
+  xaxis_breaks[[n]] <- class_spec + previous_class + position_of_previous_class ## adding up all variables
+  previous_class <- class_spec ## storing class halfway mark
+  for(n in 2:max(as.numeric(as.character(mut_order$clust_knn)))) {
+    message(n)
+    position_of_previous_class <- xaxis_breaks[[n-1]] ## getting the previous class position
+    class_spec <- round(mut_order %>% filter(clust_knn == n) %>% nrow(.) / 2, digits = 0) ## calculate halfway mark of new class
+    xaxis_breaks[[n]] <- class_spec + previous_class + position_of_previous_class ## adding up all variables
+    previous_class <- class_spec ## storing class halfway mark
+  }
+}
+xaxis_breaks <- as.data.frame(do.call(rbind, xaxis_breaks)) ## rbind list
+xaxis_breaks <- mut_order[rownames(mut_order) %in% xaxis_breaks$V1,] ## find the tumor samples in these positions
+
+total_n <- as.data.frame(table(mut_order$clust_knn)) ## getting total n in cluster
+
+mut_order$log10mut <- log10(mut_order$mut_count + 1) ## mutation count log transformation + pseudo count
+
+mut_median <- mut_order %>% 
+  group_by(clust_knn) %>% 
+  dplyr::summarize(mut_med = median(log10mut)) ## calculate median for each class
+
+## Need to add 50 pseudo samples front and end of data so they don't touch the y-axis
+mut_order <- mut_order[,c("sample_id", "clust_knn", "log10mut")] ## selecting relevant column
+
+begin_NA <- data.frame(sample_id = paste0("sample", 1:100), 
+                       clust_knn = min(as.numeric(mut_order$clust_knn)), ## put lowest cluster to prevent a new facet
+                       log10mut = NA) ## put NA values so they don't get plotted
+end_NA <- data.frame(sample_id = paste0("sample", 101:200), ## repeat the step for the ends
+                       clust_knn = max(as.numeric(mut_order$clust_knn)),
+                       log10mut = NA)
+mut_order <- rbind(begin_NA, mut_order, end_NA) ## rbind the data in a specfic order
+
+mut_order$sample_id <- factor(mut_order$sample_id, levels = mut_order$sample_id) ## factor samples
+mut_order$clust_knn <- factor(mut_order$clust_knn, levels = c(1:10)) ## factor clusters
+
+fig1G <- ggplot(mut_order, aes(x = sample_id, y = log10mut, color = clust_knn)) + 
+  geom_point(size = 0.25) + 
+  ylab("Log10(Mutation Count)") + 
+  xlab("") +
+  theme_classic() +
+  facet_wrap(~ factor(clust_knn, levels = c(1:10)), ncol = 10, scales = "free_x") +
+  geom_hline(data= mut_median, aes(yintercept=mut_med)) +
+  scale_y_continuous(sec.axis = sec_axis(~.)) + ## dup y-axis
+  scale_x_discrete(breaks = c(as.character(mut_order$sample_id[1]), as.character(xaxis_breaks$sample_id)), labels = c("n =" ,total_n$Freq)) +
+  theme(axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
+        axis.ticks.x = element_blank(),
+        axis.line.x = element_line(colour = "black", size = 0.5),
+        axis.line.x.top = element_line(colour = "black", size = 0.5),
+        panel.spacing = unit(1, "lines"),
+        strip.background = element_rect(size = 0.5),
+        strip.placement = "outside",
+        strip.text.x = element_text(size = 10),
+        legend.position = "none") +
+  scale_color_manual(values = kelly.colours[-c(1:2)])
+
+## code to keep only the bottom border line of the facet
+fig1G <- ggplotGrob(fig1G)
+lg <- linesGrob(x=unit(c(0,1),"npc"), y=unit(c(0,0),"npc"), 
+                   gp=gpar(col="black", lwd=4))
+
+for (k in grep("strip-t",fig1G$layout$name)) {
+  fig1G$grobs[[k]]$grobs[[1]]$children[[1]] <- lg
+}
+
+fig1G <- as.ggplot(fig1G)
+fig1G
+```
+
+

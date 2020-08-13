@@ -1,0 +1,73 @@
+<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Figure 1:
+Classification of tumors by pathway disruptions.** a) Each of 377 selected
+Reactome pathways (columns) is classified as disrupted if one or more genes is
+mutated in the tumor sample (rows). Tumors are grouped by tissue of origin using
+standardized abbreviations from the TCGA project. b) MCA analysis was performed to 
+determine the eigenvalue with the most explanatory power from the categorical data.
+Average of 100 permutations of the data was used as a baseline. c) The p-value of
+each eigenvalue was plotted and the max eigenvalue with a pvalue < 0.05 was selected. 
+d) The resulting MCA was projected down to 3 dimensions for the purpose of density 
+based clustering (only the first 2 dimensions are shown). Each dot represents a tumor 
+e) HDBSCAN was used to perform hierarchical density based clustering tuned to minimize
+the fraction of unassigned tumors. f) HDBSCAN clustered tumors were visualized on the UMAP
+projection; tumors are colored by cluster membership (see legend). This results
+in some tumors remaining unclassified (grey points). g) kNN was used to assign
+membership to the remaining tumors. h) Mutational burden plot where each dot corresponds
+to the sample mutation counts for tumors in each class. i) Projection of cancer 
+type identity onto UMAP. Abbrevs: BRCA = Breast cancer, COAD = Colorectal adenocarcinoma,
+HNSC = Head and neck squamous cell, PAAD = Pancreatic adenocarcinoma. j) Projection of breast
+cancer subtypes onto the UMAP. k) Projection of BRCA1/2 somatic mutation onto the
+UMAP. l) Projection of tumor stage onto the UMAP, regardless of cancer type. m) 
+Projection of metastatic status onto the UMAP. Abbrevs: M0 = non-metastatic tumors, 
+M1 = metastatic tumors.</p>
+
+<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Figure 2: Pan-cancer 
+enrichment of pathway disruptions.** a) Waterfall plot; columns represent tumors. 
+Each row represents a pathway. The pathways are ranked such that the pathway with 
+the most disruptions across all 7,607 tumors is the first row _etc._ and tumors are
+ordered to prioritize the top pathway disruptions successively. The top 100 most 
+mutated pathways are shown. Red signifies pathway disrupted pathways, grey signifies
+not disrupted. b) Heatmap shows the relative enrichment of each pathway (columns) 
+within each numbered cluster (rows). Effect size is displayed as colors (orange, 
+enrichment; purple, depletion). c) Proportion of mutated samples in the each significant
+pathway (columns; union set of pathways with effect size >= 0.30 in each cluster)
+within each numbered cluster (rows).</p>
+
+<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Figure 3: Gene level 
+analysis reveals tissue-specific class signatures.** Odds ratio plot; Column uses 
+a logarithmic axis to represent odds ratio with a 95% confidence interval. Row 
+represents the significant genes from each cluster. Each cluster was compared 
+against the background (all other clusters) to find deferentially mutated genes. 
+Significant genes (pvalue < 0.01) were selected and limited to the top ten results 
+for each clusters. Heatmap; Column represents the cancer type. Row represents the 
+significant genes as described above. The heatmap shows the proportion of samples 
+per cluster, per cancer type that is mutated for each of the significant genes. 
+Depleted significant genes (left). Enriched significant genes (right).</p>
+
+<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Table 1: Cluster-specific 
+enriched pathways (effect size >= 0.30) in metastatsis.**
+
+<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Supplementary figure S1. 
+Distribution of cancer type on UMAP clusters.** Each panel shows the identity of 
+individual tumors by one of 23 cancer types projected onto the cluster UMAP identified 
+in **Figure 1D of the main text**.
+
+<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Supplementary Figure S2. 
+Histological subtypes.** Each panel shows the histological subtypes of one of the 23 
+cancers projected onto the tumors of the UMAP from **Figure 1D of the main text**.
+
+<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Supplementary Figure S3.
+Distribution of mismatch repair genes on UMAP clusters.** Each panel shows one of 15  
+genes involved in genome stability projected on the UMAP from **Figure 1D of the main text**.
+
+<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Supplementary Figure S4. 
+Projection of pathway disruptions onto the UMAP.** Each panel shows one of 377 Reactome
+pathways projected on the UMAP from **Figure 1D of the main text** ordered by the 
+hierarchical pathway order (column) from **Figure 2B of the main text**.
+
+<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Supplementary Figure S5.
+Distribution of oncogenes on UMAP clusters.** The left panel shows the identity of 
+clusters 1, 7 and 8. The multipanel on the right shows one of the three oncogenes 
+projected onto the tumors of the UMAP from **Figure 1D of the main text**.
+
+
