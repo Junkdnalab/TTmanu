@@ -26,7 +26,7 @@ $$dP = (1-P(T)) R(T) dT$$
 leading to the differential equation for the cumulative probability of death
 $P(T)$
 
-$$\frac{dP}{dT} = R(T)(1-P(T))$$
+$$\frac{dP}{dT} = (1-P(T))R(T)$$
 
 The solution of this ODE is:
 
@@ -50,10 +50,10 @@ magnitude of k to be primarily determined by the $k_{tis}$ value whose prior is
 significantly less constrained so that there is a wider range of dangers across
 tissue types.
 
-The $k$ in our model can be taken as, roughly, the aging rate relative to the
-baseline rates as depicted in **supplementary figure S5**. Thus, a value of
-$k=2$ means that a given cancer causes you to experience the same risk in time
-$dt$ as a non-cancer patient would experience at the same age, in time $2dt$.
+The $k$ in our model can be taken as, roughly, the aging rate relative
+to the baseline rates. Thus, a value of $k=2$ means that a given
+cancer causes you to experience the same risk in time $dt$ as a
+non-cancer patient would experience at the same age, in time $2dt$.
 
 Using this model, we split the data by Male/Female sex, and by White, vs Black
 race as these were the main well-identified categories available to us in the
@@ -66,13 +66,10 @@ function, while the tissue and class specific multipliers are not ethnicity
 specific.
 
 Using the model described above we fit the data using Stan via the rstan package
-in R. Posterior inferences are shown in **FIXME WHICH FIGURE?**.
+in R. Posterior inferences are shown in **Figure 7**.
 
-**supplementary figure S5** gives a comparison on log-scale between the post-fit
-survival curves and the CDC data it is based on. For demonstration purposes we
-also illustrate some examples of the expected survival for a population that
-receives a diagnosis with doubled risk of death at ages 40, 50, 60, 70, and 80
-(**supplementary figure S6**).
+**supplementary figure S5** gives a comparison on log-scale between
+the post-fit survival curves and the CDC data it is based on.
 
 As an aside, we did not explicitly account for stage at diagnosis in our model
 for the following reasons. In the tumor sample data, stage at diagnosis is

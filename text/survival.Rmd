@@ -18,81 +18,59 @@ risks using the available CDC life tables. We then constrain the cancer specific
 multiplier using the longevity data within the cancer tumor dataset. Our model
 estimates the effect of cancer type and class-specific cancer effects
 independently, resulting in a cancer and class specific estimate of the aging
-rate multiplier. We found that cancer types, as expected, have a range of
-prognoses relative to the general population, as shown in **figure 5a**. The
-least deadly was prostate cancer (PRAD), and the most deadly was glioblastoma
-(GBM) which has a risk multiplier of between 15 and 22 relative to the
-background risk of death in the population. This undoubtedly is due to the fact
-that relatively young patients are affected by GBM. Among the deadliest cancers
-outside of GBM were stomach (STAD), melanoma (SKCM) and pancreatic (PAAD)
-cancers. Apart from these top 4 cancers which ranged from 6-22 in relative risk
-of age-adjusted death, the remaining cancer types ranged from about 1 to 5 in
-magnitude (**figure 5a**). A rate of 1 represents patients who die relatively
+rate multiplier. 
+
+To understand the model, see **Figure 7A** where we show simulated survival time
+curves for four related groups. We start with a cohort of women aged 30 and show
+their expected survival (blue). By setting their cancer rate multiplier to k=2
+we can simulate the effect of a moderately deadly cancer (red). Compare this to
+a randomly selected group of women ranging in age from 30 to 70 years old (dark
+blue). Immediately the survival curve changes due to the mixture of ages,
+without any malignancy. Adding a k=2 malignancy further reduces expected
+lifespan (dark red). We can see that for different tissues simply due to the
+change in distribution of age-at-diagnosis we should expect equally deadly
+cancers to have *different* survival curves. The model takes this into account
+and the aggressiveness of the cancer can be estimated without the confounding
+aspect of age.
+
+We found that cancer types, as expected, have a range of prognoses relative to
+the general population. For example in **Figure 7B-E** we see three particularly
+deadly cancers (Stomach:STAD, Glioblastoma:GBM, and Pancreatic:PAAD), and one
+cancer where diagnosis apparently decreases risk relative to background
+(Thyroid: THCA). Cancers with posterior probability for relative risk of less
+than 1 such as THCA may be those where diagnosis is associated with patients who
+have relatively healthy behaviors, are seen regularly by doctors, and comply
+with health recommendations.
+
+The degree to which a given cancer accelerates aging can be determined by the
+ktis multiplier (**Figure 7F**) multiplied by the class specific modifier
+(**Figure 7G**). Looking at the tissue specific multiplier, the least deadly was
+prostate cancer (PRAD), and the most deadly was glioblastoma (GBM) which has a
+risk multiplier of between 15 and 22 relative to the background risk of death in
+the population. This undoubtedly is due to the fact that relatively young
+patients are affected by GBM and that it is extremely deadly. Among the
+deadliest cancers outside of GBM were stomach (STAD), melanoma (SKCM) and
+pancreatic (PAAD) cancers. Apart from these top 4 cancers which ranged from 6-22
+in relative risk of age-adjusted death, the remaining cancer types ranged from
+about 1 to 5 in magnitude. A rate of 1 represents patients who die relatively
 close to the age predicted purely from their demographics independent of the
 information that they have the given cancer.
 
-```{r survfig}
-
-library(ggridges)
-library(patchwork)
-
-load("../code/survival/survmodel-ethbkd.stansave")
-
-cancerdat = read_csv("../data/survival/clinical_plus_cluster.csv");
-cancerdat$type = as.factor(cancerdat$type)
-
-
-dfsamps = as.data.frame(sampseth)
-
-kcancplot = function(dfsamps,tisnames){
-	ktisnames = grep("ktis",names(dfsamps),value=TRUE)
-	dfktis = dfsamps[,ktisnames]
-	dfktis = stack(dfktis) ## convert to two column "values" and "ind" with "ind" being the name of the variable
-	names(dfktis) = c("value","parname")
-	
-	dim(tisnames) = c(length(tisnames),1)
-
-	dfktis$cancname = sapply(dfktis$parname,function(x) tisnames[x])
-	ggplot(dfktis) + geom_density_ridges(aes_(~value,~cancname))+ theme_minimal() + scale_fill_brewer(palette="Paired") + xlim(0,22) + labs(x="ktis multiplier",y="Cancer Type",title="Tissue Specific Effects")
-}
-
-
-kclassplot = function(dfsamps,tisnames){
-	kclnames = grep("k\\[",names(dfsamps), value=TRUE)
-	dfclas = dfsamps[,kclnames]
-	dfclas = stack(dfclas)
-	names(dfclas) = c("value","coefname")
-	dfclas$class = as.numeric(gsub("k\\[(.*),(.*)\\]","\\2",dfclas$coefname))
-	dfclas$tiss = tisnames[as.numeric(gsub("k\\[(.*),(.*)\\]","\\1",dfclas$coefname))]
-	ggplot(dfclas) + geom_density_ridges(aes_(~value,~class)) +
-		facet_wrap(. ~ tiss,nrow=3) + theme_minimal() + scale_fill_brewer(palette = "Paired") +
-		xlim(0,3) + theme(legend.position = "none") + ggtitle("Class Specific Coefficients")
-}
-
-
-p1 = kcancplot(dfsamps,levels(cancerdat$type))
-p2 = kclassplot(dfsamps,levels(cancerdat$type))
-
-p1 + p2
-
-```
-
-
-Our estimates of tissue-specific class effects, in contrast, ranged from 0-3,
-reflecting that some classes are either less deadly or more deadly than other
-classes within each cancer types. A class specific rate of 1 represents typical
-rate for this tissue type (**figure 5b**). For several cancers ( _e.g._ PRAD,
-kidney chromophobe (KICH), diffuse large B-cell lymphoma (DBLC), thyroid cancer
-(THCA)) the posterior estimates are largely indestinguishable from the prior,
-reflecting that either there were too few mortalities in the data to make an
-estimate (as expected for PRAD and THCA) or two few samples period. We did not
-observe class-specific trends that held true across cancer types, which could
-result from different cancers having different standards of care for example. In
-support of this interpretation, we also tested a factored model which considered
-both cancer type and each class independent of cancer type (**supplementary
-figure S7??**). Though we were able to successfully fit this model, it is a
-special case of the more general model where class and tissue can independently
-affect longevity, and there is no reason to believe that class specific effects
-would necessarily remain constant across tissue types given how widely the
-patients vary across tissue types as well as the different drug and surgical
-treatments typical used for each tissue.
+Our estimates of tissue-specific class effects, in contrast, ranged from less
+than 1 up to about 3 or 4, reflecting that some classes are either less deadly
+or more deadly than other classes within each cancer types (**Figure 7G**). A
+class specific rate of 1 represents typical rate for this tissue type. For
+several cancers ( _e.g._ PRAD, kidney chromophobe (KICH), diffuse large B-cell
+lymphoma (DBLC), thyroid cancer (THCA)) the posterior estimates are largely
+indestinguishable from the prior, reflecting that either there were too few
+mortalities in the data to make an estimate (as expected for PRAD and THCA) or
+two few samples period. We did not observe class-specific trends that held true
+across cancer types, which could result from different cancers having different
+standards of care for example. In support of this interpretation, we also tested
+a factored model which considered both cancer type and each class independent of
+cancer type (not shown). Though we were able to successfully fit this model, it
+is a special case of the more general model where class and tissue can
+independently affect longevity, and there is no reason to believe that class
+specific effects would necessarily remain constant across tissue types given how
+widely the patients vary across tissue types as well as the different drug and
+surgical treatments typical used for each tissue.

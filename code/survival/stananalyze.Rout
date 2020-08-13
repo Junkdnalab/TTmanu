@@ -24,16 +24,16 @@ Loading required package: RSQLite
 > library(readr)
 > library(tidyverse)
 ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──
-✔ ggplot2 3.3.2     ✔ dplyr   1.0.0
+✔ ggplot2 3.3.2     ✔ dplyr   1.0.1
 ✔ tibble  3.0.3     ✔ stringr 1.4.0
-✔ tidyr   1.1.0     ✔ forcats 0.5.0
+✔ tidyr   1.1.1     ✔ forcats 0.5.0
 ✔ purrr   0.3.4     
 ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()
 > library(rstan)
 Loading required package: StanHeaders
-rstan (Version 2.21.1, GitRev: 2e1f913d3ca3)
+rstan (Version 2.21.2, GitRev: 2e1f913d3ca3)
 For execution on a local, multicore CPU with excess RAM we recommend calling
 options(mc.cores = parallel::detectCores()).
 To avoid recompilation of unchanged Stan programs, we recommend calling
@@ -301,6 +301,8 @@ Missing column names filled in: 'X1' [1]
 > 
 > ## optimization for initialization doesn't always work... 
 > start = optimizing(smodel,data=standata);
+Warning message:
+In .local(object, ...) : non-zero return code in optimizing
 > start2 = optimizing(smodel,data=standata);
 Warning message:
 In .local(object, ...) : non-zero return code in optimizing
@@ -2845,7 +2847,11 @@ pdf
 > 
 > smodelf = stan_model(file="survmodelfactor.stan")
 > start = optimizing(smodelf,data=standata);
+Warning message:
+In .local(object, ...) : non-zero return code in optimizing
 > start2 = optimizing(smodelf,data=standata);
+Warning message:
+In .local(object, ...) : non-zero return code in optimizing
 > start3 = optimizing(smodelf,data=standata);
 Warning message:
 In .local(object, ...) : non-zero return code in optimizing
@@ -3381,12 +3387,12 @@ Missing column names filled in: 'X1' [1]
 > #sampseth = sampling(sethmodel,data=standataeth,chains=3,warmup=500,iter=1000,cores=4,control=list(max_treedepth=12),init=list(start,start2,start3));
 > 
 > 
-> tryCatch(load("survmodel-ethn.stansave"),error=function(e){
+> tryCatch(load("survmodel-ethbkd.stansave"),error=function(e){
 +     sampseth = sampling(sethmodel,data=standataeth,chains=3,warmup=2000,iter=4000,thin=2,cores=4,control=list(max_treedepth=12))
 + 
-+     save("sampseth",file="survmodel-ethn.stansave")
++     save("sampseth",file="survmodel-ethbkd.stansave")
 + })
-> load("survmodel-ethn.stansave")
+> load("survmodel-ethbkd.stansave")
 > 
 > asampseth = as.array(sampseth)
 > 

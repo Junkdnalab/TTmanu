@@ -497,9 +497,9 @@ cat("\\newpage")
 ```{r, results='asis'}
 cat("\\newpage")
 ```
-![](../figures/fig6B.png)
-\newpage
-![](../figures/fig6C.png)
+
+```{r child='../code/survival/survfig.Rmd'}
+```
 
 ## Supplementary Information
 
