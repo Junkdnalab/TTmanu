@@ -14,7 +14,9 @@ suppressPackageStartupMessages(c(
   library(tidyverse),
   library(data.table),
   library(plot3D),
-  library(flextable)
+  library(flextable),
+  library(knitr),
+  library(kableExtra)
 ))
 ```
 
@@ -627,8 +629,8 @@ load("../data/table_st1.Rda")
 write.xlsx(table_st1, file = "../data/table_st1.xlsx", row.names = FALSE)
 ```
 
-
-```{r enrich-pathway-in-clust, eval = FALSE}
+**Supplementary Table 1. Cluster-specific enriched pathways (effect size >= 0.30).**
+```{r enrich-pathway-in-clust, fig.width= 9}
 ## docx friendly
 load("../data/moderate_enrich_prob.Rda")
 
@@ -639,14 +641,21 @@ st1$log10pvalue <- round(-log10((st1$Signif + 1) / 1E5), digits = 2) ## Getting 
 st1$Enrichment_Score <- round(st1$Enrichment_Score, digits = 2)
 st1$Signif <- NULL ## we don't need this anymore
 
-st1 %>% flextable() %>% 
-  set_caption(caption = "") %>%
-  align(part = "all") %>% 
-  width(., width = c(4,0.75,1,1)) %>% 
-  fontsize(size = 10, part = "body")
+# st1 <- st1 %>% flextable() %>% 
+#   set_caption(caption = "") %>%
+#   align(part = "all") %>% 
+#   width(., width = c(4,0.75,1,1)) %>% 
+#   fontsize(size = 10, part = "body")
+# 
+# knitr::knit_print(st1)
+names(st1) <- c("Pathway", "Cluster", "Effect Size", "-log(p)")
+ st1 %>%  knitr::kable(format = "latex", longtable = TRUE, align = c("l", rep("c",3))) %>%
+   kable_styling(latex_options=c("scale_down", "repeat_header"), full_width = FALSE, font_size = 12) %>%
+   column_spec(1, color = "black", width = "4in")
 ```
 
 
+\newpage
 
 ![**Supplemental figure S6. Survival fit independent of disease status.** _The red and blue curves show the survival of people in the US by female and male, respectively. The orange and green curves show the model fits._]
 
