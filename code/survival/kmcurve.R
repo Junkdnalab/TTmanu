@@ -71,10 +71,23 @@ cancerdat = cancerdat[!is.na(cancerdat$finaltime),]
 
 
 plotkmcomp = function(sim,ref,act,actstatus){
-    ggplot(data.frame(stime=sim,rtime=ref,acttime=act,status=rep(1,length(ref)),actstatus=actstatus)) +
-        geom_km(aes(time=stime,status=status),color="red") +
-        geom_km(aes(time=rtime,status=status),color="blue") +
-        geom_km(aes(time=acttime,status=actstatus),color="darkgreen")
+    data.frame(
+        stime = sim,
+        rtime = ref,
+        acttime = act,
+        status = rep(1, length(ref)),
+        actstatus = actstatus
+    ) %>%
+        pivot_longer(-c(status, actstatus),
+            values_to = "time",
+            names_to = "condition"
+        ) %>%
+            mutate(status = case_when(condition != "acttime" ~ as.integer(status),
+            condition == "acttime" ~ as.integer(actstatus))) %>%
+        ggplot(aes(time = time, color = condition, status = status)) +
+        geom_km() +
+        theme_classic() +
+        theme(legend.position = c(.8, .75))
 }
     
 
@@ -103,17 +116,31 @@ plotcancertype = function(cancerdat,i){
 
     survyrswm = sapply(agesm,function(a) tryCatch(simdeath(r20wm,ageratewm,a,kmean)/365,error= function(e) {0}))
     survyrswmref = sapply(agesm,function(a) tryCatch(simdeath(r20wm,ageratewm,a,1)/365,error= function(e) {0}))
-
-    p1 = tryCatch(plotkmcomp(survyrswf,survyrswfref,women$finaltime/365,women$finalstatus)+
-                  coord_cartesian(xlim=c(0,80)) +
-                  labs(x="Survival Time (years past diagnosis)",
-                       y="Probability",
-                       title=sprintf("Survival for %s simulated white female patients",i)) +
-                  annotate("text",x=80, y=.9,label="Simulated General Population k=1",color="blue",hjust="right") +
-                  annotate("text",x=80, y=.7,label=sprintf("Simulated Patient Population k=%.1f",kmean),color="red",hjust="right")+
-                  annotate("text",x=80, y=.5,label=sprintf("Actual Patient Population",kmean),color="darkgreen",hjust="right")                  
-                 ,
-                  error= function(e) {print(e);ggplot()})
+    p1 <- tryCatch(plotkmcomp(survyrswf, survyrswfref, women$finaltime / 365, women$finalstatus) +
+        coord_cartesian(xlim = c(0, 80)) +
+        labs(
+            x = "Survival Time (years past diagnosis)",
+            y = "Probability",
+            title = sprintf("Survival for %s simulated white female patients", i)
+        ) +
+        scale_color_manual(
+            values = c(
+                rtime = "#0072b2",
+                stime = "#d55e00",
+                acttime = "#009e73"
+            ),
+            breaks = c("rtime", "stime", "acttime"),
+            labels = c(
+                "Simulated General Population; k = 1",
+                sprintf("Simulated Patient Population; k = %.1f", kmean),
+                "Actual Patient Population"
+            )
+        ),
+    error = function(e) {
+        print(e)
+        ggplot()
+    }
+    )
     p2 = tryCatch(plotkmcomp(survyrswm,survyrswmref,men$finaltime/365,men$finalstatus)+
                   coord_cartesian(xlim=c(0,80)) +
                   labs(x="Survival Time (years past diagnosis)",y="Probability",
