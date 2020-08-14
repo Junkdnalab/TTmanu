@@ -1,6 +1,5 @@
-
-
-```{r, survfig, echo=FALSE, warning=FALSE, error=TRUE,message=FALSE,fig.height=9, fig.width=6.5}
+#### Figure 7
+```{r, survfig, echo=FALSE, warning=FALSE, error=TRUE,message=FALSE,fig.height=9, fig.width=9}
 
 
 library(ggridges)
@@ -98,14 +97,7 @@ mytheme = theme(
     title = element_text(size=10)
   )
 
-mylayout = '
-AAAAAAAA
-BBBBBBBB
-BBBBBBBB
-CCCCCCCC
-CCCCCCCC
-CCCCCCCC
-'
+
 
 kmlayout = "
 AB
@@ -120,9 +112,22 @@ kmlegend <- theme(legend.direction = "horizontal")
 
 print(
 ((p1+mytheme)/((pstad[[1]]+mytheme + kmlegend)+(pgbm[[1]]+mytheme + kmlegend) +
-(ppaad[[1]]+mytheme + kmlegend) + (thca[[1]] + mytheme + kmlegend) + guide_area() + plot_layout(design = kmlayout, guides = "collect")))/((pcanc+mytheme) + (pclass+mytheme))+plot_layout(design=mylayout) +plot_annotation(tag_levels = "A")
+(ppaad[[1]]+mytheme + kmlegend) + (thca[[1]] + mytheme + kmlegend) + guide_area() + plot_layout(design = kmlayout, guides = "collect"))) + plot_annotation(tag_levels = "A")
 )
-
-
-
 ```
+
+```{r, results='asis'}
+cat("\\newpage")
+```
+
+#### Figure 8
+```{r, message = FALSE, fig.width = 9}
+mylayout = '
+ABB
+ABB
+#BB
+'
+
+((pcanc+mytheme) + (pclass+mytheme))+plot_layout(design=mylayout) +plot_annotation(tag_levels = "A")
+```
+
