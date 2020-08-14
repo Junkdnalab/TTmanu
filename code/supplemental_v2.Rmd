@@ -1,0 +1,652 @@
+---
+output:
+  bookdown::pdf_book:
+    number_sections: FALSE
+    toc: FALSE
+    keep_tex: yes
+always_allow_html: TRUE
+editor_options:
+  chunk_output_type: console
+---
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, dpi=600, warning = FALSE, message = FALSE)
+suppressPackageStartupMessages(c(
+  library(tidyverse),
+  library(data.table),
+  library(plot3D),
+  library(flextable)
+))
+```
+
+```{r supplementary-figure-s1, fig.width = 9}
+umap_cancertype <- fread("../data/umap_3d_coors.tsv") ## load data
+
+cancer_type <- unique(umap_cancertype$project_code) ## Get cancer type in data set
+cancer_type <- cancer_type[order(cancer_type)] ## Order alphabetically 
+
+
+
+par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1))
+par(mar = c(2,2,0,0))
+for(n in cancer_type[1:6]) {
+with(umap_cancertype %>% 
+       filter(project_code == n),
+     scatter3D(plot_y, -plot_z, plot_x, 
+                                bg = "grey", pch = 21, cex = 0.8, lwd = 0.2,
+                                theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+                                colvar = NULL))
+title(xlab="UMAP 2", line=0)
+legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
+}
+
+par(mfrow = c(2,3), mai = c(0.1, 0.1, 2, 0.1))
+par(mar = c(2,2,0,0))
+for(n in cancer_type[7:12]) {
+with(umap_cancertype %>%
+       filter(project_code == n),
+     scatter3D(plot_y, -plot_z, plot_x, 
+                                bg = "grey", pch = 21, cex = 0.8, lwd = 0.2,
+                                theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+                                colvar = NULL))
+title(xlab="UMAP 2", line=0)
+legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
+}
+par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1))
+par(mar = c(2,2,0,0))
+for(n in cancer_type[13:15]) {
+with(umap_cancertype %>%
+       filter(project_code == n),
+     scatter3D(plot_y, -plot_z, plot_x, 
+                                bg = "grey", pch = 21, cex = 0.8, lwd = 0.2,
+                                theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+                                colvar = NULL))
+title(xlab="UMAP 2", line=0)
+legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
+}
+
+par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1))
+par(mar = c(2,2,0,0))
+for(n in cancer_type[19:23]) {
+with(umap_cancertype %>%
+       filter(project_code == n),
+     scatter3D(plot_y, -plot_z, plot_x,
+                                bg = "grey", pch = 21, cex = 0.8, lwd = 0.2,
+                                theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+                                colvar = NULL))
+title(xlab="UMAP 2", line=0)
+legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
+}
+
+```
+**Supplementary figure S1. Distribution of cancer type on UMAP clusters.** Each panel shows the identity of 
+individual tumors by one of 23 cancer types projected onto the cluster UMAP identified 
+in **Figure 2C of the main text**.
+
+\newpage
+
+```{r supplementary-figure-s2-data-generation, fig.width = 9}
+ditto_color <- c(
+  "#E69F00", "#56B4E9", "#009E73", "#F0E442",
+  "#0072B2", "#D55E00", "#CC79A7", "#666666",
+  "#AD7700", "#1C91D4", "#007756", "#D5C711",
+  "#005685", "#A04700", "#B14380", "#4D4D4D",
+  "#FFBE2D", "#80C7EF", "#00F6B3", "#F4EB71",
+  "#06A5FF", "#FF8320", "#D99BBD", "#8C8C8C",
+  "#FFCB57", "#9AD2F2", "#2CFFC6", "#F6EF8E",
+  "#38B7FF", "#FF9B4D", "#E0AFCA", "#A3A3A3",
+  "#8A5F00", "#1674A9", "#005F45", "#AA9F0D",
+  "#00446B", "#803800", "#8D3666", "#3D3D3D")
+
+cancer_w_subtypes <- list()
+for(n in cancer_type) {
+  spec_cancer <- umap_cancertype %>% 
+    mutate(J_color = case_when(project_code == n ~ Subtype_Selected,
+                               TRUE ~ "Other")) %>%
+    filter(J_color != "Other")
+  if(nrow(spec_cancer) == 0) {next
+  }
+  cancer_w_subtypes[[n]] <- n
+}
+cancer_w_subtypes <- names(cancer_w_subtypes)
+
+par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1))
+par(mar = c(2,2,0,0))
+
+for(n in cancer_w_subtypes[1:6]) {
+  spec_cancer <- umap_cancertype %>% 
+    mutate(J_color = case_when(project_code == n ~ Subtype_Selected,
+                               TRUE ~ "Other")) %>%
+    filter(J_color != "Other")
+  if(nrow(spec_cancer) == 0) {next
+    }
+  subtypes <- unique(spec_cancer$J_color)
+  J_colors <- c(ditto_color[c(2:(length(subtypes) + 1))])#, 'grey')
+  names(J_colors) <- subtypes
+
+  with(spec_cancer,
+     scatter3D(plot_y, -plot_z, plot_x, 
+               bg = J_colors[J_color], pch = 21, cex = 0.8, lwd = 0.2,
+               theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+               xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+               colvar = NULL))
+  legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
+#legend("top", inset = c(0), legend=names(J_colors[1:2]), col=J_colors[1:2], pch = 20, bty = "n", horiz = T, cex = 1.2)
+#legend("top", inset = c(0.10), legend=names(J_colors[3:4]), col=J_colors[3:4], pch = 20, bty = "n", horiz = T, cex = 1.2)
+  title(xlab="UMAP 2", line=0)
+}
+
+par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1))
+par(mar = c(2,2,0,0))
+
+for(n in cancer_w_subtypes[7:12]) {
+  spec_cancer <- umap_cancertype %>% 
+    mutate(J_color = case_when(project_code == n ~ Subtype_Selected,
+                               TRUE ~ "Other")) %>%
+    filter(J_color != "Other")
+  if(nrow(spec_cancer) == 0) {next
+    }
+  subtypes <- unique(spec_cancer$J_color)
+  J_colors <- c(ditto_color[c(2:(length(subtypes) + 1))])#, 'grey')
+  names(J_colors) <- subtypes
+
+  with(spec_cancer,
+     scatter3D(plot_y, -plot_z, plot_x, 
+               bg = J_colors[J_color], pch = 21, cex = 0.8, lwd = 0.2,
+               theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+               xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+               colvar = NULL))
+  legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
+#legend("top", inset = c(0), legend=names(J_colors[1:2]), col=J_colors[1:2], pch = 20, bty = "n", horiz = T, cex = 1.2)
+#legend("top", inset = c(0.10), legend=names(J_colors[3:4]), col=J_colors[3:4], pch = 20, bty = "n", horiz = T, cex = 1.2)
+  title(xlab="UMAP 2", line=0)
+}
+
+par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1))
+par(mar = c(2,2,0,0))
+
+for(n in cancer_w_subtypes[13:15]) {
+  spec_cancer <- umap_cancertype %>% 
+    mutate(J_color = case_when(project_code == n ~ Subtype_Selected,
+                               TRUE ~ "Other")) %>%
+    filter(J_color != "Other")
+  if(nrow(spec_cancer) == 0) {next
+    }
+  subtypes <- unique(spec_cancer$J_color)
+  J_colors <- c(ditto_color[c(2:(length(subtypes) + 1))])#, 'grey')
+  names(J_colors) <- subtypes
+
+  with(spec_cancer,
+     scatter3D(plot_y, -plot_z, plot_x, 
+               bg = J_colors[J_color], pch = 21, cex = 0.8, lwd = 0.2,
+               theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+               xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+               colvar = NULL))
+  legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
+#legend("top", inset = c(0), legend=names(J_colors[1:2]), col=J_colors[1:2], pch = 20, bty = "n", horiz = T, cex = 1.2)
+#legend("top", inset = c(0.10), legend=names(J_colors[3:4]), col=J_colors[3:4], pch = 20, bty = "n", horiz = T, cex = 1.2)
+  title(xlab="UMAP 2", line=0)
+}
+
+par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1))
+par(mar = c(2,2,0,0))
+
+for(n in cancer_w_subtypes[16:19]) {
+  spec_cancer <- umap_cancertype %>% 
+    mutate(J_color = case_when(project_code == n ~ Subtype_Selected,
+                               TRUE ~ "Other")) %>%
+    filter(J_color != "Other")
+  if(nrow(spec_cancer) == 0) {next
+    }
+  subtypes <- unique(spec_cancer$J_color)
+  J_colors <- c(ditto_color[c(2:(length(subtypes) + 1))])#, 'grey')
+  names(J_colors) <- subtypes
+
+  with(spec_cancer,
+     scatter3D(plot_y, -plot_z, plot_x, 
+               bg = J_colors[J_color], pch = 21, cex = 0.8, lwd = 0.2,
+               theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+               xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+               colvar = NULL))
+  legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
+#legend("top", inset = c(0), legend=names(J_colors[1:2]), col=J_colors[1:2], pch = 20, bty = "n", horiz = T, cex = 1.2)
+#legend("top", inset = c(0.10), legend=names(J_colors[3:4]), col=J_colors[3:4], pch = 20, bty = "n", horiz = T, cex = 1.2)
+  title(xlab="UMAP 2", line=0)
+}
+
+# ggplot(umap_cancertype, aes(x = plot_y, y = plot_x, colour = Subtype_Selected)) + 
+#   geom_point(data = umap_bg, aes(x = plot_y, y = plot_x), colour = "grey", size = 0.25) +
+#   geom_point(size = 0.25) +
+#   theme_classic() +
+#   coord_fixed() +
+#   xlab("UMAP 1") + ylab("UMAP 2") +
+#   theme(axis.text.x = element_blank(),
+#     axis.text.y = element_blank(),
+#     axis.title.x = element_blank(),
+#     axis.title.y = element_blank(),
+#     axis.ticks = element_blank(),
+#     axis.line = element_blank(),
+#     legend.position = "none") +
+#   facet_wrap(~ project_code, ncol = 5) ## facet by cancer type
+```
+**Supplementary Figure S2. Histological subtypes.** Each panel shows the histological subtypes of one of the 23 
+cancers projected onto the tumors of the UMAP from **Figure 2C of the main text**.
+
+\newpage
+
+```{r supplementary-figure-s3-data-generation, eval = FALSE}
+load("../data/gdc_tumor_coding_complete.Rdata")
+load("../data/gene_data.Rda")
+
+## Booleanize mutation count for each tumor sample
+missense <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$missense) 
+splice <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$splice)
+frameshdel <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$frameshdel)
+frameshins <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$frameshins)
+utr3 <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$utr3)
+utr5 <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$utr5)
+nonstop <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$nonstop)
+nonsense <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$nonsense)
+
+gdc_mut_count_patient <- missense + splice + frameshdel + frameshins + utr3 + utr5 + nonstop + nonsense ## add up all the mutation count
+rm(missense, splice, frameshdel, frameshins, utr3, utr5, nonstop, nonsense)
+gc()
+gdc_mut_count_patient[gdc_mut_count_patient > 0] <- 1 ## booleanize data, anything greater than 1 is equal to 1
+
+## MMR genes
+genes <- c("MSH2", "MSH6", "MLH1", "MLH3", "PMS1", "PMS2", "BRIP1", "RAD51", "CHEK2", "APC",
+           "TET2", "TET3", "TERT", "TEP1", "DKC1")
+
+selected_mut <- gene_data %>% dplyr::select(external_gene_name, ensembl_gene_id) %>% filter(external_gene_name %in% genes) ## getting ensembl_id for the mmr genes for filtering gdc data
+
+# ##oncogene
+# oncogene <- c("AKT2","BCL2","CTNNB1","ERBB2","KRAS","MDM2","MYC","PIK3CA","TET2","USP6") ## list of selected oncogene
+# ##tumor_supressor
+# tumor_suppressor <- c("APC","BRIP1","CDKN2C","CHEK2","MSH2","PTEN","RB1","SMARCA4","TP53","VHL", "APOBEC3B") ## list of selected tumor suppressor
+# 
+# selected_mut <- gene_data %>% dplyr::select(external_gene_name, ensembl_gene_id) %>% filter(external_gene_name %in% c(oncogene, tumor_suppressor)) ## getting ensembl_id for the oncogenes for filtering gdc data
+
+selected_mut <- gdc_mut_count_patient %>% filter(rownames(.) %in% selected_mut$ensembl_gene_id) %>% ## filter by ensembl ids
+  rownames_to_column(var = "ensembl_gene_id") %>% left_join(., selected_mut, by = "ensembl_gene_id") %>% ## replace ensembl ids with gene name 
+  column_to_rownames(var = "external_gene_name") %>% dplyr::select(-ensembl_gene_id) %>%
+  t() %>% as.data.frame() %>% rownames_to_column(var = "sample_id")  ## prep for left_join
+
+
+selected_mut <- umap_cancertype %>% dplyr::select(sample_id, plot_x, plot_y, plot_z) %>% ## select relevant columns
+  left_join(., selected_mut, by = "sample_id") %>%
+  melt(data = ., id.vars = c("sample_id", "plot_x", "plot_y", "plot_z")) %>%
+  filter(value != 0)
+
+save(selected_mut, file = "../data/selected_mut.Rda")
+```
+
+```{r supplementary-figure-s3, fig.width = 9}
+# out.width = '77%'
+load("../data/selected_mut.Rda")
+
+genes <- c("MSH2", "MSH6", "MLH1", "MLH3", "PMS1", "PMS2", "BRIP1", "RAD51", "CHEK2", "APC", "TET2", "TET3", "TERT", "TEP1", "DKC1")
+
+par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1))
+par(mar = c(2,2,0,0))
+for(n in genes[1:6]) {
+with(selected_mut %>% 
+       filter(variable == n),
+     scatter3D(plot_y, -plot_z, plot_x, 
+                                bg = "grey", pch = 21, cex = 0.8, lwd = 0.2,
+                                theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+                                colvar = NULL))
+title(xlab="UMAP 2", line=0)
+legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
+}
+
+par(mfrow = c(2,3), mai = c(0.1, 0.1, 2, 0.1))
+par(mar = c(2,2,0,0))
+for(n in genes[7:12]) {
+with(selected_mut %>% 
+       filter(variable == n),
+     scatter3D(plot_y, -plot_z, plot_x, 
+                                bg = "grey", pch = 21, cex = 0.8, lwd = 0.2,
+                                theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+                                colvar = NULL))
+title(xlab="UMAP 2", line=0)
+legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
+}
+par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1))
+par(mar = c(2,2,0,0))
+for(n in genes[13:15]) {
+with(selected_mut %>% 
+       filter(variable == n),
+     scatter3D(plot_y, -plot_z, plot_x, 
+                                bg = "grey", pch = 21, cex = 0.8, lwd = 0.2,
+                                theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+                                colvar = NULL))
+title(xlab="UMAP 2", line=0)
+legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
+}
+```
+**Supplementary Figure S3. Distribution of mismatch repair genes on UMAP clusters.** Each panel shows one of 15 
+genes involved in genome stability projected on the UMAP from **Figure 2C of the main text**.
+
+\newpage
+
+### Supplementary Figure S4
+This is the 377 pathway UMAP. I will need to develop a loop that does this.
+
+**Supplementary Figure S4. Projection of pathway disruptions onto the UMAP.** Each panel shows one of 377 Reactome
+pathways projected on the UMAP from **Figure 1D of the main text** ordered by the hierarchical pathway order 
+(column) from **Figure 2C of the main text**.
+```{r supplementary-figure-s4-data-generation, eval = FALSE}
+load("../data/gdc_reactome_path_analysis.Rda") ## load data
+umap_cancertype <- fread("../data/umap_3d_coors.tsv") 
+n_path <- 377 ## how many pathways do we want to look at starting from the most to least mutated pathway
+
+toppath <- gdc_reactome_path_analysis %>% rowSums() %>% as.data.frame() %>% rownames_to_column(var = "path_name") %>% arrange(desc(.)) %>% .[1:n_path,] %>% .[, "path_name"] ## order pathway by most to least mutated pathway
+
+selected_path <- gdc_reactome_path_analysis %>% t() %>% as.data.frame() %>% rownames_to_column(var = "sample_id") ## prepare pathway for left_join
+
+selected_path <- umap_cancertype %>% dplyr::select(sample_id, plot_x, plot_y) %>% ## select relevant columns
+  left_join(., selected_path, by = "sample_id") %>%
+  melt(data = ., id.vars = c("sample_id", "plot_x", "plot_y")) %>%
+  filter(value != 0)
+
+save(selected_path, file = "../data/selected_path.Rda")
+
+load("../data/selected_path.Rda") ## load data
+load("../data/gdc_reactome_path_analysis.Rda")
+umap_cancertype <- fread("../data/umap_3d_coors.tsv")
+umap_bg <- umap_cancertype[,-"project_code"] ## get background data for facet
+
+n_path <- 377 ## number of pathways we want to see
+
+toppath <- gdc_reactome_path_analysis %>% rowSums() %>% as.data.frame() %>% rownames_to_column(var = "path_name") %>% arrange(desc(.)) %>% .[1:n_path,] %>% .[, "path_name"] ## order pathway by most to least mutated pathway.. needed for facet
+
+## creating layout to plot all 377 pathways
+figs4_layout <- data.frame(start = seq(from = 1, to = length(toppath), by = 25),
+                          end = c(seq(from = 25, to = length(toppath), by = 25), length(toppath)))
+
+for(n in 1:nrow(figs4_layout)) {
+  message(n)
+  pathway_layout <- figs4_layout %>% .[n,] ## getting the layout for selecting pathways
+  pathway_layout <- toppath[pathway_layout$start:pathway_layout$end] ## filtering those pathways from toppath
+  filtered_path <- selected_path %>% filter(variable %in% pathway_layout) %>% ## filtering our data to only include those pathways
+    mutate(variable = factor(variable, levels = c(pathway_layout)))
+  ggplot_umap <- ggplot(filtered_path, aes(x = plot_y, y = plot_x, colour = as.character(value))) + 
+    geom_point(data = umap_bg, aes(x = plot_y, y = plot_x), colour = "grey", size = 0.25) +
+    geom_point(size = 0.25) +
+    theme_classic() +
+    coord_fixed() +
+    xlab("UMAP 1") + ylab("UMAP 2") +
+    scale_colour_manual(values = rep("firebrick3", 25)) +
+    theme(axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.line = element_blank(),
+      strip.text = element_text(size = 5),
+      legend.position = "none") +
+    facet_wrap(~ variable,
+               ncol = 5) ## facet by pathways
+  new_dfname <- paste0("ggplot_umap_", n)
+  assign(paste0(new_dfname), value = ggplot_umap)
+}
+
+save(ggplot_umap_1,ggplot_umap_2,ggplot_umap_3,ggplot_umap_4,ggplot_umap_5,ggplot_umap_6,ggplot_umap_7,ggplot_umap_8,ggplot_umap_9,ggplot_umap_10,ggplot_umap_11,ggplot_umap_12,ggplot_umap_13,ggplot_umap_14,ggplot_umap_15,ggplot_umap_16, file = "../data/fig_s4_ggplot.Rda")
+```
+
+```{r supplementary-figure-s4, message = FALSE, echo = FALSE, out.width = '90%', fig.align= 'center', eval = FALSE}
+load("../data/fig_s4_ggplot.Rda")
+
+ggplot_umap_1
+ggplot_umap_2
+ggplot_umap_3
+ggplot_umap_4
+ggplot_umap_5
+ggplot_umap_6
+ggplot_umap_7
+ggplot_umap_8
+ggplot_umap_9
+ggplot_umap_10
+ggplot_umap_11
+ggplot_umap_12
+ggplot_umap_13
+ggplot_umap_14
+ggplot_umap_15
+ggplot_umap_16
+
+# ggplot(selected_path, aes(x = x_2d, y = y_2d, colour = as.character(value))) + 
+#   geom_point(data = umap_bg, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.5) +
+#   geom_point(size = 0.5) +
+#   theme_classic() +
+#   coord_fixed() +
+#   xlab("UMAP 1") + ylab("UMAP 2") +
+#   scale_colour_manual(values = rep("firebrick3", 20)) +
+#   theme(axis.text.x = element_blank(),
+#     axis.text.y = element_blank(),
+#     axis.title.x = element_blank(),
+#     axis.title.y = element_blank(),
+#     axis.ticks = element_blank(),
+#     axis.line = element_blank(),
+#     legend.position = "none") +
+#   facet_wrap(~ factor(variable, levels = toppath),
+#                       ncol = 5) ## facet by pathways
+
+```
+
+\newpage
+
+```{r, supplemental-s5-data-generation, eval = FALSE}
+load("../data/gdc_tumor_coding_complete.Rdata")
+load("../data/gene_data.Rda")
+umap_cancertype <- fread("../data/umap_3d_coors.tsv") ## load data
+
+## Booleanize mutation count for each tumor sample
+missense <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$missense) 
+splice <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$splice)
+frameshdel <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$frameshdel)
+frameshins <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$frameshins)
+utr3 <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$utr3)
+utr5 <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$utr5)
+nonstop <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$nonstop)
+nonsense <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$nonsense)
+
+gdc_mut_count_patient <- missense + splice + frameshdel + frameshins + utr3 + utr5 + nonstop + nonsense ## add up all the mutation count
+rm(missense, splice, frameshdel, frameshins, utr3, utr5, nonstop, nonsense)
+gc()
+gdc_mut_count_patient[gdc_mut_count_patient > 0] <- 1 ## booleanize data, anything greater than 1 is equal to 1
+
+## class 7 and 8 distinguishing genes
+genes <- c("PIK3CA", "KRAS", "TP53")
+
+selected_mut <- gene_data %>% dplyr::select(external_gene_name, ensembl_gene_id) %>% filter(external_gene_name %in% genes) ## getting ensembl_id for the genes for filtering gdc data
+
+selected_mut <- gdc_mut_count_patient %>% filter(rownames(.) %in% selected_mut$ensembl_gene_id) %>% ## filter by ensembl ids
+  rownames_to_column(var = "ensembl_gene_id") %>% left_join(., selected_mut, by = "ensembl_gene_id") %>% ## replace ensembl ids with gene name 
+  column_to_rownames(var = "external_gene_name") %>% dplyr::select(-ensembl_gene_id) %>%
+  t() %>% as.data.frame() %>% rownames_to_column(var = "sample_id")  ## prep for left_join
+
+
+s5_data <- umap_cancertype %>% dplyr::select(sample_id, plot_x, plot_y, plot_z) %>% ## select relevant columns
+  left_join(., selected_mut, by = "sample_id") %>%
+  melt(data = ., id.vars = c("sample_id", "plot_x", "plot_y", "plot_z")) %>%
+  filter(value != 0)
+
+save(s5_data, file = "../data/s5_data.Rda")
+```
+
+```{r supplemental-s5-plot, fig.width=9}
+umap_cancertype <- data.table::fread("../data/umap_3d_coors.tsv")
+
+umap_cancertype$clust_knn <- as.character(umap_cancertype$clust_knn)
+
+clusters178 <- umap_cancertype %>% 
+       mutate(color = case_when(clust_knn %in% c("1", "7", "8") ~ clust_knn,
+                                  TRUE ~ "Other"))
+
+I_outlines <- c("black", "black", "black", "#00000000")
+names(I_outlines) <- c("1", "7", "8", "Other")
+
+I_colors <- c("gold2", "gray51", "springgreen4", "#00000011")
+names(I_colors) <- c("1", "7", "8", "Other")
+
+load("../data/s5_data.Rda")
+genes <- as.character(unique(s5_data$variable))
+
+par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1))
+par(mar = c(2,2,0,0))
+plot.new()
+with(clusters178, 
+     scatter3D(plot_y, -plot_z, plot_x, 
+                                bg = I_colors[color], col = I_outlines[color],
+                                pch = 21, cex = 0.8, lwd = 0.2,
+                                theta = 0, phi = 65, scale = F,
+                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+                                colvar = NULL))
+legend("top", inset = c(0.05), legend=names(I_colors[c(1:3)]), col=I_colors[c(1:3)], pch = 20, bty = "n", horiz = T, cex = 1.2)
+title(xlab="UMAP 2", line=0)
+plot.new()
+
+for(n in genes) {
+with(s5_data %>% 
+       filter(variable == n),
+     scatter3D(plot_y, -plot_z, plot_x, 
+                                bg = "grey", pch = 21, cex = 0.8, lwd = 0.2,
+                                theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+                                colvar = NULL))
+title(xlab="UMAP 2", line=0)
+legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
+}
+```
+**Supplementary Figure S5. Distribution of oncogenes on UMAP clusters.** The left panel shows the identity of 
+clusters 1, 7 and 8. The multipanel on the right shows one of the three oncogenes projected onto the tumors of 
+the UMAP from **Figure 2C of the main text**.
+
+\newpage 
+```{r supplemental-table-st1-data-generation, eval = FALSE}
+load("../data/gdc_tumor_coding_complete.Rdata")
+load("../data/gdc_reactome_path_analysis.Rda")
+load("../data/gene2_level2_lookup.Rda")
+load("../data/pathname2level2.Rda")
+load("../data/gene_data.Rda")
+load("../data/gdc_gene_exp_adj.Rda")
+
+## Parameters ##
+n_path <- 377 ## how many top pathways do you want to see. 1 = top path, 2 = top path and second most
+mutated_gene_position <- c(1,2,3) ## what gene do you want to see. 1 = top gene, 2 = second most, 3 = third
+show_perc <- TRUE ## show perc for mutated gene
+
+
+toppath <- gdc_reactome_path_analysis %>% rowSums() %>% as.data.frame() %>% rownames_to_column(var = "path_name") %>% arrange(desc(.)) %>% .[1:n_path,] %>% .[, "path_name"] ## getting the top mutated pathways
+
+id_to_names <- gene2level2_lookup %>% rownames_to_column(var = "ensembl_gene_id") %>% ## convert ensembl to gene name
+  left_join(., gene_data[,c("ensembl_gene_id", "external_gene_name")], by = "ensembl_gene_id") %>%
+  remove_rownames() %>% column_to_rownames(var = "external_gene_name") %>%
+  dplyr::select(-ensembl_gene_id) %>%
+  t() %>% as.data.frame() %>% rownames_to_column(var = "PATH_ID") %>% ## convert path_id to path_name
+  left_join(., pathname2level2, by = "PATH_ID") %>%
+  remove_rownames() %>% column_to_rownames(var = "PATH_NAME") %>%
+  dplyr::select(-PATH_ID) %>%
+  t() %>% as.data.frame()
+
+gene_mutation <- gdc_gene_exp_adj %>% rownames_to_column(var = "ensembl_gene_id") %>% ## convert ensembl to gene name
+  left_join(., gene_data[,c("ensembl_gene_id", "external_gene_name")], by = "ensembl_gene_id") %>%
+  remove_rownames() %>% column_to_rownames(var = "external_gene_name") %>%
+  dplyr::select(-ensembl_gene_id)
+
+table_st1 <- list() ## list for forloop 
+
+for(n in toppath) {
+  message(n)
+  ## finding top mutated gene in pathway
+  gene_in_path <- id_to_names %>% .[,which(names(.) == n)] %>% as.data.frame() %>% ## select pathway
+    'rownames<-' (rownames(id_to_names)) %>% 
+    filter(. == 1) %>% ## filter for genes that are in that pathway
+    rownames(.)
+  top_mut_gene <- gene_mutation %>% .[rownames(.) %in% gene_in_path, ] %>% ## only include genes in paths
+      rowSums() %>% as.data.frame() %>% 'colnames<-' ("obs_count") %>% ## sum the pathway mutation
+    rownames_to_column(var = "gene") %>%
+      mutate(n_sample = length(gene_mutation),
+             perc_mut = round((obs_count / length(gene_mutation)) * 100, digits = 1)) %>% 
+       arrange(desc(obs_count))
+  top_gene_in_path <- list()
+  for(p in mutated_gene_position) {
+    message(p)
+    if(show_perc == TRUE) {
+    top_gene_in_path[[p]] <- paste0(top_mut_gene$gene[p], " (", top_mut_gene$perc_mut[p],"%)")  
+    }
+    if(show_perc == FALSE) {
+    top_gene_in_path[[p]] <- paste0(top_mut_gene$gene[p])  
+    }
+  }
+  top_gene_in_path <- top_gene_in_path %>% do.call(rbind, .) %>% as.data.frame() %>% ## rbind list
+   'rownames<-' (mutated_gene_position) %>% t() %>% as.data.frame()
+  ## calculating the percent mutated samples
+  spec_path <- data.frame(Pathway = n,
+                          Percent_Mutated = round(gdc_reactome_path_analysis %>% .[n,] %>% sum() / length(gdc_reactome_path_analysis) * 100, digits = 1))
+  table_st1[[n]] <- cbind(spec_path, top_gene_in_path)
+}
+table_st1 <- as.data.frame(do.call(rbind, table_st1))
+save(table_st1, file = "../data/table_st1.Rda")  
+rm(list = ls(all.names = T))  
+gc()
+```
+
+```{r supplemental-table-st1, eval = FALSE}
+load("../data/table_st1.Rda")
+## for html only
+# table_st1 %>% dplyr::select(-Pathway) %>% knitr::kable() %>%
+#   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 12) %>%
+#   column_spec(1, bold = T, color = "black")
+
+## for word doc
+# table_st1 %>% flextable() %>% 
+#   set_caption(caption = "") %>%
+#   align(part = "all") %>% 
+#   width(., width = c(4,0.5,0.5,0.5,0.5)) %>% 
+#   fontsize(size = 8, part = "body")
+
+write.xlsx(table_st1, file = "../data/table_st1.xlsx", row.names = FALSE)
+```
+
+
+```{r enrich-pathway-in-clust, eval = FALSE}
+## docx friendly
+load("../data/moderate_enrich_prob.Rda")
+
+st1 <- moderate_enrich_prob %>% filter(difference >= 0.30 & signif <= 2500) %>% ## filter effect size >= 0.20 and enrichment at a 95% CI
+  dplyr::select(path, clust, signif, difference) %>% 'colnames<-' (c("Pathway", "Cluster", "Signif", "Enrichment_Score")) ## select relevant column and rename col
+
+st1$log10pvalue <- round(-log10((st1$Signif + 1) / 1E5), digits = 2) ## Getting p value ## adding 1 for pseudo count.. 1E5 is the n simulations performed
+st1$Enrichment_Score <- round(st1$Enrichment_Score, digits = 2)
+st1$Signif <- NULL ## we don't need this anymore
+
+st1 %>% flextable() %>% 
+  set_caption(caption = "") %>%
+  align(part = "all") %>% 
+  width(., width = c(4,0.75,1,1)) %>% 
+  fontsize(size = 10, part = "body")
+```
+
+
+
+![**Supplemental figure S6. Survival fit independent of disease status.** _The red and blue curves show the survival of people in the US by female and male, respectively. The orange and green curves show the model fits._]
+
