@@ -4,23 +4,23 @@ indistinguishable from tissue-of-origin, and general, unifying principles remain
 obscure. To address this challenge, we reduced mutation data to disruptions in a
 select set of pathways relevant to basic cell biology, from DNA replication to
 cellular communication. Using dimension reduction techniques, we assigned tumor
-samples into ten classes distinct from their tissues-of-origin and largely
-free of bias from mutational burden or clinical stage. We showed that these
-tumor classes vary in prognosis by modeling relative risk of death in different
+samples into ten classes distinct from their tissues-of-origin largely free of
+bias from mutational burden or clinical stage. We showed that these tumor
+classes vary in prognosis by modeling relative risk of death in different
 classes and cancer types. We identified class-specific mutations in different
 tissues, demonstrating that tissue-specific signatures contribute to common
-cellular phenotypes. Moreover, driver gene mutations involved in replication fidelity and genome
-stability, such as BRCA1 and Rb1, are equally distributed among our classes,
-contrary to the expectation that such genes are avatars of molecular
-subtype. We also investigated pathways that distinguish between metastatic and
-non-metastatic tumors, and found that most meaningful differences are
-class-specific. Many metastastasis enriched pathways from one class of
-tumors are class-specific pathways from another class, suggesting phenotypic
-convergence, and potentially highlighting key pathways to focus on
-for prevention of class-specific relapse. In summary, our
-observations suggest that some genes act as drivers of genome instability in all
-classes, while different sets of class-specific genes confer increased fitness
-in a combinatorial fashion, eventually converging on one or more end-stage
-disease phenotypes. Thus, we present a coherent view of global tumor biology,
-and explain how common cellular dysfunction might arise from tissue-specific
-mutations.
+cellular phenotypes. Moreover, driver gene mutations involved in replication
+fidelity and genome stability, such as BRCA1 and Rb1, are equally distributed
+among our classes, contrary to the expectation that such genes are avatars of
+molecular subtype. We also investigated pathways that distinguish between
+metastatic and non-metastatic tumors, and found that most meaningful differences
+are class-specific. Many metastasis enriched pathways from one class of tumors
+are class-specific pathways from another class, suggesting phenotypic
+convergence, and potentially highlighting key pathways to focus on for
+prevention of class-specific relapse. Taken as a whole, our observations suggest
+that some genes act as drivers of the cancer phenotype in all classes, while
+specific pathway disruptions confer increased fitness in a combinatorial
+fashion, producing a limited number of distinct molecular class phenotypes.
+Eventually these classes converge on one or more end-stage disease phenotypes.
+Thus, we present a coherent view of global tumor biology, and explain how common
+cellular dysfunction might arise from tissue-specific mutations.
