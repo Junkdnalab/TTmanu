@@ -10,7 +10,7 @@ library(ggridges)
 
 cancerdat = read_csv("../../data/survival/clinical_plus_cluster.csv");
 treatdays = read_csv("../../data/survival/tcga_clinical_data.csv")
-knnclust = read_tsv("../../data/survival/peter_clusters_knn.tsv")
+# knnclust = read_tsv("../../data/survival/peter_clusters_knn.tsv")
 
 ## mortality data from CDC:
 namesmort = c("agerng","pdead","nsurv","ndie","pyrs","pyrsabove","expectedlife")
@@ -42,7 +42,7 @@ sqldf("select type,avg(age_at_initial_pathologic_diagnosis) as meanage from canc
 
 
 
-deadpat = sqldf("select patient_id,age_at_initial_pathologic_diagnosis as age, gender,race, death_days_to,type,peter.knn_clust as clust, a.clust as origclust,`ajcc_pathologic_tumor_stage.y` as stage, last_contact_days_to as lastcont from cancerdat as a join knnclust as peter on a.patient_id = substr(peter.sample_id,1,12) where (death_days_to is not null or lastcont is not null) and age is not null and age > 9")
+deadpat = sqldf("select patient_id,age_at_initial_pathologic_diagnosis as age, gender,race, death_days_to,type,clust_knn as clust, clust as origclust,`ajcc_pathologic_tumor_stage.y` as stage, last_contact_days_to as lastcont from cancerdat where (death_days_to is not null or lastcont is not null) and age is not null and age > 9")
 
 unique(deadpat$race)
 deadpat[deadpat$race == "BLACK OR AFRICAN AMERICAN","race"] = "BLACK"
