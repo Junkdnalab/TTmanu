@@ -121,7 +121,8 @@ plotcancertype = function(cancerdat,i){
         labs(
             x = "Survival Time (years past diagnosis)",
             y = "Probability",
-            title = sprintf("Survival for %s simulated white female patients", i)
+            title = sprintf("Survival for %s simulated white female patients", i),
+            subtitle = sprintf("Simulated Patient Population; k = %.1f", kmean)
         ) +
         scale_color_manual(
             values = c(
@@ -132,7 +133,7 @@ plotcancertype = function(cancerdat,i){
             breaks = c("rtime", "stime", "acttime"),
             labels = c(
                 "Simulated General Population; k = 1",
-                sprintf("Simulated Patient Population; k = %.1f", kmean),
+                "Simulated Patient Population",
                 "Actual Patient Population"
             )
         ),

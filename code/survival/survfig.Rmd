@@ -107,11 +107,20 @@ CCCCCCCC
 CCCCCCCC
 '
 
-
+kmlayout = "
+AB
+AB
+AB
+CD
+CD
+CD
+EE
+"
+kmlegend <- theme(legend.direction = "horizontal")
 
 print(
-((p1+mytheme)/((pstad[[1]]+mytheme)+(pgbm[[1]]+mytheme) +
-(ppaad[[1]]+mytheme) + (thca[[1]] + mytheme)))/((pcanc+mytheme) + (pclass+mytheme))+plot_layout(design=mylayout) +plot_annotation(tag_levels = "A")
+((p1+mytheme)/((pstad[[1]]+mytheme + kmlegend)+(pgbm[[1]]+mytheme + kmlegend) +
+(ppaad[[1]]+mytheme + kmlegend) + (thca[[1]] + mytheme + kmlegend) + guide_area() + plot_layout(design = kmlayout, guides = "collect")))/((pcanc+mytheme) + (pclass+mytheme))+plot_layout(design=mylayout) +plot_annotation(tag_levels = "A")
 )
 
 
