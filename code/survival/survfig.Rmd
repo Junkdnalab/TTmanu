@@ -20,13 +20,24 @@ mixedages = runif(100,30,70)
 mixedsurvwfk1 = sapply(mixedages, function(x) simdeath(r20wf,ageratewf,x,1)/365)
 mixedsurvwfk2 = sapply(mixedages, function(x) simdeath(r20wf,ageratewf,x,2)/365)
 
-p1 = ggplot(data.frame(r=patientsurvivalsbkd,c=patientsurvivalsk2,rm = mixedsurvwfk1, cm=mixedsurvwfk2, status=rep(1,length(patientsurvivalsbkd)))) +
-geom_km(aes(time=r,status=status),color="blue") +
-geom_km(aes(time=c,status=status),color="red") +
-geom_km(aes(time=rm,status=status),color="darkblue") +
-geom_km(aes(time=cm,status=status),color="darkred") +
-annotate("text",rep(90,4),c(.9,.7,.5,.3),color=c("blue","red","darkblue","darkred"),label=c("Random 30 year old women","Random 30 year old women cancer k=2","Random uniform(30,70) year old women","Random uniform(30,70) year old women k=2"),hjust="right")+
-labs(title="Simulated patients",x="Time (years)",y="Fraction Surviving")
+p1 = data.frame(
+    r = patientsurvivalsbkd,
+    c = patientsurvivalsk2,
+    rm = mixedsurvwfk1,
+    cm = mixedsurvwfk2,
+    status = rep(1, length(patientsurvivalsbkd))
+) %>%
+    rownames_to_column(var = "index") %>%
+    pivot_longer(-c(index, status), values_to = "time", names_to = "condition") %>%
+    ggplot(aes(time = time, color = condition, status = status)) +
+    geom_km() +
+    scale_color_manual(
+        values = c(r = "#56b4e9", c = "#e69f00", rm = "#0072b2", cm = "#d55e00"),
+        breaks = c("r", "c", "rm", "cm"),
+        labels = c("Random 30 year old women", "Random 30 year old women cancer k=2", "Random uniform(30,70) year old women", "Random uniform(30,70) year old women k=2")
+    ) +
+    theme_classic() +
+    theme(legend.position = c(.8, .75))
 
 
 pstad = plotcancertype(cancerdat,"STAD")
@@ -81,7 +92,9 @@ mytheme = theme(
 #    axis.line = element_blank(),
     strip.text.y.right = element_text(angle = 0),
     strip.background = element_blank(),
-    legend.position = "none",
+    legend.key.height = unit(0.4, "lines"),
+    legend.title = element_blank(),
+    #legend.position = "none",
     title = element_text(size=10)
   )
 
@@ -94,11 +107,20 @@ CCCCCCCC
 CCCCCCCC
 '
 
-
+kmlayout = "
+AB
+AB
+AB
+CD
+CD
+CD
+EE
+"
+kmlegend <- theme(legend.direction = "horizontal")
 
 print(
-((p1+mytheme)/((pstad[[1]]+mytheme)+(pgbm[[1]]+mytheme) +
-(ppaad[[1]]+mytheme) + (thca[[1]] + mytheme)))/((pcanc+mytheme) + (pclass+mytheme))+plot_layout(design=mylayout) +plot_annotation(tag_levels = "A")
+((p1+mytheme)/((pstad[[1]]+mytheme + kmlegend)+(pgbm[[1]]+mytheme + kmlegend) +
+(ppaad[[1]]+mytheme + kmlegend) + (thca[[1]] + mytheme + kmlegend) + guide_area() + plot_layout(design = kmlayout, guides = "collect")))/((pcanc+mytheme) + (pclass+mytheme))+plot_layout(design=mylayout) +plot_annotation(tag_levels = "A")
 )
 
 
