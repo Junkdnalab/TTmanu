@@ -203,7 +203,8 @@ title(ylab = "explained variance", line = 3.5)
 title(xlab = "MCA Eigenvalues", line = 2)
 legend("topright", legend=c("Eigenvalues", "Permuted Eigenvalues"),
        col=c("#998ec3", "#f1a340"), lty=1, cex=0.8)
-### D
+mtext("A", side=3, line=0, cex=1.2, adj=-0.35)
+### C
 par(mar = c(2,2,0,0), bg = NA)
 with(umap_cancertype, scatter3D(plot_y, -plot_z, plot_x, 
                                 bg = "white", pch = 21, cex = 0.8, lwd = 0.2,
@@ -211,7 +212,8 @@ with(umap_cancertype, scatter3D(plot_y, -plot_z, plot_x,
                                 xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
                                 colvar = NULL))
 title(xlab="UMAP 2", line=0)
-### E
+mtext("C", side=3, line=-2.05, cex=1.2, adj=0)
+### D
 par(mar = c(4,6,2,0) + 0.1)
 with(sample_df, plot(x = minPts, y = value, 
                      col = "grey", pch = 20, yaxt = "n",
@@ -223,8 +225,8 @@ abline(v = optimal_minPts, col = "red")
 title(ylab = "score", line = 3.5)
 title(xlab = "Minimum Cluster Size", line = 2)
 axis(2, at=c(0.25, 0.35, 0.45, 0.55), las = 1)
-
-### C
+mtext("D", side=3, line=0, cex=1.2, adj=-0.27)
+### B
 with(randomize %>% filter(eigenvalue < 50), plot(x = eigenvalue, y = pvalue, 
                                                  type = "l", bty = "l",
                                                  col = "black", las = 1,
@@ -235,7 +237,8 @@ abline(v = optimal_mca_dimensions, col = "red")
 title(main = paste0("Significant dimensions = ", optimal_mca_dimensions), adj = 0, font = 3, cex.main = .8)
 title(ylab = "P-value", line = 3.5)
 title(xlab = "MCA Eigenvalues", line = 2)
-### F
+mtext("B", side=3, line=0, cex=1.2, adj=-0.35)
+### E
 par(mar = c(2,2,0,0), bg = NA)
 with(umap_cancertype, scatter3D(plot_y, -plot_z, plot_x, 
                                 bg = cluster.colours[as.character(clust)], pch = 21, cex = 0.8, lwd = 0.2,
@@ -243,13 +246,15 @@ with(umap_cancertype, scatter3D(plot_y, -plot_z, plot_x,
                                 xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
                                 colvar = NULL))
 title(xlab="UMAP 2", line=0)
-### G
+mtext("E", side=3, line=-2.05, cex=1.2, adj=0)
+### F
 with(umap_cancertype, scatter3D(plot_y, -plot_z, plot_x, 
                                 bg = cluster.colours[as.character(clust_knn)], pch = 21, cex = 0.8, lwd = 0.2,
                                 theta = 0, phi = 65, scale = F,
                                 xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
                                 colvar = NULL))
 title(xlab="UMAP 2", line=0)
+mtext("F", side=3, line=-2.05, cex=1.2, adj=0)
 
 plot.new()
 ```

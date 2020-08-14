@@ -76,19 +76,19 @@ We attempted to account for our clusters in terms of more trivial explanations.
 For example, it could be that the classes we identified are consistent with a
 signature of overall disease progression, such that successive, adjacent classes
 on the UMAP projection exhibit increasing specificity. We identified no such
-trend in the number of mutations (see **figure 1H**), the relative staging
-(**figure 1L**) or metastasis (**figure 1M**); and each class instead was
-associated with unique combinations of pathways (as in **figures 2B, C**).
+trend in the number of mutations (see **figure 4**), the relative staging
+(**figure 2D**) or metastasis (**figure 2E**); and each class instead was
+associated with unique combinations of pathways (as in **figures 5B, C**).
 
 We find that most tumors segregate into one of ten biologically distinct
-clusters, regardless of the cancer type (**figure 1G,I** and **supplementary
+clusters, regardless of the cancer type (**figure 2F, 3A** and **supplementary
 figure S1**). Some cancer types ( _e.g._ pancreatic adenocarcinomas in the RAS
 mutant cluster 8, and Kidney Chromophobe in cluster 1, see **supplementary
 figure S1**) are unevenly distributed, though we could not identify any cancers
 that were exclusive to a single tumor class. Only cancer types with the fewest
 samples were found to be absent from one or more classes at all. Somewhat
 surprisingly to us, this finding extends to histological subtypes of breast,
-head and neck cancers, leukemias, _etc._ (see **Figure 1J** and **Supplemental
+head and neck cancers, leukemias, _etc._ (see **Figure 3B** and **Supplemental
 Figure S2**). This result implies that many, if not most, histological subtypes
 could reflect differences in cell-of-origin, rather than fundamental differences
 in proximal cause. The four major subtypes of breast cancer correspond to histological
@@ -98,7 +98,7 @@ molecular regulators of development in the precursor cell types present in the
 breast epithelium drive the various histological phenotypes [@breast-subtypes;
 @breast-subtypes3]. Consistent with this view we found that breast tumor samples
 of the Luminal A subtype were heavily biased toward membership in clusters 1 and
-7, and basal tumor samples were biased toward cluster 6 (**figure 1J**).
+7, and basal tumor samples were biased toward cluster 6 (**figure 3B**).
 However, both subtypes also contained samples in every other class (without
 exception), and Luminal B and Her2 positive samples are distributed across
 clusters. We interpret these data to mean that inherited cell-of-origin
@@ -126,12 +126,12 @@ Our results illustrate how unique combinations of mutations in pan-cancer driver
 
 Finally, we must remark on the limitations of our work exemplified in two of the
 classes, 1 and 10, for which we did not find distinctive associations with
-pathways (**figure 2B, C**). Class 1 has a relatively low proportion of mutated
+pathways (**figure 5B, C**). Class 1 has a relatively low proportion of mutated
 pathways across the board, although it is broadly enriched in many of the same
 tumor-promoting pathways common to the other groups. This likely does not
 reflect a true difference in stages of tumor evolution, as our data show clearly
 that this class is as likely to contain stage IV metastatic tumors as it is to
-contain those of stage I (**figure 1L, M**). This class likely represents a
+contain those of stage I (**figure 3D, E**). This class likely represents a
 group of tumors with aberrations in methylation, copy number alterations,
 structural variants, or combinations thereof which we excluded from our
 analysis. Consistent with this, kidney chromophobe and thyroid cancers have high
@@ -151,7 +151,7 @@ for point mutations and indels.
 
 By modeling CDC longevity data as a baseline risk function we showed that each
 of our pathway disruption classes exhibit cancer-type specific effects on
-expected survival (**figure 4**). Contrary to what one might expect at the
+expected survival (**figure 7**). Contrary to what one might expect at the
 outset, we found that models assuming different survival based on class _and_
 cancer type fit better than models in which these variables are independent
 factors. However, considering that within each cancer type there are different
@@ -183,7 +183,7 @@ BRCA1/2, MMR genes, mitotic checkpoints, Cohesion complexes, _etc._
 evolution must involve the acquisition of disruptions to pathways that may
 individually be harmful ( _e.g._ highly proliferative cells are more likely to
 senesce) but together produce more specialized cancer phenotype and increased
-fitness (as in **figure 4** and **tables 1** and **ST2**). Importantly, our
+fitness (as in **figure 6** and **tables 1** and **ST2**). Importantly, our
 observations do not imply the order in which these mutations should accumulate.
 This could be addressed in a future study by integrating our analysis with
 evolutionary analysis of clonality, drawing inferences from variant allele
@@ -215,7 +215,7 @@ are analyzed together, and supporting the view that metastasis has
 class-specific requirements. Since the number of metastatic samples is
 relatively low this part of our analysis is likely underpowered and subject to
 expanded analysis with larger cohorts. Nonetheless, the class-specific
-metastatic pathway enrichment we observe (in **table 2**) could be a result of
+metastatic pathway enrichment we observe (in **table 1**) could be a result of
 the pathways directly promoting metastatic phenotypes in these classes, or
 because they acquire a stronger or more complete oncogenic phenotype, as we
 don’t know the order in which they were acquired. The fact that most metastatic
@@ -231,13 +231,13 @@ were characterized by cluster-specific pathways that seem superficially
 unrelated; for example cluster 2 has mutations in the proteasome subunits,
 cluster 3 has mutations impacting protein translation, whereas cluster 5 has
 defects in RNA metabolism and clusters 7, 8 and 9 have defects in the more
-traditional extra-cellular signaling pathways (as exemplified in **table 1**).
+traditional extra-cellular signaling pathways (as exemplified in **table S1**).
 It may be that the primary effects of mutations in protein and RNA metabolism in
 clusters 3 and 5 point to currently unappreciated mechanisms impacting hallmark
 pathways. Clusters 3 and 5 are also marked by a decidedly different set of
 pathways in metastasis. Clusters 3 and 5 notably have (in addition to signaling
 pathways) mutations in glucagon and glycogen metabolism, respectively, in their
-metastases (**table 2**), consistent with energy metabolism as one of the new
+metastases (**table 1**), consistent with energy metabolism as one of the new
 hallmarks [@hallmarks_II], but also distinguishing these classes from the others
 in the order or nature of hallmark acquisition. Thus, even at relatively low
 power, our analysis of metastasis further supports the pathway-centric approach

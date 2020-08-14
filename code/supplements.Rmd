@@ -464,3 +464,29 @@ st1 %>% flextable() %>%
 
 
 ![**Supplemental figure S6. Survival fit independent of disease status.** _The red and blue curves show the survival of people in the US by female and male, respectively. The orange and green curves show the model fits._](../figures/fig6A.png)
+
+
+#### Supplemental figure text
+
+<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Supplementary figure S1. 
+Distribution of cancer type on UMAP clusters.** Each panel shows the identity of 
+individual tumors by one of 23 cancer types projected onto the cluster UMAP identified 
+in **Figure 1D of the main text**.
+
+<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Supplementary Figure S2. 
+Histological subtypes.** Each panel shows the histological subtypes of one of the 23 
+cancers projected onto the tumors of the UMAP from **Figure 1D of the main text**.
+
+<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Supplementary Figure S3.
+Distribution of mismatch repair genes on UMAP clusters.** Each panel shows one of 15  
+genes involved in genome stability projected on the UMAP from **Figure 1D of the main text**.
+
+<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Supplementary Figure S4. 
+Projection of pathway disruptions onto the UMAP.** Each panel shows one of 377 Reactome
+pathways projected on the UMAP from **Figure 1D of the main text** ordered by the 
+hierarchical pathway order (column) from **Figure 2B of the main text**.
+
+<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Supplementary Figure S5.
+Distribution of oncogenes on UMAP clusters.** The left panel shows the identity of 
+clusters 1, 7 and 8. The multipanel on the right shows one of the three oncogenes 
+projected onto the tumors of the UMAP from **Figure 1D of the main text**.
