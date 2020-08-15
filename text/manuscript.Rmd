@@ -434,48 +434,48 @@ The authors have nothing to declare. This work was supported
 cat("\\newpage")
 ```
 #### Figure 1
-```{r }
-#child='../code/figure1v2.Rmd'
+```{r child='../code/figure1v2.Rmd'}
+#
 ```
 
 ```{r, results='asis'}
 cat("\\newpage")
 ```
 #### Figure 2
-```{r }
-#child='../code/figure2v2.Rmd'
+```{r child='../code/figure2v2.Rmd'}
+#
 ```
 
 ```{r, results='asis'}
 cat("\\newpage")
 ```
 #### Figure 3
-```{r }
-#child = '../code/figure4v2.Rmd'
+```{r child = '../code/figure4v2.Rmd'}
+#
 ```
 
 ```{r, results='asis'}
 cat("\\newpage")
 ```
 #### Figure 4
-```{r }
-#child = '../code/figure3v2.Rmd'
+```{r child = '../code/figure3v2.Rmd'}
+#
 ```
 
 ```{r, results='asis'}
 cat("\\newpage")
 ```
 #### Figure 5
-```{r }
-#child = '../code/figure2.Rmd'
+```{r child = '../code/figure2.Rmd'}
+#
 ```
 
 ```{r, results='asis'}
 cat("\\newpage")
 ```
 #### Figure 6
-```{r }
-#child = '../code/figure4.Rmd'
+```{r child = '../code/figure4.Rmd'}
+#
 ```
 
 ```{r, results='asis'}
@@ -490,8 +490,8 @@ cat("\\newpage")
 cat("\\newpage")
 ```
 #### Table 1
-```{r }
-#child = '../code/table2.Rmd'
+```{r child = '../code/table2.Rmd'}
+#
 ```
 
 ```{r, results='asis'}

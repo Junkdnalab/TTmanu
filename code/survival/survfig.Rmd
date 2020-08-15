@@ -111,8 +111,8 @@ EE
 kmlegend <- theme(legend.direction = "horizontal")
 
 print(
-((p1+mytheme)/((pstad[[1]]+mytheme + kmlegend)+(pgbm[[1]]+mytheme + kmlegend) +
-(ppaad[[1]]+mytheme + kmlegend) + (thca[[1]] + mytheme + kmlegend) + guide_area() + plot_layout(design = kmlayout, guides = "collect"))) + plot_annotation(tag_levels = "A")
+  ((p1+mytheme)/((pstad[[1]]+mytheme + kmlegend)+(pgbm[[1]]+mytheme + kmlegend) +
+                   (ppaad[[1]]+mytheme + kmlegend) + (thca[[1]] + mytheme + kmlegend) + guide_area() + plot_layout(design = kmlayout, guides = "collect"))) + plot_annotation(tag_levels = "A")
 )
 ```
 
@@ -121,13 +121,40 @@ cat("\\newpage")
 ```
 
 #### Figure 8
-```{r, message = FALSE, fig.width = 9}
-mylayout = '
-ABB
-ABB
-#BB
-'
+```{r, message = FALSE, fig.width = 3}
+pcanc+mytheme
+```
 
-((pcanc+mytheme) + (pclass+mytheme))+plot_layout(design=mylayout) +plot_annotation(tag_levels = "A")
+```{r, results='asis'}
+cat("\\newpage")
+```
+
+#### Figure 9
+```{r, message = FALSE, fig.width = 9, fig.height= 9}
+kelly.colours <- c("gray95", "gray13", "gold2", "plum4", "darkorange1",
+                   "lightskyblue2", "firebrick", "burlywood3", "gray51", "springgreen4",
+                   "lightpink2", "deepskyblue4", "lightsalmon2", "mediumpurple4",
+                   "orange", "maroon", "yellow3", "brown4", "yellow4", "sienna4", "chocolate", "gray19")
+
+cluster.colours <- c("grey", kelly.colours[c(3:12)])
+names(cluster.colours) <- c(0:10)
+
+kclassplot = function(dfsamps,tisnames){
+	kclnames = grep("k\\[",names(dfsamps), value=TRUE)
+	dfclas = dfsamps[,kclnames]
+	dfclas = stack(dfclas)
+	names(dfclas) = c("value","coefname")
+	dfclas$class = as.factor(as.numeric(gsub("k\\[(.*),(.*)\\]","\\2",dfclas$coefname)))
+	dfclas$tiss = tisnames[as.numeric(gsub("k\\[(.*),(.*)\\]","\\1",dfclas$coefname))]
+	ggplot(dfclas,aes_(quote(value),quote(class), fill = quote(class))) + geom_density_ridges() +
+		facet_wrap(. ~ tiss,nrow=3) + theme_minimal() + scale_fill_brewer(palette = "Paired") +
+		xlim(0,3) + theme(legend.position = "none") + ggtitle("Class Specific Coefficients")
+}
+
+
+pclass = kclassplot(dfsamps,levels(cancerdat$type))
+
+
+pclass+mytheme+scale_fill_manual(values = cluster.colours)
 ```
 
