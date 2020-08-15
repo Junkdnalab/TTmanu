@@ -84,9 +84,9 @@ near or even below 1 suggesting that these populations may have
 healthier lifestyles and more access to care. Most cancer types fall
 in the range 2-7 as might be expected.
 
-**Figure 9** Class specific $k_class$ values shown for each cancer
-type. The overall $k$ value is the product of $k_tis \times
-k_class$. The class specific value shows the relative aggressiveness
+**Figure 9** Class specific $k_{class}$ values shown for each cancer
+type. The overall $k$ value is the product of $k_{tis} \times
+k_{class}$. The class specific value shows the relative aggressiveness
 of that particular class within the tissue. For example class 1, 2,
 and 6 Glioblastoma (GBM) are apparently much less deadly than other
 types of GBM. A similar situation can be seen with Pancreatic Cancer
