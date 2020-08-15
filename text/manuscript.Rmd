@@ -74,7 +74,8 @@ suppressPackageStartupMessages(c(
   library(rtracklayer),
   library(poibin),
   library(flextable),
-  library(plot3D)
+  library(plot3D),
+  library(ggfortify)
 ))
 ```
 
@@ -476,7 +477,7 @@ cat("\\newpage")
 ```{r child = '../code/figure4.Rmd'}
 #
 ```
-#### Figure 7
+
 ```{r, results='asis'}
 cat("\\newpage")
 ```

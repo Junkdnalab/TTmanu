@@ -14,7 +14,9 @@ suppressPackageStartupMessages(c(
   library(tidyverse),
   library(data.table),
   library(plot3D),
-  library(flextable)
+  library(flextable),
+  library(knitr),
+  library(kableExtra)
 ))
 ```
 
@@ -115,6 +117,7 @@ for(n in cancer_type) {
   }
   cancer_w_subtypes[[n]] <- n
 }
+
 cancer_w_subtypes <- names(cancer_w_subtypes)
 
 par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1))
@@ -138,9 +141,10 @@ for(n in cancer_w_subtypes[1:6]) {
                xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
                colvar = NULL))
-  legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
-#legend("top", inset = c(0), legend=names(J_colors[1:2]), col=J_colors[1:2], pch = 20, bty = "n", horiz = T, cex = 1.2)
-#legend("top", inset = c(0.10), legend=names(J_colors[3:4]), col=J_colors[3:4], pch = 20, bty = "n", horiz = T, cex = 1.2)
+  legend("top", inset = c(0.75), legend=n, bty = "n", horiz = T, cex = 1.2)
+  legend("top", inset = c(0), legend=names(J_colors[1:2]), col=J_colors[1:2], pch = 20, bty = "n", horiz = T, cex = 1.2)
+  legend("top", inset = c(0.10), legend=names(J_colors[3:4]), col=J_colors[3:4], pch = 20, bty = "n", horiz = T, cex = 1.2)
+  legend("top", inset = c(0.20), legend=names(J_colors[5:6]), col=J_colors[5:6], pch = 20, bty = "n", horiz = T, cex = 1.2)
   title(xlab="UMAP 2", line=0)
 }
 
@@ -165,9 +169,10 @@ for(n in cancer_w_subtypes[7:12]) {
                xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
                colvar = NULL))
-  legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
-#legend("top", inset = c(0), legend=names(J_colors[1:2]), col=J_colors[1:2], pch = 20, bty = "n", horiz = T, cex = 1.2)
-#legend("top", inset = c(0.10), legend=names(J_colors[3:4]), col=J_colors[3:4], pch = 20, bty = "n", horiz = T, cex = 1.2)
+  legend("top", inset = c(0.75), legend=n, bty = "n", horiz = T, cex = 1.2)
+  legend("top", inset = c(0), legend=names(J_colors[1:2]), col=J_colors[1:2], pch = 20, bty = "n", horiz = T, cex = 1.2)
+  legend("top", inset = c(0.10), legend=names(J_colors[3:4]), col=J_colors[3:4], pch = 20, bty = "n", horiz = T, cex = 1.2)
+  legend("top", inset = c(0.20), legend=names(J_colors[5:6]), col=J_colors[5:6], pch = 20, bty = "n", horiz = T, cex = 1.2)
   title(xlab="UMAP 2", line=0)
 }
 
@@ -192,9 +197,10 @@ for(n in cancer_w_subtypes[13:15]) {
                xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
                colvar = NULL))
-  legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
-#legend("top", inset = c(0), legend=names(J_colors[1:2]), col=J_colors[1:2], pch = 20, bty = "n", horiz = T, cex = 1.2)
-#legend("top", inset = c(0.10), legend=names(J_colors[3:4]), col=J_colors[3:4], pch = 20, bty = "n", horiz = T, cex = 1.2)
+  legend("top", inset = c(0.75), legend=n, bty = "n", horiz = T, cex = 1.2)
+  legend("top", inset = c(0), legend=names(J_colors[1:2]), col=J_colors[1:2], pch = 20, bty = "n", horiz = T, cex = 1.2)
+  legend("top", inset = c(0.10), legend=names(J_colors[3:4]), col=J_colors[3:4], pch = 20, bty = "n", horiz = T, cex = 1.2)
+  legend("top", inset = c(0.20), legend=names(J_colors[5:6]), col=J_colors[5:6], pch = 20, bty = "n", horiz = T, cex = 1.2)
   title(xlab="UMAP 2", line=0)
 }
 
@@ -219,9 +225,10 @@ for(n in cancer_w_subtypes[16:19]) {
                xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
                colvar = NULL))
-  legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
-#legend("top", inset = c(0), legend=names(J_colors[1:2]), col=J_colors[1:2], pch = 20, bty = "n", horiz = T, cex = 1.2)
-#legend("top", inset = c(0.10), legend=names(J_colors[3:4]), col=J_colors[3:4], pch = 20, bty = "n", horiz = T, cex = 1.2)
+  legend("top", inset = c(0.75), legend=n, bty = "n", horiz = T, cex = 1.2)
+  legend("top", inset = c(0), legend=names(J_colors[1:2]), col=J_colors[1:2], pch = 20, bty = "n", horiz = T, cex = 1.2)
+  legend("top", inset = c(0.10), legend=names(J_colors[3:4]), col=J_colors[3:4], pch = 20, bty = "n", horiz = T, cex = 1.2)
+  legend("top", inset = c(0.20), legend=names(J_colors[5:6]), col=J_colors[5:6], pch = 20, bty = "n", horiz = T, cex = 1.2)
   title(xlab="UMAP 2", line=0)
 }
 
@@ -346,12 +353,6 @@ genes involved in genome stability projected on the UMAP from **Figure 2C of the
 
 \newpage
 
-### Supplementary Figure S4
-This is the 377 pathway UMAP. I will need to develop a loop that does this.
-
-**Supplementary Figure S4. Projection of pathway disruptions onto the UMAP.** Each panel shows one of 377 Reactome
-pathways projected on the UMAP from **Figure 1D of the main text** ordered by the hierarchical pathway order 
-(column) from **Figure 2C of the main text**.
 ```{r supplementary-figure-s4-data-generation, eval = FALSE}
 load("../data/gdc_reactome_path_analysis.Rda") ## load data
 umap_cancertype <- fread("../data/umap_3d_coors.tsv") 
@@ -361,94 +362,234 @@ toppath <- gdc_reactome_path_analysis %>% rowSums() %>% as.data.frame() %>% rown
 
 selected_path <- gdc_reactome_path_analysis %>% t() %>% as.data.frame() %>% rownames_to_column(var = "sample_id") ## prepare pathway for left_join
 
-selected_path <- umap_cancertype %>% dplyr::select(sample_id, plot_x, plot_y) %>% ## select relevant columns
+selected_path <- umap_cancertype %>% dplyr::select(sample_id, plot_x, plot_y, plot_z) %>% ## select relevant columns
   left_join(., selected_path, by = "sample_id") %>%
-  melt(data = ., id.vars = c("sample_id", "plot_x", "plot_y")) %>%
+  melt(data = ., id.vars = c("sample_id", "plot_x", "plot_y", "plot_z")) %>%
   filter(value != 0)
 
 save(selected_path, file = "../data/selected_path.Rda")
 
-load("../data/selected_path.Rda") ## load data
-load("../data/gdc_reactome_path_analysis.Rda")
-umap_cancertype <- fread("../data/umap_3d_coors.tsv")
-umap_bg <- umap_cancertype[,-"project_code"] ## get background data for facet
+# load("../data/selected_path.Rda") ## load data
+# load("../data/gdc_reactome_path_analysis.Rda")
+# umap_cancertype <- fread("../data/umap_3d_coors.tsv")
+# umap_bg <- umap_cancertype[,-"project_code"] ## get background data for facet
+# 
+# n_path <- 377 ## number of pathways we want to see
+# 
+# toppath <- gdc_reactome_path_analysis %>% rowSums() %>% as.data.frame() %>% rownames_to_column(var = "path_name") %>% arrange(desc(.)) %>% .[1:n_path,] %>% .[, "path_name"] ## order pathway by most to least mutated pathway.. needed for facet
+# 
+# ## creating layout to plot all 377 pathways
+# figs4_layout <- data.frame(start = seq(from = 1, to = length(toppath), by = 25),
+#                           end = c(seq(from = 25, to = length(toppath), by = 25), length(toppath)))
+# 
+# for(n in 1:nrow(figs4_layout)) {
+#   message(n)
+#   pathway_layout <- figs4_layout %>% .[n,] ## getting the layout for selecting pathways
+#   pathway_layout <- toppath[pathway_layout$start:pathway_layout$end] ## filtering those pathways from toppath
+#   filtered_path <- selected_path %>% filter(variable %in% pathway_layout) %>% ## filtering our data to only include those pathways
+#     mutate(variable = factor(variable, levels = c(pathway_layout)))
+#   ggplot_umap <- ggplot(filtered_path, aes(x = plot_y, y = plot_x, colour = as.character(value))) + 
+#     geom_point(data = umap_bg, aes(x = plot_y, y = plot_x), colour = "grey", size = 0.25) +
+#     geom_point(size = 0.25) +
+#     theme_classic() +
+#     coord_fixed() +
+#     xlab("UMAP 1") + ylab("UMAP 2") +
+#     scale_colour_manual(values = rep("firebrick3", 25)) +
+#     theme(axis.text.x = element_blank(),
+#       axis.text.y = element_blank(),
+#       axis.title.x = element_blank(),
+#       axis.title.y = element_blank(),
+#       axis.ticks = element_blank(),
+#       axis.line = element_blank(),
+#       strip.text = element_text(size = 5),
+#       legend.position = "none") +
+#     facet_wrap(~ variable,
+#                ncol = 5) ## facet by pathways
+#   new_dfname <- paste0("ggplot_umap_", n)
+#   assign(paste0(new_dfname), value = ggplot_umap)
+# }
+# 
+# save(ggplot_umap_1,ggplot_umap_2,ggplot_umap_3,ggplot_umap_4,ggplot_umap_5,ggplot_umap_6,ggplot_umap_7,ggplot_umap_8,ggplot_umap_9,ggplot_umap_10,ggplot_umap_11,ggplot_umap_12,ggplot_umap_13,ggplot_umap_14,ggplot_umap_15,ggplot_umap_16, file = "../data/fig_s4_ggplot.Rda")
+```
 
-n_path <- 377 ## number of pathways we want to see
+```{r figure-s4-plot, fig.width= 9}
+load("../data/selected_path.Rda")
+load("../data/effect_heatmap.Rda") ## load effect heatmap data
+pathorder <- as.character(levels(effect_heatmap$path_name)) ## getting col order
 
-toppath <- gdc_reactome_path_analysis %>% rowSums() %>% as.data.frame() %>% rownames_to_column(var = "path_name") %>% arrange(desc(.)) %>% .[1:n_path,] %>% .[, "path_name"] ## order pathway by most to least mutated pathway.. needed for facet
+startingpoint <- seq(1, 377, by = 15)
+startingpointlist <- list()
+for(n in startingpoint) {
+  start1 <- n
+  end1 <- start1 + 5
+  start2 <- end1 + 1
+  end2 <- start2 + 5
+  start3 <- end2 + 1
+  end3 <- start3 + 2
+  startingpointlist[[n]] <- data.frame(start1 = start1,
+                                       end1 = end1,
+                                       start2 = start2,
+                                       end2 = end2,
+                                       start3 = start3,
+                                       end3 = end3)
+}
+startingpointlist <- as.data.frame(do.call(rbind, startingpointlist))
 
-## creating layout to plot all 377 pathways
-figs4_layout <- data.frame(start = seq(from = 1, to = length(toppath), by = 25),
-                          end = c(seq(from = 25, to = length(toppath), by = 25), length(toppath)))
-
-for(n in 1:nrow(figs4_layout)) {
-  message(n)
-  pathway_layout <- figs4_layout %>% .[n,] ## getting the layout for selecting pathways
-  pathway_layout <- toppath[pathway_layout$start:pathway_layout$end] ## filtering those pathways from toppath
-  filtered_path <- selected_path %>% filter(variable %in% pathway_layout) %>% ## filtering our data to only include those pathways
-    mutate(variable = factor(variable, levels = c(pathway_layout)))
-  ggplot_umap <- ggplot(filtered_path, aes(x = plot_y, y = plot_x, colour = as.character(value))) + 
-    geom_point(data = umap_bg, aes(x = plot_y, y = plot_x), colour = "grey", size = 0.25) +
-    geom_point(size = 0.25) +
-    theme_classic() +
-    coord_fixed() +
-    xlab("UMAP 1") + ylab("UMAP 2") +
-    scale_colour_manual(values = rep("firebrick3", 25)) +
-    theme(axis.text.x = element_blank(),
-      axis.text.y = element_blank(),
-      axis.title.x = element_blank(),
-      axis.title.y = element_blank(),
-      axis.ticks = element_blank(),
-      axis.line = element_blank(),
-      strip.text = element_text(size = 5),
-      legend.position = "none") +
-    facet_wrap(~ variable,
-               ncol = 5) ## facet by pathways
-  new_dfname <- paste0("ggplot_umap_", n)
-  assign(paste0(new_dfname), value = ggplot_umap)
+s4plot <- function(x) {
+  a <-  x[,"start1"]
+  b <- x[,"end1"]
+  c <- x[,"start2"]
+  d <- x[,"end2"]
+  e <- x[,"start3"]
+  f <- x[,"end3"]
+  path01<- pathorder[a:b]
+  path02<- pathorder[c:d]
+  path03<- pathorder[e:f]
+par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1))
+par(mar = c(2,2,0,0))
+for(n in path01) { #pathorder[x[,"start1"]:x[,"end1"]]
+  pathname <- as.data.frame(strsplit(n, " ")) ## split string into word
+  pathname <- pathname[,1] ## get the character vectors
+  with(selected_path %>% 
+       filter(variable == n),
+     scatter3D(plot_y, -plot_z, plot_x, 
+                                bg = "grey", pch = 21, cex = 0.8, lwd = 0.2,
+                                theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+                                colvar = NULL))
+title(xlab="UMAP 2", line=0)
+path1 <- paste0(pathname[1], " ", pathname[2], " ", pathname[3], " ", pathname[4], " ")
+path1 <- gsub("NA", "", path1)
+path2 <- paste0(pathname[5], " ", pathname[6], " ", pathname[7], " ", pathname[8], " ")
+path2 <- gsub("NA", "", path2)
+legend("top", inset = c(0.01), legend=path1, bty = "n", horiz = T, cex = 0.9)
+legend("top", inset = c(0.06), legend=path2, bty = "n", horiz = T, cex = 0.9)
 }
 
-save(ggplot_umap_1,ggplot_umap_2,ggplot_umap_3,ggplot_umap_4,ggplot_umap_5,ggplot_umap_6,ggplot_umap_7,ggplot_umap_8,ggplot_umap_9,ggplot_umap_10,ggplot_umap_11,ggplot_umap_12,ggplot_umap_13,ggplot_umap_14,ggplot_umap_15,ggplot_umap_16, file = "../data/fig_s4_ggplot.Rda")
+par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1))
+par(mar = c(2,2,0,0))
+for(n in pathorder[x[,"start2"]:x[,"end2"]]) {
+  pathname <- as.data.frame(strsplit(n, " ")) ## split string into word
+  pathname <- pathname[,1] ## get the character vectors
+  with(selected_path %>% 
+       filter(variable == n),
+     scatter3D(plot_y, -plot_z, plot_x, 
+                                bg = "grey", pch = 21, cex = 0.8, lwd = 0.2,
+                                theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+                                colvar = NULL))
+title(xlab="UMAP 2", line=0)
+path1 <- paste0(pathname[1], " ", pathname[2], " ", pathname[3], " ", pathname[4], " ")
+path1 <- gsub("NA", "", path1)
+path2 <- paste0(pathname[5], " ", pathname[6], " ", pathname[7], " ", pathname[8], " ")
+path2 <- gsub("NA", "", path2)
+legend("top", inset = c(0.01), legend=path1, bty = "n", horiz = T, cex = 0.9)
+legend("top", inset = c(0.06), legend=path2, bty = "n", horiz = T, cex = 0.9)
+}
+
+
+par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1))
+par(mar = c(2,2,0,0))
+for(n in pathorder[x[,"start3"]:x[,"end3"]]) {
+  pathname <- as.data.frame(strsplit(n, " ")) ## split string into word
+  pathname <- pathname[,1] ## get the character vectors
+  with(selected_path %>% 
+       filter(variable == n),
+     scatter3D(plot_y, -plot_z, plot_x, 
+                                bg = "grey", pch = 21, cex = 0.8, lwd = 0.2,
+                                theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+                                colvar = NULL))
+title(xlab="UMAP 2", line=0)
+path1 <- paste0(pathname[1], " ", pathname[2], " ", pathname[3], " ", pathname[4], " ")
+path1 <- gsub("NA", "", path1)
+path2 <- paste0(pathname[5], " ", pathname[6], " ", pathname[7], " ", pathname[8], " ")
+path2 <- gsub("NA", "", path2)
+legend("top", inset = c(0.01), legend=path1, bty = "n", horiz = T, cex = 0.9)
+legend("top", inset = c(0.06), legend=path2, bty = "n", horiz = T, cex = 0.9)
+}
+}
+
+
+data <- startingpointlist[1,]
+s4plot(x = data)
+data <- startingpointlist[2,]
+s4plot(x = data)
+data <- startingpointlist[3,]
+s4plot(x = data)
+data <- startingpointlist[4,]
+s4plot(x = data)
+data <- startingpointlist[5,]
+s4plot(x = data)
+data <- startingpointlist[6,]
+s4plot(x = data)
+data <- startingpointlist[7,]
+s4plot(x = data)
+data <- startingpointlist[8,]
+s4plot(x = data)
+data <- startingpointlist[9,]
+s4plot(x = data)
+data <- startingpointlist[10,]
+s4plot(x = data)
+data <- startingpointlist[11,]
+s4plot(x = data)
+data <- startingpointlist[12,]
+s4plot(x = data)
+data <- startingpointlist[13,]
+s4plot(x = data)
+data <- startingpointlist[14,]
+s4plot(x = data)
+data <- startingpointlist[15,]
+s4plot(x = data)
+data <- startingpointlist[16,]
+s4plot(x = data)
+data <- startingpointlist[17,]
+s4plot(x = data)
+data <- startingpointlist[18,]
+s4plot(x = data)
+data <- startingpointlist[19,]
+s4plot(x = data)
+data <- startingpointlist[20,]
+s4plot(x = data)
+data <- startingpointlist[21,]
+s4plot(x = data)
+data <- startingpointlist[22,]
+s4plot(x = data)
+data <- startingpointlist[23,]
+s4plot(x = data)
+data <- startingpointlist[24,]
+s4plot(x = data)
+data <- startingpointlist[25,]
+s4plot(x = data)
+
+par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1))
+par(mar = c(2,2,0,0))
+for(n in pathorder[376:377]) { 
+  pathname <- as.data.frame(strsplit(n, " ")) ## split string into word
+  pathname <- pathname[,1] ## get the character vectors
+  with(selected_path %>% 
+       filter(variable == n),
+     scatter3D(plot_y, -plot_z, plot_x, 
+                                bg = "grey", pch = 21, cex = 0.8, lwd = 0.2,
+                                theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+                                colvar = NULL))
+title(xlab="UMAP 2", line=0)
+path1 <- paste0(pathname[1], " ", pathname[2], " ", pathname[3], " ", pathname[4], " ")
+path1 <- gsub("NA", "", path1)
+path2 <- paste0(pathname[5], " ", pathname[6], " ", pathname[7], " ", pathname[8], " ")
+path2 <- gsub("NA", "", path2)
+legend("top", inset = c(0.01), legend=path1, bty = "n", horiz = T, cex = 0.9)
+legend("top", inset = c(0.06), legend=path2, bty = "n", horiz = T, cex = 0.9)
+}
 ```
-
-```{r supplementary-figure-s4, message = FALSE, echo = FALSE, out.width = '90%', fig.align= 'center', eval = FALSE}
-load("../data/fig_s4_ggplot.Rda")
-
-ggplot_umap_1
-ggplot_umap_2
-ggplot_umap_3
-ggplot_umap_4
-ggplot_umap_5
-ggplot_umap_6
-ggplot_umap_7
-ggplot_umap_8
-ggplot_umap_9
-ggplot_umap_10
-ggplot_umap_11
-ggplot_umap_12
-ggplot_umap_13
-ggplot_umap_14
-ggplot_umap_15
-ggplot_umap_16
-
-# ggplot(selected_path, aes(x = x_2d, y = y_2d, colour = as.character(value))) + 
-#   geom_point(data = umap_bg, aes(x = x_2d, y = y_2d), colour = "grey", size = 0.5) +
-#   geom_point(size = 0.5) +
-#   theme_classic() +
-#   coord_fixed() +
-#   xlab("UMAP 1") + ylab("UMAP 2") +
-#   scale_colour_manual(values = rep("firebrick3", 20)) +
-#   theme(axis.text.x = element_blank(),
-#     axis.text.y = element_blank(),
-#     axis.title.x = element_blank(),
-#     axis.title.y = element_blank(),
-#     axis.ticks = element_blank(),
-#     axis.line = element_blank(),
-#     legend.position = "none") +
-#   facet_wrap(~ factor(variable, levels = toppath),
-#                       ncol = 5) ## facet by pathways
-
-```
+**Supplementary Figure S4. Projection of pathway disruptions onto the UMAP.** Each panel shows one of 377 Reactome
+pathways projected on the UMAP from **Figure 1D of the main text** ordered by the hierarchical pathway order 
+(column) from **Figure 2C of the main text**.
 
 \newpage
 
@@ -473,7 +614,7 @@ gc()
 gdc_mut_count_patient[gdc_mut_count_patient > 0] <- 1 ## booleanize data, anything greater than 1 is equal to 1
 
 ## class 7 and 8 distinguishing genes
-genes <- c("PIK3CA", "KRAS", "TP53")
+genes <- c("AKT2","BCL2","CTNNB1","ERBB2","KRAS","PIK3CA","CDKN2C","PTEN","RB1","SMARCA4","TP53","VHL")
 
 selected_mut <- gene_data %>% dplyr::select(external_gene_name, ensembl_gene_id) %>% filter(external_gene_name %in% genes) ## getting ensembl_id for the genes for filtering gdc data
 
@@ -492,38 +633,43 @@ save(s5_data, file = "../data/s5_data.Rda")
 ```
 
 ```{r supplemental-s5-plot, fig.width=9}
-umap_cancertype <- data.table::fread("../data/umap_3d_coors.tsv")
-
-umap_cancertype$clust_knn <- as.character(umap_cancertype$clust_knn)
-
-clusters178 <- umap_cancertype %>% 
-       mutate(color = case_when(clust_knn %in% c("1", "7", "8") ~ clust_knn,
-                                  TRUE ~ "Other"))
-
-I_outlines <- c("black", "black", "black", "#00000000")
-names(I_outlines) <- c("1", "7", "8", "Other")
-
-I_colors <- c("gold2", "gray51", "springgreen4", "#00000011")
-names(I_colors) <- c("1", "7", "8", "Other")
+# umap_cancertype <- data.table::fread("../data/umap_3d_coors.tsv")
+# 
+# umap_cancertype$clust_knn <- as.character(umap_cancertype$clust_knn)
+# 
+# clusters178 <- umap_cancertype %>% 
+#        mutate(color = case_when(clust_knn %in% c("1", "7", "8") ~ clust_knn,
+#                                   TRUE ~ "Other"))
+# 
+# I_outlines <- c("black", "black", "black", "#00000000")
+# names(I_outlines) <- c("1", "7", "8", "Other")
+# 
+# I_colors <- c("gold2", "gray51", "springgreen4", "#00000011")
+# names(I_colors) <- c("1", "7", "8", "Other")
+# 
+# load("../data/s5_data.Rda")
+# genes <- as.character(unique(s5_data$variable))
+# 
+# par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1))
+# par(mar = c(2,2,0,0))
+# plot.new()
+# with(clusters178, 
+#      scatter3D(plot_y, -plot_z, plot_x, 
+#                                 bg = I_colors[color], col = I_outlines[color],
+#                                 pch = 21, cex = 0.8, lwd = 0.2,
+#                                 theta = 0, phi = 65, scale = F,
+#                                 xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+#                                 colvar = NULL))
+# legend("top", inset = c(0.05), legend=names(I_colors[c(1:3)]), col=I_colors[c(1:3)], pch = 20, bty = "n", horiz = T, cex = 1.2)
+# title(xlab="UMAP 2", line=0)
+# plot.new()
 
 load("../data/s5_data.Rda")
-genes <- as.character(unique(s5_data$variable))
+genes <- c("AKT2","BCL2","CTNNB1","ERBB2","KRAS","PIK3CA","CDKN2C","PTEN","RB1","SMARCA4","TP53","VHL")
 
 par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1))
 par(mar = c(2,2,0,0))
-plot.new()
-with(clusters178, 
-     scatter3D(plot_y, -plot_z, plot_x, 
-                                bg = I_colors[color], col = I_outlines[color],
-                                pch = 21, cex = 0.8, lwd = 0.2,
-                                theta = 0, phi = 65, scale = F,
-                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
-                                colvar = NULL))
-legend("top", inset = c(0.05), legend=names(I_colors[c(1:3)]), col=I_colors[c(1:3)], pch = 20, bty = "n", horiz = T, cex = 1.2)
-title(xlab="UMAP 2", line=0)
-plot.new()
-
-for(n in genes) {
+for(n in genes[1:6]) {
 with(s5_data %>% 
        filter(variable == n),
      scatter3D(plot_y, -plot_z, plot_x, 
@@ -535,10 +681,24 @@ with(s5_data %>%
 title(xlab="UMAP 2", line=0)
 legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
 }
+
+par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1))
+par(mar = c(2,2,0,0))
+for(n in genes[7:12]) {
+with(s5_data %>% 
+       filter(variable == n),
+     scatter3D(plot_y, -plot_z, plot_x, 
+                                bg = "grey", pch = 21, cex = 0.8, lwd = 0.2,
+                                theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+                                colvar = NULL))
+title(xlab="UMAP 2", line=0)
+legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
+}
+
 ```
-**Supplementary Figure S5. Distribution of oncogenes on UMAP clusters.** The left panel shows the identity of 
-clusters 1, 7 and 8. The multipanel on the right shows one of the three oncogenes projected onto the tumors of 
-the UMAP from **Figure 2C of the main text**.
+**Supplementary Figure S5. Distribution of oncogenes/tumor suppressors on UMAP clusters.** Each panel shows shows one of the twelve oncogenes/tumor suppressors projected onto the tumors of the UMAP from **Figure 2C of the main text**.
 
 \newpage 
 ```{r supplemental-table-st1-data-generation, eval = FALSE}
@@ -627,8 +787,8 @@ load("../data/table_st1.Rda")
 write.xlsx(table_st1, file = "../data/table_st1.xlsx", row.names = FALSE)
 ```
 
-
-```{r enrich-pathway-in-clust, eval = FALSE}
+**Supplementary Table 1. Cluster-specific enriched pathways (effect size >= 0.30).**
+```{r enrich-pathway-in-clust, fig.width= 9}
 ## docx friendly
 load("../data/moderate_enrich_prob.Rda")
 
@@ -639,14 +799,21 @@ st1$log10pvalue <- round(-log10((st1$Signif + 1) / 1E5), digits = 2) ## Getting 
 st1$Enrichment_Score <- round(st1$Enrichment_Score, digits = 2)
 st1$Signif <- NULL ## we don't need this anymore
 
-st1 %>% flextable() %>% 
-  set_caption(caption = "") %>%
-  align(part = "all") %>% 
-  width(., width = c(4,0.75,1,1)) %>% 
-  fontsize(size = 10, part = "body")
+# st1 <- st1 %>% flextable() %>% 
+#   set_caption(caption = "") %>%
+#   align(part = "all") %>% 
+#   width(., width = c(4,0.75,1,1)) %>% 
+#   fontsize(size = 10, part = "body")
+# 
+# knitr::knit_print(st1)
+names(st1) <- c("Pathway", "Cluster", "Effect Size", "-log(p)")
+ st1 %>%  knitr::kable(format = "latex", longtable = TRUE, align = c("l", rep("c",3))) %>%
+   kable_styling(latex_options=c("scale_down", "repeat_header"), full_width = FALSE, font_size = 12) %>%
+   column_spec(1, color = "black", width = "4in")
 ```
 
 
+\newpage
 
 ![**Supplemental figure S6. Survival fit independent of disease status.** _The red and blue curves show the survival of people in the US by female and male, respectively. The orange and green curves show the model fits._]
 
