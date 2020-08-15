@@ -173,7 +173,7 @@ least, our novel pathway-disruption classification method identifies molecular
 pathology largely independent of tissue-of-origin. As an
 example of one type of cancer that does have a biased pathway profile,
 pancreatic adenocarcinoma (PAAD) was predominantly found in class 8, which is
-distinguished  by KRAS mutations among others (**supplementary figure S3**). 
+distinguished  by KRAS mutations among others (**supplementary figure S5**). 
 But even PAAD comprises tumors from the nine remaining classes, meaning that 
 patients suffering these tumors have potentially different underlying molecular
 pathologies.
@@ -237,8 +237,8 @@ structures on a common backbone of tumor samples (**figure 2C**) could in
 principle also reflect progression through a series of stages. In support of
 this hypothesis, the backbone starts with a cluster of tumors (class 1) that has the fewest point mutations and culminates in a cluster (class 10) which
 has nearly every pathway disrupted (**figure 4**). However, outside of class 10 we don't observe
-an obvious trend in the overall mutation burden across the backbone of the UMAP (**figure
-1H**). Nonetheless, to test the hypothesis that the molecular-pathway disruption
+an obvious trend in the overall mutation burden across the backbone of the UMAP. 
+Nonetheless, to test the hypothesis that the molecular-pathway disruption
 classes represent advancement through stages, we projected staging data onto the
 UMAP. Similar to tissue of origin and other categories of tumor, we did not
 observe any bias among the stages to specific pathway disruption classes
@@ -289,7 +289,7 @@ Similarly, class 4 was distinguished by mutations affecting regulation of DNA
 and histone methylation ("DNA methylation", "PRC2 methylates histones and DNA",
 and "Nucleosome assembly"). Classes 7-9 have in common mutations in
 extracellular, intracellular, and immune-related signaling pathways (see
-**figure5C** and **supplementary figure S4**). Cluster 2 had the highest pathway
+**figure 5C** and **supplementary figure S4**). Cluster 2 had the highest pathway
 enrichment levels of the three, having mutations in hedgehog signaling,
 "β-catenin degradation", "cellular response to hypoxia", "regulation of
 cell cycle" and "apoptosis" among others.
