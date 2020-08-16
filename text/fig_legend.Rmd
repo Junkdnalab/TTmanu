@@ -1,98 +1,96 @@
-**Figure 1: Molecular pathway profiles of tumor samples with one or more
-mutations.** Each of 377 selected Reactome pathways (columns) is classified
-as disrupted if one or more genes is mutated in the tumor sample (rows) where
-red and grey represents the pathway is mutated and not, respectively. Tumors
-are grouped by tissue of origin using standardized abbreviations 
-from the TCGA project.
+**Figure 1: Molecular pathway profiles of tumor samples with one or more mutations.** 
+Each of 377 selected Reactome pathways (columns) is classified as disrupted if
+one or more genes is mutated in the tumor sample (rows) where red and grey
+represents the pathway is mutated and not, respectively. Tumors are grouped by
+tissue of origin using standardized abbreviations from the TCGA project.
 
 **Figure 2: Method for tumor classification using pathway aberration data** 
-a) MCA analysis was performed to determine the eigenvalue with the most 
-explanatory power from the categorical data. Average of 100 permutations of 
-the data was used as a baseline. b) The p-value of each eigenvalue was plotted
-and the max eigenvalue with a pvalue < 0.05 was selected. c) The resulting MCA 
-was projected down to 3 dimensions for the purpose of density based clustering 
-(only the first 2 dimensions are shown). Each dot represents a tumor d) HDBSCAN
-was used to perform hierarchical density based clustering tuned to minimize
-the fraction of unassigned tumors. e) HDBSCAN clustered tumors were visualized 
-on the UMAP projection; tumors are colored by cluster membership (see legend). 
-This results in some tumors remaining unclassified (grey points). f) kNN was 
-used to assign membership to the remaining tumors. 
+a) MCA analysis was performed to determine the eigenvalue with the most
+explanatory power from the categorical data. Average of 100 permutations of the
+data was used as a baseline. b) The p-value of each eigenvalue was plotted and
+the max eigenvalue with a pvalue < 0.05 was selected. c) The resulting MCA was
+projected down to 3 dimensions for the purpose of density based clustering (only
+the first 2 dimensions are shown). Each dot represents a tumor d) HDBSCAN was
+used to perform hierarchical density based clustering tuned to minimize the
+fraction of unassigned tumors. e) HDBSCAN clustered tumors were visualized on
+the UMAP projection; tumors are colored by cluster membership (see legend). This
+results in some tumors remaining unclassified (grey points). f) kNN was used to
+assign membership to the remaining tumors.
 
-**Figure 3: Pathway-based classification is independent of tissue-of-origin features.**
-a) Projection of cancer type identity onto UMAP. Abbrevs: BRCA = Breast cancer, 
-COAD = Colorectal adenocarcinoma, HNSC = Head and neck squamous cell, PAAD = 
-Pancreatic adenocarcinoma. b) Projection of breast cancer subtypes onto the UMAP.
-c) Projection of BRCA1/2 somatic mutation onto the UMAP. d) Projection of tumor 
-stage onto the UMAP, regardless of cancer type. e) Projection of metastatic status
-onto the UMAP. Abbrevs: M0 = non-metastatic tumors, M1 = metastatic tumors.
+**Figure 3: Pathway-based classification is independent of tissue-of-origin features.** 
+a) Projection of cancer type identity onto UMAP. Abbrevs: BRCA = Breast cancer,
+COAD = Colorectal adenocarcinoma, HNSC = Head and neck squamous cell, PAAD =
+Pancreatic adenocarcinoma. b) Projection of breast cancer subtypes onto the
+UMAP. c) Projection of BRCA1/2 somatic mutation onto the UMAP. d) Projection of
+tumor stage onto the UMAP, regardless of cancer type. e) Projection of
+metastatic status onto the UMAP. Abbrevs: M0 = non-metastatic tumors, M1 =
+metastatic tumors.
 
-**Figure 4: Somatic mutation frequencies for tumors in each class** Column uses 
-a logarithmic axis to represent mutation count. Row represents the tumor samples. 
-Each dot corresponds to the sample mutation count for tumors in each class, 
-ordered by mutation counts. The median mutation count in each cluster is indicated 
-by the horizontal line.
+**Figure 4: Somatic mutation frequencies for tumors in each class** 
+Column uses a logarithmic axis to represent mutation count. Row represents the
+tumor samples. Each dot corresponds to the sample mutation count for tumors in
+each class, ordered by mutation counts. The median mutation count in each
+cluster is indicated by the horizontal line.
 
-**Figure 5: Pan-cancer enrichment of pathway disruptions.** a) Waterfall plot; columns
-represent tumors. Each row represents a pathway. The pathways are ranked such that the 
-pathway with the most disruptions across all 7,607 tumors is the first row _etc._ and 
-tumors are ordered to prioritize the top pathway disruptions successively. The top 100 
-most mutated pathways are shown. Red signifies pathway disrupted pathways, grey signifies
-not disrupted. b) Heatmap shows the relative enrichment of each pathway (columns) 
-within each numbered cluster (rows). Effect size is displayed as colors (orange, 
-enrichment; purple, depletion). c) Proportion of mutated samples in the each significant
-pathway (columns; union set of pathways with effect size >= 0.30 in each cluster)
-within each numbered cluster (rows).
+**Figure 5: Pan-cancer enrichment of pathway disruptions.** 
+a) Waterfall plot; columns represent tumors. Each row represents a pathway. The
+pathways are ranked such that the pathway with the most disruptions across all
+7,607 tumors is the first row _etc._ and tumors are ordered to prioritize the
+top pathway disruptions successively. The top 100 most mutated pathways are
+shown. Red signifies pathway disrupted pathways, grey signifies not disrupted.
+b) Heatmap shows the relative enrichment of each pathway (columns) within each
+numbered cluster (rows). Effect size is displayed as colors (orange, enrichment;
+purple, depletion). c) Proportion of mutated samples in the each significant
+pathway (columns; union set of pathways with effect size >= 0.30 in each
+cluster) within each numbered cluster (rows).
 
-**Figure 6: Gene level analysis reveals tissue-specific class signatures.** Odds ratio 
-plot; Column uses a logarithmic axis to represent odds ratio with a 95% confidence 
-interval. Row represents the significant genes from each cluster. Each cluster was 
-compared against the background (all other clusters) to find deferentially mutated 
-genes. Significant genes (pvalue < 0.01) were selected and limited to the top ten 
-results for each clusters. Heatmap; Column represents the cancer type. Row represents the 
-significant genes as described above. The heatmap shows the proportion of samples 
-per cluster, per cancer type that is mutated for each of the significant genes. 
-Depleted significant genes (left). Enriched significant genes (right).
+**Figure 6: Gene level analysis reveals tissue-specific class signatures.** 
+Odds ratio plot; Column uses a logarithmic axis to represent odds ratio with a
+95% confidence interval. Row represents the significant genes from each cluster.
+Each cluster was compared against the background (all other clusters) to find
+deferentially mutated genes. Significant genes (pvalue < 0.01) were selected and
+limited to the top ten results for each clusters. Heatmap; Column represents the
+cancer type. Row represents the significant genes as described above. The
+heatmap shows the proportion of samples per cluster, per cancer type that is
+mutated for each of the significant genes. Depleted significant genes (left).
+Enriched significant genes (right).
 
-**Figure 7: ** Comparison of different cancers, simulated and actual
-results results. A) To understand the risk model, we plot survival of
-four simulated cohorts. Compare survival of a group consisting of
-randomly selected 30 year old women (light blue) to an equal sized
-group of 30 year old women with cancer, k = 2 (light orange). To
-understand how the mix of ages alters the survival curve, we compare a
-randomly selected group of people with ages uniformly distributed from
-30 to 70 (dark blue) and a randomly selected group with uniformly
-distributed ages and cancer k = 2 (dark orange). B,C,D,E) We compare a
-randomly selected group with correct age distribution for the given
-cancer (blue) to the model predicted survival for the given average k
-(red) and the actual survival for the patients in our dataset (CHOOSE
-COLOR HERE, NOT GREEN). As can be seen, Stomach Cancer (STAD),
-Glioblastoma (GBM), and Pancreatic Cancer (PAAD) are all very
-deadly. The modeled results fit the general trend for the actual
-patients. Thyroid Cancer (THCA) on the other hand has very little if
-any effect on life expectancy, in fact there may be a slight benefit
-which may be associated with a bias in diagnosis towards patients who
-are more health conscious, or higher socioeconomic status, with more
-access to care compared to random population members.
+**Figure 7: ** Comparison of different cancers, simulated and actual results
+results. A) To understand the risk model, we plot survival of four simulated
+cohorts. Compare survival of a group consisting of randomly selected 30 year old
+women (light blue) to an equal sized group of 30 year old women with cancer, k =
+2 (light orange). To understand how the mix of ages alters the survival curve,
+we compare a randomly selected group of people with ages uniformly distributed
+from 30 to 70 (dark blue) and a randomly selected group with uniformly
+distributed ages and cancer k = 2 (dark orange). B,C,D,E) We compare a randomly
+selected group with correct age distribution for the given cancer (blue) to the
+model predicted survival for the given average k (red) and the actual survival
+for the patients in our dataset (CHOOSE COLOR HERE, NOT GREEN). As can be seen,
+Stomach Cancer (STAD), Glioblastoma (GBM), and Pancreatic Cancer (PAAD) are all
+very deadly. The modeled results fit the general trend for the actual patients.
+Thyroid Cancer (THCA) on the other hand has very little if any effect on life
+expectancy, in fact there may be a slight benefit which may be associated with a
+bias in diagnosis towards patients who are more health conscious, or higher
+socioeconomic status, with more access to care compared to random population
+members.
 
-**Figure 8** Tissue specific effects are compared by showing the
-probability density for the posterior value of the k_tis
-multiplier. These values reflect the general deadliness of the cancer
-type across all clusters. GBM, PAAD, and SKCM stand out as having
-values in the 10 to 20 range with a wide degree of uncertainty. Other
-cancers such as Prostate (PRAD) and Thyroid (THCA) show values down
-near or even below 1 suggesting that these populations may have
-healthier lifestyles and more access to care. Most cancer types fall
-in the range 2-7 as might be expected.
+**Figure 8** Tissue specific effects are compared by showing the probability
+density for the posterior value of the $k_{tis}$ multiplier. These values
+reflect the general deadliness of the cancer type across all clusters. GBM,
+PAAD, and SKCM stand out as having values in the 10 to 20 range with a wide
+degree of uncertainty. Other cancers such as Prostate (PRAD) and Thyroid (THCA)
+show values down near or even below 1 suggesting that these populations may have
+healthier lifestyles and more access to care. Most cancer types fall in the
+range 2-7 as might be expected.
 
-**Figure 9** Class specific $k_{class}$ values shown for each cancer
-type. The overall $k$ value is the product of $k_{tis} \times
-k_{class}$. The class specific value shows the relative aggressiveness
-of that particular class within the tissue. For example class 1, 2,
-and 6 Glioblastoma (GBM) are apparently much less deadly than other
-types of GBM. A similar situation can be seen with Pancreatic Cancer
-(PAAD) where 1, 6, and 8 are less deadly compared to classes 7,
-9, 10. For some cancer types there are few data points and little
-ability to estimate values with precision (DLBC and KICH for example).
+**Figure 9** Class specific $k_{class}$ values shown for each cancer type. The
+overall $k$ value is the product of $k_{tis} \times k_{class}$. The class
+specific value shows the relative aggressiveness of that particular class within
+the tissue. For example class 1, 2, and 6 Glioblastoma (GBM) are apparently much
+less deadly than other types of GBM. A similar situation can be seen with
+Pancreatic Cancer (PAAD) where 1, 6, and 8 are less deadly compared to classes
+7, 9, 10. For some cancer types there are few data points and little ability to
+estimate values with precision (DLBC and KICH for example).
 
 
 **Table 1: Cluster-specific enriched pathways (effect size >= 0.30) in metastatsis.**
