@@ -74,7 +74,8 @@ suppressPackageStartupMessages(c(
   library(rtracklayer),
   library(poibin),
   library(flextable),
-  library(plot3D)
+  library(plot3D),
+  library(ggfortify)
 ))
 ```
 
@@ -296,7 +297,7 @@ Similarly, class 4 was distinguished by mutations affecting regulation of DNA
 and histone methylation ("DNA methylation", "PRC2 methylates histones and DNA",
 and "Nucleosome assembly"). Classes 7-9 have in common mutations in
 extracellular, intracellular, and immune-related signaling pathways (see
-**figure5C** and **supplementary figure S4**). Cluster 2 had the highest pathway
+**figure 5C** and **supplementary figure S4**). Cluster 2 had the highest pathway
 enrichment levels of the three, having mutations in hedgehog signaling,
 "β-catenin degradation", "cellular response to hypoxia", "regulation of cell
 cycle" and "apoptosis" among others.
@@ -492,7 +493,7 @@ cat("\\newpage")
 ```{r child = '../code/figure4.Rmd'}
 #
 ```
-#### Figure 7
+
 ```{r, results='asis'}
 cat("\\newpage")
 ```

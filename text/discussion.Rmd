@@ -78,7 +78,7 @@ For example, it could be that the classes we identified are consistent with a
 signature of overall disease progression, such that successive, adjacent classes
 on the UMAP projection exhibit increasing specificity. We identified no such
 trend in the number of mutations (see **figure 4**), the relative staging
-(**figure 2D**) or metastasis (**figure 2E**); and each class instead was
+(**figure 3D**) or metastasis (**figure 3E**); and each class instead was
 associated with unique combinations of pathways (as in **figures 5B, C**).
 
 We find that most tumors segregate into one of ten biologically distinct
@@ -163,7 +163,7 @@ Likewise, Class 10 represents a group of hyper-mutated tumors that harbor so
 many mutations that virtually no pathway is unaffected. It seems likely that a
 significant fraction of the “mutant” samples for each pathway are burdened with
 excess passenger mutations. This could be addressed with application of
-ever-increasingly sophisticated filtering likely passenger mutations [ _e.g._
+ever-increasingly sophisticated filtering of likely passenger mutations [ _e.g._
 @spliceAI; @deep-learning-clinical-variants]. In the future, we hope to
 incorporate these other data into a comprehensive pathway-centric analysis as we
 have done here for point mutations and indels.
@@ -172,7 +172,7 @@ have done here for point mutations and indels.
 
 By modeling CDC longevity data as a baseline risk function we showed that each
 of our pathway disruption classes exhibit cancer-type specific effects on
-expected survival (**figure 7**). Contrary to what one might expect at the
+expected survival (**figure 9**). Contrary to what one might expect at the
 outset, we found that models assuming different survival based on class and
 cancer type fit better than models in which they are independent factors.
 However, considering that within each cancer type there are different clinical
