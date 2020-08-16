@@ -24,12 +24,12 @@ expression and genomic signatures, with the express goal of understanding the
 common themes of all cancer independent of tissue of origin. Understanding
 cancer as a disease of the cell has long been a goal of the field and is perhaps
 best characterized in essays by @weinberg2000; @hallmarks_II (see also
-Discussion). The first of these studies in the enomic era identified 11 subtypes
+Discussion). The first of these studies in the genomic era identified 11 subtypes
 from 12 cancer types, using integrative analysis with co-equal weighting of gene
 expression, methylation, copy number and proteomics data
 [@hoadleyMultiplatformAnalysis2014]. The principal finding was that
 tissue-of-origin is the predominant driving factor, though a significant
-proportion of tumors (~10%$) could be reclassified independent of
+proportion of tumors (~10%) could be reclassified independent of
 tissue-of-origin. In a second study involving 33 cancer types and a much greater
 number of tumors [@shenIntegrativeClusteringMultiple2009], the authors identify
 28 clusters that could be further subdivided into organ specific groups,
@@ -38,7 +38,7 @@ pan-gynecological/ squamous and pan-kidney
 [@hoadleyCellofOriginPatternsDominate2018].
 
 More recently, attempts have been made to consider pan-cancer mutations and
-other data outside the context of enrichment at the gene level. @PCAWG-PATH
+other data as disruptions of normal pathway activity. @PCAWG-PATH
 carried out near-exhaustive analysis of pathway enrichment using whole genome
 data. Horn _et al._ [@hornNetSigNetworkbasedDiscovery2018] introduce approaches
 to address the sparseness of mutations, allowing the potential importance of a
@@ -51,7 +51,7 @@ tissue diversity--and low sample numbers that they are impossible to detect
 using positive selection theory. Some groups have attempted to address this
 challenge by applying machine learning to cancer data sets to discover groups of
 functionally related genes as they interact with larger pathways and networks
-[@kimPancancerAnalysisSomatic2018, @mourikis-ml-pathways, @moonlight]. These
+[@kimPancancerAnalysisSomatic2018; @mourikis-ml-pathways; @moonlight]. These
 studies have proven very effective at highlighting some potentially fundamental
 disease phenotypes at the pathway level that cross cancers with different
 origins at the cellular and tissue level.
