@@ -813,7 +813,3 @@ names(st1) <- c("Pathway", "Cluster", "Effect Size", "-log(p)")
 ```
 
 
-\newpage
-
-![**Supplemental figure S6. Survival fit independent of disease status.** _The red and blue curves show the survival of people in the US by female and male, respectively. The orange and green curves show the model fits._]
-
