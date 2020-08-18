@@ -39,20 +39,20 @@ tcga_ssm <- tcga_ssm %>% mutate(type = case_when(type == "insertion of <=200bp" 
 
 complete_sample <- tcga_ssm %>% .[,"sample_id"] %>% unique() %>% .[grep(pattern= "TCGA-", x = .)] # complete TCGA tumor samples
 
-tcga_sample <- fread("../data/sample.tsv.gz", header = T, sep = "\t")
-tcga_sample <- tcga_sample %>% dplyr::select(project_code, submitted_sample_id, submitted_specimen_id, icgc_donor_id, submitted_donor_id, study) %>% 
-  .[.$submitted_sample_id %in% complete_sample,] %>%
-  mutate(type = substring(.$submitted_sample_id, first = 14, last = 15)) %>% ## 01 is primary solid tumor
-  filter(type == "01") ## filtering 01 samples
+tcga_sample <- fread("../data/sample.tsv.gz", header = T, sep = "\t") ## loading in sample metadata
+tcga_sample <- tcga_sample %>% dplyr::select(project_code, submitted_sample_id, submitted_specimen_id, icgc_donor_id, submitted_donor_id, study) %>% ## selecting the relevant columns
+  .[.$submitted_sample_id %in% complete_sample,] %>% ## Only include samples in complete_sample
+  mutate(type = substring(.$submitted_sample_id, first = 14, last = 15)) %>% ## Getting "sample type" info from TCGA barcode
+  filter(type == "01") ## filtering 01 samples (primary solid tumor)
 tcga_dup_id <- tcga_sample %>% .[.$icgc_donor_id %in% .[which(duplicated(.$submitted_donor_id)),]$icgc_donor_id,] %>% ## what are the dup donors
-  filter(study == "PCAWG") ## selecting dup samples that are PCAWG
+  filter(study == "PCAWG") ## selecting dup samples that are from PCAWG
 tcga_sample <- tcga_sample %>% .[!.$icgc_donor_id %in% tcga_dup_id$icgc_donor_id, ] %>% ## remove the dups from tcga_samples
   rbind(., tcga_dup_id) ## rbind the fixed dups
 
-tcga_donor <- fread("../data/donor.tsv.gz", header = T, sep = "\t")
+tcga_donor <- fread("../data/donor.tsv.gz", header = T, sep = "\t") ## loading in sample survival data
 tcga_donor <- tcga_donor %>% dplyr::select(icgc_donor_id, project_code, submitted_donor_id, donor_sex, donor_vital_status, disease_status_last_followup, donor_age_at_diagnosis, donor_age_at_enrollment, donor_age_at_last_followup, donor_survival_time, donor_interval_of_last_followup) ## selecting columns that we are interested in
 
-sample_sheet <- left_join(tcga_sample, tcga_donor, by = c("submitted_donor_id", "project_code", "icgc_donor_id"))
+sample_sheet <- left_join(tcga_sample, tcga_donor, by = c("submitted_donor_id", "project_code", "icgc_donor_id")) ## combining the tcga sample and donor data
 
 ## Preparing gene metadata ##
 
@@ -61,10 +61,10 @@ sample_sheet <- left_join(tcga_sample, tcga_donor, by = c("submitted_donor_id", 
 #                                    fromType = "ENSEMBL", 
 #                                    toType = c("ENTREZID"), OrgDb = org.Hs.eg.db)
 load("../data/ensembl_2_entrez_full_list.Rda")
-tcga_ssm <- tcga_ssm[tcga_ssm$ensembl_id %in% ensembl_2_entrez_full_list$ENSEMBL,]
+tcga_ssm <- tcga_ssm[tcga_ssm$ensembl_id %in% ensembl_2_entrez_full_list$ENSEMBL,] ## Only include genes in the gdc data that is found in the ensembl_2_entrez_full_lust
 
 ## Now we only have 19067 genes
-complete_ensembl <- as.data.frame(unique(as.character(tcga_ssm$ensembl_id)))
+complete_ensembl <- as.data.frame(unique(as.character(tcga_ssm$ensembl_id))) ## ensembl gene list
 names(complete_ensembl) <- "ensembl_id"
 
 selected_mut <- unique(as.character(tcga_ssm$type))
@@ -115,8 +115,10 @@ for(selected_mut in selected_mut) {
  #   mart = ensembl)
  # save(gene_data, file = "gene_data.Rda")
 load("../data/gene_data.Rda")
-######################
+###################### Converting ensembl id to gene symbol
 
+## Saniety check to make sure all the genes in the mutation data is found in the gene_data. If not, 
+## then only include the genes in gene_data
 missense_variant <- missense_variant[rownames(missense_variant) %in% gene_data$ensembl_gene_id,]
 UTR_3_prime_variant <- UTR_3_prime_variant[rownames(UTR_3_prime_variant) %in% gene_data$ensembl_gene_id,]
 UTR_5_prime_variant <- UTR_5_prime_variant[rownames(UTR_5_prime_variant) %in% gene_data$ensembl_gene_id,]
@@ -129,7 +131,7 @@ nonsense_variant <- nonsense_variant[rownames(nonsense_variant) %in% gene_data$e
 
 ## Matching df to the ensembl_id orders in gene_data
 match_ensembl <- function(x) {
-  x <- x[match(gene_data$ensembl_gene_id, rownames(x)),]
+  x <- x[match(gene_data$ensembl_gene_id, rownames(x)),] 
 }
 
 missense_variant <- match_ensembl(missense_variant)
@@ -141,7 +143,7 @@ splice_variant <- match_ensembl(splice_variant)
 nonstop_variant <- match_ensembl(nonstop_variant)
 nonsense_variant <- match_ensembl(nonsense_variant)
 
-
+## Convert gene_data into GRanges for Summarized Experiment
 genes <- GRanges(
   seqnames = paste("chr", gene_data$chromosome_name, sep=""),
   ranges = IRanges(
@@ -151,7 +153,7 @@ genes <- GRanges(
   mcols = list(
     ensembl_gene_id = gene_data$ensembl_gene_name,
     hgnc_symbol = gene_data$hgnc_symbol))
-
+## Create Summarized Experiment
 gdc_tumor_coding_complete <- SummarizedExperiment(
   assays = list(
     missense   = missense_variant,
@@ -197,8 +199,8 @@ filtered_ensembl2reactome <- ensembl2reactome %>% filter(!V4 %in% c("Disease", "
 
 toMatch <- c("disease", "defect", "cancer", "oncogenic", "disorder", "infection", "mutant", "bacteria", "listeria", "loss") ## pathways with the following key terms were removed.
 
-filtered_ensembl2reactome <- filtered_ensembl2reactome %>% mutate(l_pathname = tolower(.$PATH_NAME)) %>% 
-  .[!grep(paste(toMatch,collapse="|"), .$l_pathname),]
+filtered_ensembl2reactome <- filtered_ensembl2reactome %>% mutate(l_pathname = tolower(.$PATH_NAME)) %>% ## lower casing the pathway names because some pathways have disease vs Disease
+  .[!grep(paste(toMatch,collapse="|"), .$l_pathname),] ## Removing pathways with the key terms in toMatch 
 
 filtered_ensembl2reactome <- filtered_ensembl2reactome %>% .[which(!.$PATH_ID %in% c("R-HSA-212436", "R-HSA-388396")),] ## Removing Generic Transcription Pathway and GPCR downstream signalling as they are broad pathways
 
@@ -220,9 +222,9 @@ gc()
 ```
 
 ```{r filter-tissue-specific-low-expressed-genes, eval=FALSE}
-gtf_file <- "../data/gencode.v30.annotation.gtf"
-gencode_gtf <- rtracklayer::import(gtf_file)
-gene_info <- as.data.frame(mcols(gencode_gtf)[, c("type", "gene_id", "transcript_id", "gene_type", "transcript_type", "gene_name")])#; rm(gencode_gtf)
+gtf_file <- "../data/gencode.v30.annotation.gtf" ## loading gene information downloaded from gencode
+gencode_gtf <- rtracklayer::import(gtf_file) ## import data
+gene_info <- as.data.frame(mcols(gencode_gtf)[, c("type", "gene_id", "transcript_id", "gene_type", "transcript_type", "gene_name")]) ## selecting relevant columns
 ## We only want transcript only 
 gene_info <- gene_info[gene_info$type == "transcript",]
 ## We only want protein_coding only
@@ -235,7 +237,6 @@ good.g2t <- as_tibble(unique(g2t))
 
 ## df with transcript_id and entrez id                      
 gencode_entrez <- readr::read_tsv("../data/gencode.v30.metadata.EntrezGene.gz", col_names = FALSE)
-head(gencode_entrez[1:10,])
 colnames(gencode_entrez) <- c("transcript_id", "entrez_id")
 ## Joining data that are joined together by transcript_id
 entrez_g2t <- left_join(good.g2t, gencode_entrez)
@@ -357,7 +358,7 @@ entrez_g2t <- entrez_g2t[-c(which(entrez_g2t$gene_id == "ENSG00000260548")),]
 
 ## manual gene removal complete
 
-load("../data/TCGA.RNA.Rda")
+load("../data/TCGA.RNA.Rda") ## loading in mRNA expression data from UCSC xena browser
 
 
 ## Put entrez ids as rownames and shortening the TCGA ids since the last three portions of the TCGA barcode is coded to explain the test performed and etc. 
@@ -366,13 +367,13 @@ tumor_samples <- gdc_tumor_coding_complete %>% colData(.) %>%
   dplyr::select(project_code, submitted_specimen_id) %>%
   mutate(submitted_specimen_id = substring(text = .$submitted_specimen_id, first = 1, last = 15))
 
-TCGA.RNA <- TCGA.RNA %>% dplyr::select(-gene_symbol) %>%
-  remove_rownames(.) %>% column_to_rownames(var = "gene_id") %>% 
-  .[rownames(.) %in% entrez_g2t$entrez_id,] %>%
+TCGA.RNA <- TCGA.RNA %>% dplyr::select(-gene_symbol) %>% ## Don't need gene symbol info
+  remove_rownames(.) %>% column_to_rownames(var = "gene_id") %>%  ## entrez id to rownames
+  .[rownames(.) %in% entrez_g2t$entrez_id,] %>% ## Filter TCGA data to only include genes found in gencode (entrez_g2t)
   'colnames<-' (substring(text = names(.), first = 1, last = 15)) %>% ## only need the first 15 character of barcode
   .[, names(.) %in% tumor_samples$submitted_specimen_id] ## only include tumor samples in our analysis
 
-g2e_list <- entrez_g2t[entrez_g2t$entrez_id %in% rownames(TCGA.RNA),]
+g2e_list <- entrez_g2t[entrez_g2t$entrez_id %in% rownames(TCGA.RNA),] ## getting the list of genes in entrez_g2t thats in TCGA.RNA
 
 express_no_express_lookup <- list()
 for(i in unique(tumor_samples$project_code)) {
@@ -388,24 +389,23 @@ for(i in unique(tumor_samples$project_code)) {
   gc
 }
 express_no_express_lookup <- do.call(cbind, express_no_express_lookup) ## cbind list
-express_no_express_lookup[is.na(express_no_express_lookup)] <- 0
+express_no_express_lookup[is.na(express_no_express_lookup)] <- 0 ## NA values are 0
 
-## 
 gdc_ensembl_id <- gdc_tumor_coding_complete %>% rowRanges(.) %>% as.data.frame(.) %>% ## getting the ensembl_ids in our gdc dataset
   rownames(.)
 g2e_list <- g2e_list[g2e_list$gene_id %in% gdc_ensembl_id,] ## subsetting the g2e_list to only have ensembl_ids in our gdc dataset
 
 
-express_no_express_lookup <- express_no_express_lookup[rownames(express_no_express_lookup) %in% g2e_list$entrez_id, ]
-express_no_express_lookup[express_no_express_lookup <= 10] <- 0 ## Set threshold to >10 for gene expression
-express_no_express_lookup[express_no_express_lookup >10] <- 1 
+express_no_express_lookup <- express_no_express_lookup[rownames(express_no_express_lookup) %in% g2e_list$entrez_id, ] ## Saniety check to only include genes in express lookup that are in g2e_list
+express_no_express_lookup[express_no_express_lookup <= 10] <- 0 ## Set threshold to <=10 for not expressed
+express_no_express_lookup[express_no_express_lookup >10] <- 1 ## >10 is expressed
 
 ## convert entrez id to ensembl_id
 express_no_express_lookup <- express_no_express_lookup %>% .[match(g2e_list$entrez_id, rownames(.)),] %>% ## match the entrez_id express_no_express_lookup with g2e_list
   'rownames<-' (g2e_list$gene_id) ## replace entrez_id with 
 
 ## Booleanize mutation count for each tumor sample
-missense <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$missense) 
+missense <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$missense) ## Load in each mut type data
 splice <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$splice)
 frameshdel <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$frameshdel)
 frameshins <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$frameshins)
@@ -418,7 +418,7 @@ gdc_mut_count_patient <- missense + splice + frameshdel + frameshins + utr3 + ut
 rm(missense, splice, frameshdel, frameshins, utr3, utr5, nonstop, nonsense)
 gc()
 gdc_mut_count_patient <- gdc_mut_count_patient[rownames(gdc_mut_count_patient) %in% rownames(express_no_express_lookup),] ## filter data with genes in the express_no_express_lookup
-gdc_mut_count_patient[gdc_mut_count_patient > 0] <- 1 ## booleanize data, anything greater than 1 is equal to 1
+gdc_mut_count_patient[gdc_mut_count_patient > 0] <- 1 ## booleanize data, anything greater than 0 is equal to 1
 
 gdc_gene_exp_adj <- list()
 for(i in unique(tumor_samples$project_code)) {
@@ -497,27 +497,28 @@ df_lookup <- rbind(df_lookup, mx) ## cbind data
 
 pathway_order <- rownames(df_lookup) ## need to perserve the order of pathway for the next operation
 gdc_reactome_path_analysis <- df_lookup %>% mutate_if(is.numeric, ~1 * (. > 0)) %>% as.data.frame() %>% ## Mutate anything >0 to 1's (Booleanize data)
-  'rownames<-' (pathway_order) %>%
-  rownames_to_column(var = "PATH_ID") %>%
-  left_join(., pathname2level2, by = "PATH_ID") %>%
-  dplyr::select(-PATH_ID) %>% 
-  remove_rownames() %>% column_to_rownames(var = "PATH_NAME")
+  'rownames<-' (pathway_order) %>% ## rename rows with pathway order names
+  rownames_to_column(var = "PATH_ID") %>% ## move rownames to column
+  left_join(., pathname2level2, by = "PATH_ID") %>% ## leftjoin pathname with the data
+  dplyr::select(-PATH_ID) %>% ## get rid of the path id 
+  remove_rownames() %>% column_to_rownames(var = "PATH_NAME") ## move pathnameto rownames
 rm(df_missing, path_missing, mx, df_gene, sample_list, complete_path, pathway_order, df_lookup)
 gc()
 save(gdc_reactome_path_analysis, file = "gdc_reactome_path_analysis.Rda")
 ```
 
 ```{r tumor-clusters, eval = FALSE}
-####################
-## Figure 1A data ##
-####################
+###################
+## Figure 1 data ##
+###################
 load("../data/gdc_reactome_path_analysis.Rda")
 load("../data/gdc_tumor_coding_complete.Rdata")
 load("../data/gene2_level2_lookup.Rda")
 
-path_daisy <- daisy(t(gdc_reactome_path_analysis), type = list(symm  = c(1:col(gdc_reactome_path_analysis))))
+## Column distance metric for pheatmap
+path_daisy <- daisy(t(gdc_reactome_path_analysis), type = list(symm  = c(1:col(gdc_reactome_path_analysis)))) 
 path_daisy <- as.dist(as.matrix(path_daisy))
-
+## Row distance metric for pheatmap
 path_daisy_row <- daisy(gdc_reactome_path_analysis, type = list(symm  = c(1:nrow(gdc_reactome_path_analysis))))
 path_daisy_row <- as.dist(as.matrix(path_daisy_row))
 
@@ -535,17 +536,17 @@ pathway_dendro <- pheatmap(gdc_reactome_path_analysis,
          legend_breaks = c(0, 0.25, 0.75, 1),
          legend_labels = c("","Not Mut", "Mut", ""),
          color = c("grey", "firebrick3"),
-         clustering_method = "ward.D2",
+         clustering_method = "ward.D2", ## ward.D2 clustering
          legend = T)
 dev.off()
-pathway_dendro <- pathway_dendro$tree_row$order ## getting pathway row ordering
-df <- rownames(gdc_reactome_path_analysis)
-pathway_dendro <- df[pathway_dendro]
+pathway_dendro <- pathway_dendro$tree_row$order ## getting pathway row ordering (numerical values)
+df <- rownames(gdc_reactome_path_analysis) ## getting pathway name from the pathway analysis
+pathway_dendro <- df[pathway_dendro] ## Reorder the pathway names based on the ordering from pheatmap
 
 tumor_samples <- gdc_tumor_coding_complete %>% colData(.) %>%  ## get sample_id data from gdc
   as.data.frame(.) %>%
-  dplyr::select(project_code, submitted_sample_id, submitted_specimen_id) %>%  
-  mutate(project_code = gsub(pattern = "\\-.*", replacement = "", x = .$project_code))
+  dplyr::select(project_code, submitted_sample_id, submitted_specimen_id) %>%  ## selecting relevant colums
+  mutate(project_code = gsub(pattern = "\\-.*", replacement = "", x = .$project_code)) ## getting rid of the -US at the end of each cancer type
 
 cancer_type <- tumor_samples %>% .$project_code %>% unique %>% .[order(.)] ## get unique cancer_type
 
@@ -604,9 +605,9 @@ cancer_disrupt_heatmap$sample_id <- factor(cancer_disrupt_heatmap$sample_id, lev
 cancer_disrupt_heatmap <- left_join(cancer_disrupt_heatmap, cancer_order, by = "sample_id") ## add in cancer type information for faceting
 save(cancer_disrupt_heatmap, file = "cancer_disrupt_heatmap.Rda") 
 
-####################
-## Figure 1B data ##
-####################
+########################
+## Figure 2A + B data ##
+########################
 gdc_path <- gdc_reactome_path_analysis %>%
   t() %>%
   as.data.frame() %>%
@@ -626,7 +627,7 @@ gdc_path_mca$project_code <- NULL ## Remove project_code column from df
 pathway_list <- make_clean_names(colnames(gdc_path_mca))
 pathway_count <- length(pathway_list)
 gdc_path_mca <- as.data.frame(lapply(gdc_path_mca, function(x) {
-  factor(x, levels = c(0, 1), labels = c("no", "yes"))
+  factor(x, levels = c(0, 1), labels = c("no", "yes")) ## converting boolean values to categorical 'yes' or 'no'
 }))
 colnames(gdc_path_mca) <- pathway_list
 gdc_path_mca$project_code <- gdc_path_tumor_types
@@ -636,26 +637,27 @@ rownames(gdc_path_mca) <- gdc_path_sample_names
 mca_res <- MCA(X = gdc_path_mca[, pathway_list], graph = FALSE)
 
 expl_var <- mca_res$eig[, 2]
-expl_var_perm <- matrix(NA, ncol = length(mca_res$eig[, 2]), nrow = 100)
+expl_var_perm <- matrix(NA, ncol = length(mca_res$eig[, 2]), nrow = 100) ## creating a matrix for permutation data
 
 set.seed(4242)
-for (k in seq(100)) {
-  gdc_perm <- as.data.frame(lapply(gdc_path_mca[, pathway_list], sample))
-  MCA_perm <- MCA(X = gdc_perm, graph = FALSE)
-  expl_var_perm[k, ] <- MCA_perm$eig[, 2]
+for (k in seq(100)) { ## Perform 100 permutation MCA analysis
+  gdc_perm <- as.data.frame(lapply(gdc_path_mca[, pathway_list], sample)) ## permute data
+  MCA_perm <- MCA(X = gdc_perm, graph = FALSE) ## perform MCA analysis 
+  expl_var_perm[k, ] <- MCA_perm$eig[, 2] ## Store data in mx. 
 }
 
 randomize <- tibble(
   eigenvalue = 1:length(expl_var),
-  expl_var = expl_var,
-  perm = colMeans(expl_var_perm),
+  expl_var = expl_var, ## observed explained variance
+  perm = colMeans(expl_var_perm), ## mean permuted explained variance
   pvalue = rowSums(t(expl_var_perm) >= expl_var) / 100
 )
 
+## Determining the optimal mca dimension
 optimal_mca_dimensions <- randomize %>%
-  filter(pvalue < 0.05) %>%
-  filter(eigenvalue == max(eigenvalue)) %>%
-  pull(eigenvalue)
+  filter(pvalue < 0.05) %>% ## filtering for pvalue < 0.05
+  filter(eigenvalue == max(eigenvalue)) %>% ## filtering for the maximum eigenvalue
+  pull(eigenvalue) 
 
 mca_res <- MCA(
   X = gdc_path_mca[, pathway_list],
@@ -665,7 +667,7 @@ mca_res <- MCA(
 save(randomize, mca_res, file = "figure1B_data.rda")
 
 ####################
-## Figure 1C data ##
+## Figure 2C data ##
 ####################
 n_iter <- 40
 max_n_pt <- 200
@@ -674,16 +676,16 @@ r <- rng[[3649]]
 
 rngtools::setRNG(r)
 gdc.umap <- umap(mca_res$ind$coord, 
-                 n_components = 3,
-                 n_neighbors = round(sqrt(nrow(mca_res$ind$coord))), # 87
-                 n_epochs = 1000,
+                 n_components = 3, ## reducing mca 36 dimension into 3 dimension
+                 n_neighbors = round(sqrt(nrow(mca_res$ind$coord))), ## 87; which is the sqrt of sample size 7,607
+                 n_epochs = 1000, ## number of times to find clusters
                  n_threads = 1)
 gdc_umap_coors <- as.data.frame(gdc.umap) %>%
-  rename(plot_x = V1, plot_y = V2, plot_z = V3)
-rownames(gdc_umap_coors) <- rownames(gdc_path_mca)
+  rename(plot_x = V1, plot_y = V2, plot_z = V3) # extract x, y, z coordinates from umap
+rownames(gdc_umap_coors) <- rownames(gdc_path_mca) 
 
 ####################
-## Figure 1D data ##
+## Figure 2D data ## Optimization of HDBscan
 ####################
 n_iter <- 40
 max_n_pt <- 200
@@ -733,14 +735,14 @@ optimal_minPts <- score_df %>%
 save(score_df, sample_df, optimal_minPts, file = "optimal_minpts_score.rda")
 
 ####################
-## Figure 1E data ##
+## Figure 2E data ## HDBscan umap to find clusters
 ####################
 rngtools::setRNG(r)
 
 cluster_umap <- umap(mca_res$ind$coord,
   min_dist = 1e-6,
   n_components = 3,
-  n_neighbors = round(sqrt(nrow(mca_res$ind$coord))),
+  n_neighbors = round(sqrt(nrow(mca_res$ind$coord))), 
   n_epochs = 1000,
   n_threads = 1
 )
@@ -757,7 +759,7 @@ umap_3d_coors <- gdc_umap_coors %>%
 ## clust 0 is unclassified cluster                       
 
 ####################
-## Figure 1F data ##
+## Figure 2F data ## kNN clustering of unclassified clusters
 ####################
 ## reclassifying clust 0 using our classified cluster as training test and unclassified as test set
 umap_3d_coors$clust_knn <- umap_3d_coors$clust
@@ -767,9 +769,9 @@ umap_3d_coors$clust_knn[umap_3d_coors$clust == 0] <- class::knn(
   cl = umap_3d_coors$clust[umap_3d_coors$clust != 0], k = 87
 )
 
-####################
-## Figure 1G data ##
-####################
+###################
+## Figure 4 data ## Mutation count
+###################
 missense <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$missense) ## reading in mutation data from SE
 splice <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$splice)
 frameshdel <- as.data.frame(SummarizedExperiment::assays(gdc_tumor_coding_complete)$frameshdel)
@@ -791,12 +793,12 @@ umap_3d_coors <- left_join(umap_3d_coors, mutation_count, by = "sample_id")
 rm(mutation_count)
 
 ####################
-## Figure 1H data ##
+## Figure 3A data ## Cancer type projections on UMAP
 ####################
 umap_3d_coors <- left_join(umap_3d_coors, tumor_samples[,c("project_code", "submitted_sample_id")], by = c("sample_id" = "submitted_sample_id"))
 
 ####################
-## Figure 1I data ##
+## Figure 3B data ## Subtype projections on UMAP
 ####################
 ## getting subtype information on our cancer type
 subtypes <- PanCancerAtlas_subtypes() 
@@ -818,14 +820,14 @@ umap_3d_coors <- umap_3d_coors %>%
   dplyr::select(-pan.samplesID)
 
 ##########################
-## Figure 1K and L data ##
+## Figure 3D and E data ## Staging and metastasis projection onto UMAP
 ##########################
 ## getting tumor_metastasis, staging
 tcga_clinical_tumor_staging <- list()
 for(n in cancer_type) {
   print(n)
   cancername <- paste0("TCGA-",n)
-  query <- GDCquery(project = cancername,
+  query <- GDCquery(project = cancername, ## downloading clinical data for each cancer type using TCGAbiolink
                   data.category = "Clinical",
                   data.type = "Clinical Supplement",
                   data.format = "BCR Biotab",
@@ -833,27 +835,29 @@ for(n in cancer_type) {
   GDCdownload(query)
   clinical <- GDCprepare(query)[[1]]
   if("ajcc_pathologic_tumor_stage" %in% colnames(clinical) & "ajcc_tumor_pathologic_pt" %in% colnames(clinical) == T) {
-    cat("Yep, ajcc info in there!\n")
+    cat("Yep, ajcc info in there!\n") ## If all relevant info is there. Do this.
     clinical <- clinical[-c(1:2), c("bcr_patient_barcode","ajcc_pathologic_tumor_stage", "ajcc_tumor_pathologic_pt", "ajcc_metastasis_pathologic_pm")]
   }
-  if(!"ajcc_pathologic_tumor_stage" %in% colnames(clinical) & "clinical_stage" %in% colnames(clinical) & "ajcc_tumor_pathologic_pt" %in% colnames(clinical)== T) {
-    cat("Nope, ajcc stage not there, but pathologic scores is!\n")
-    clinical <- clinical[-c(1:2), c("bcr_patient_barcode", "clinical_stage", "ajcc_tumor_pathologic_pt", "ajcc_metastasis_pathologic_pm")]
+  if(!"ajcc_pathologic_tumor_stage" %in% colnames(clinical) & "clinical_stage" %in% colnames(clinical) & "ajcc_tumor_pathologic_pt" %in% colnames(clinical)== T) { 
+    cat("Nope, ajcc stage not there, but pathologic scores is!\n") ## If ajcc_pathologic_tumor_stage is not there. Do this.
+    clinical <- clinical[-c(1:2), c("bcr_patient_barcode", "clinical_stage", "ajcc_tumor_pathologic_pt", "ajcc_metastasis_pathologic_pm")] ## Use clinical stage in place of ajcc pathologic tumor stage
     names(clinical) <- c("bcr_patient_barcode","ajcc_pathologic_tumor_stage", "ajcc_tumor_pathologic_pt", "ajcc_metastasis_pathologic_pm")
   }
   if(!"ajcc_pathologic_tumor_stage" %in% colnames(clinical) & "clinical_stage" %in% colnames(clinical) & !"ajcc_tumor_pathologic_pt" %in% colnames(clinical) & "pathologic_T" %in% colnames(clinical) == T) {
-    cat("Nope, ajcc info not there!\n")
+    cat("Nope, ajcc info not there!\n") ##If ajcc pathologic tumor stage andpathologic pt is not there. Do this
     clinical <- clinical[-c(1:2), c("bcr_patient_barcode", "clinical_stage", "pathologic_T", "pathologic_M")]
-    names(clinical) <- c("bcr_patient_barcode","ajcc_pathologic_tumor_stage", "ajcc_tumor_pathologic_pt", "ajcc_metastasis_pathologic_pm")
-    }
+    names(clinical) <- c("bcr_patient_barcode","ajcc_pathologic_tumor_stage", "ajcc_tumor_pathologic_pt", "ajcc_metastasis_pathologic_pm") ## Use clinical stage in place of ajcc pathologic tumor stage, and pathologic T in place of ajcc tumor pathologic pt.
+  }
+  ## If ajcc pathologic tumor stage and clinical stage is not present, skip to next
   if(!"ajcc_pathologic_tumor_stage" %in% colnames(clinical) & !"clinical_stage" %in% colnames(clinical) == T) next
+  ## If ajcc_pathologic tumor stage is present and not ajcc_tumor_pathologic pt, skip to next
   if("ajcc_pathologic_tumor_stage" %in% colnames(clinical) & !"ajcc_tumor_pathologic_pt" %in% colnames(clinical) == T) next
-  tcga_clinical_tumor_staging[[n]] <- clinical
+  tcga_clinical_tumor_staging[[n]] <- clinical ## store data in list
 }
 
 tcga_clinical_tumor_staging <- do.call(rbind, tcga_clinical_tumor_staging) ## rbind the list together
 tcga_clinical_tumor_staging <- tcga_clinical_tumor_staging[tcga_clinical_tumor_staging$bcr_patient_barcode %in% tumor_subtypes,] ## We have 6633 out of 7607 tumor data
-missing_sample <- as.data.frame(matrix(data = "NA", nrow = length(tumor_subtypes[!tumor_subtypes %in% tcga_clinical_tumor_staging$bcr_patient_barcode]), ncol = length(tcga_clinical_tumor_staging) -1 ))
+missing_sample <- as.data.frame(matrix(data = "NA", nrow = length(tumor_subtypes[!tumor_subtypes %in% tcga_clinical_tumor_staging$bcr_patient_barcode]), ncol = length(tcga_clinical_tumor_staging) -1 )) ## creating df of NA's for missing samples 
 
 tcga_clinical_tumor_staging <- missing_sample %>% 'colnames<-' (names(tcga_clinical_tumor_staging[-1])) %>% ## colnames based on tcga_clinical_tumor_staging
   mutate(bcr_patient_barcode = tumor_subtypes[!tumor_subtypes %in% tcga_clinical_tumor_staging$bcr_patient_barcode]) %>%
@@ -867,6 +871,7 @@ umap_3d_coors <- umap_3d_coors %>%
   left_join(., tcga_clinical_tumor_staging, by = "bcr_patient_barcode") %>% ## left_join clinical data to umap
   dplyr::select(-bcr_patient_barcode)
 
+## Convert metastasis inputs into set categorical values
 M0 <- umap_3d_coors$ajcc_metastasis_pathologic_pm %in% c("cM0 (i+)", "M0")
 M1 <- umap_3d_coors$ajcc_metastasis_pathologic_pm %in% c("M1", "M1a", "M1b", "M1c")
 NA.value <- umap_3d_coors$ajcc_metastasis_pathologic_pm %in% c("[Discrepancy]", "[Not Applicable]", "[Not Available]", "MX")
@@ -875,6 +880,7 @@ umap_3d_coors$ajcc_metastasis_pathologic_pm[M0] <- "M0"
 umap_3d_coors$ajcc_metastasis_pathologic_pm[M1] <- "M1"
 umap_3d_coors$ajcc_metastasis_pathologic_pm[NA.value] <- "NA"
 
+## Convert stage inputs into set categorical values
 stage1 <- umap_3d_coors$ajcc_pathologic_tumor_stage %in% c("Stage I", "Stage IA", "Stage IA1", "Stage IA2", "Stage IB", "Stage IB1", "Stage IB2", "Stage IC")
 stage2 <- umap_3d_coors$ajcc_pathologic_tumor_stage %in% c("Stage II", "Stage IIA", "Stage IIA1", "Stage IIA2", "Stage IIB", "Stage IIC")
 stage3 <- umap_3d_coors$ajcc_pathologic_tumor_stage %in% c("Stage III", "Stage IIIA", "Stage IIIB", "Stage IIIC", "Stage IIIC1", "Stage IIIC2")
