@@ -1,0 +1,238 @@
+---
+runtime: shiny
+output: 
+  bookdown::html_document2:
+    fig_captions: TRUE
+    number_sections: FALSE
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 2
+    code_folding: hide
+    theme: flatly
+    smart: true
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, dpi=600, warning = FALSE)
+suppressPackageStartupMessages(c(
+library(shiny),
+library(tidyverse),
+library(SummarizedExperiment),
+library(plot3D),
+library(data.table)
+))
+```
+
+## Interactive Supplemental File {.tabset}
+
+### Cancer type
+```{r shiny-widget, echo = FALSE}
+## Code to get tumor sample id and associated cancer type
+# load("../data/gdc_tumor_coding_complete.Rdata")
+# tumor_samples <- gdc_tumor_coding_complete %>% colData(.) %>% 
+#   as.data.frame(.) %>%
+#   dplyr::select(project_code, submitted_specimen_id) %>% 
+#   mutate(project_code = gsub(pattern = "\\-.*", replacement = "", x = .$project_code))
+# save(tumor_samples, file = "../data/tumor_samples.Rda")
+
+load("../data/tumor_samples.Rda") ## load tumor samples data
+
+cancer_type <- tumor_samples %>% .$project_code %>% unique %>% ## get cancer type info
+  .[order(.)] ## Order alphabetically
+
+selectInput("cancer_type", label = "Cancer type",
+              choices = cancer_type, selected = "BRCA")
+```
+
+```{r, fig.align='center'}
+umap_cancertype <- fread("../data/umap_3d_coors.tsv") ## load data
+
+kelly.colours <- c("gray95", "gray13", "gold2", "plum4", "darkorange1",
+                   "lightskyblue2", "firebrick", "burlywood3", "gray51", "springgreen4",
+                   "lightpink2", "deepskyblue4", "lightsalmon2", "mediumpurple4",
+                   "orange", "maroon", "yellow3", "brown4", "yellow4", "sienna4", "chocolate", "gray19")
+
+ditto_color <- c(
+  "#E69F00", "#56B4E9", "#009E73", "#F0E442",
+  "#0072B2", "#D55E00", "#CC79A7", "#666666",
+  "#AD7700", "#1C91D4", "#007756", "#D5C711",
+  "#005685", "#A04700", "#B14380", "#4D4D4D",
+  "#FFBE2D", "#80C7EF", "#00F6B3", "#F4EB71",
+  "#06A5FF", "#FF8320", "#D99BBD", "#8C8C8C",
+  "#FFCB57", "#9AD2F2", "#2CFFC6", "#F6EF8E",
+  "#38B7FF", "#FF9B4D", "#E0AFCA", "#A3A3A3",
+  "#8A5F00", "#1674A9", "#005F45", "#AA9F0D",
+  "#00446B", "#803800", "#8D3666", "#3D3D3D")
+
+cluster.colours <- c(kelly.colours[c(3:12)])
+names(cluster.colours) <- c(1:10)
+
+renderPlot({
+  par(mfrow = c(1,2), mai = c(0.1, 0.1, 0.1, 0.1))
+  par(mar = c(2,2,0,0))
+
+  with(umap_cancertype %>% ## using umap_cancertype data
+       filter(project_code == input$cancer_type), ## Only include selected cancer type
+     scatter3D(plot_y, -plot_z, plot_x, ## Plot cancer type using umap 3d coors
+                                bg = cluster.colours[as.character(clust_knn)], pch = 21, cex = 0.8, lwd = 0.2,
+                                theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+                                colvar = NULL))
+  title(xlab="UMAP 2", line=-3, cex = 1.2)
+  
+  ## Class frequency
+  class_freq <- umap_cancertype %>% dplyr::select(clust_knn, project_code) %>% ## select relevant columns
+    .[.$project_code %in% input$cancer_type,] %>% ## Only include selected cancer type
+    mutate(clust_knn = as.character(.$clust_knn)) ## Convert cluster membership to character
+  
+  freq_by_class <- list() ## created list to store data in the for loop below
+  
+  for(n in seq_along(1:max(umap_cancertype$clust_knn))) { ## Seq along clusters 1-10
+    df <- data.frame(clust_knn = n,
+                     freq = nrow(class_freq[class_freq$clust_knn %in% n, ]), ## count number of tumor in each cluster
+                     stringsAsFactors = FALSE)
+    freq_by_class[[n]] <- df ## store data in list
+  }
+  freq_by_class <- freq_by_class %>% do.call(rbind, .) %>% ## rbind list
+    mutate(clust_knn = factor(x = as.character(.$clust_knn), levels = as.character(c(1:max(umap_cancertype$clust_knn))))) ## turn to factor and relevel 
+  par(mar = c(4,6,2,0) + 0.1)
+  barplot(height = freq_by_class$freq / nrow(class_freq), ## freq / tot_n_cancertype 
+          names.arg = c(1:10), col = cluster.colours,
+          ylab = "Relative Proportion",
+          las = 1) ## always horizontal axis
+})
+
+renderPlot({
+  par(mfrow = c(1,2), mai = c(0.1, 0.1, 0.1, 0.1))
+  par(mar = c(2,2,0,0))
+  
+  spec_cancer <- umap_cancertype %>% filter(project_code == input$cancer_type) %>% ## Filter for selected cancer type
+    dplyr::select(plot_x, plot_y, plot_z, Subtype_Selected) ## Select relevant column 
+  spec_cancer[is.na(spec_cancer)] <- "NA" ## Convert NA to character "NA"
+  
+  s_name <- unique(spec_cancer$Subtype_Selected) ## What are the subtype names
+  s_name <- s_name[order(s_name,na.last=T)] ## Order the names ABC and have NA last
+  
+  
+  s_color <- ditto_color[c(2:(length(s_name) + 1))]
+  names(s_color) <- s_name
+  ## color scheme
+  with(spec_cancer,
+     scatter3D(plot_y, -plot_z, plot_x, 
+                                bg = s_color, pch = 21, cex = 0.8, lwd = 0.2,
+                                theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+                                colvar = NULL))
+  title(xlab="UMAP 2", line=-3)
+  legend("top", inset = c(0.12), legend=names(s_color[1:2]), col=s_color[1:2], pch = 20, bty = "n", horiz = T, cex = 1.2)
+  legend("top", inset = c(0.17), legend=names(s_color[3:4]), col=s_color[3:4], pch = 20, bty = "n", horiz = T, cex = 1.2)
+  legend("top", inset = c(0.22), legend=names(s_color[5:6]), col=s_color[5:6], pch = 20, bty = "n", horiz = T, cex = 1.2)
+  legend("top", inset = c(0.27), legend=names(s_color[7:8]), col=s_color[7:8], pch = 20, bty = "n", horiz = T, cex = 1.2)
+  
+  # Subtype frequency
+  class_freq <- umap_cancertype %>% dplyr::select(clust_knn, project_code, Subtype_Selected) %>%
+    .[.$project_code %in% input$cancer_type,] %>%
+    dplyr::select(-project_code) %>%
+    mutate(clust_knn = as.character(.$clust_knn))
+  class_freq[is.na(class_freq)] <- "NA"
+
+  class_freq$clust_knn <- factor(class_freq$clust_knn, levels = 1:10)
+  counts <- table(class_freq$Subtype_Selected, class_freq$clust_knn)
+
+  for(n in 1:ncol(counts)) {
+    message(n)
+    tot_n_clust <- sum(counts[,n])
+    counts[,n] <- round(counts[,n] / tot_n_clust, digits = 3)
+  }
+  sum(counts[,1])
+  
+  par(mar = c(4,6,2,0) + 0.1)
+  barplot(height = counts,
+          names.arg = c(1:10), col = s_color,
+          ylab = "Relative Proportion",
+          las = 1) ## always horizontal axis
+})
+```
+
+### Gene
+```{r gene-data-processing, eval = FALSE}
+load("../data/gdc_gene_exp_adj.Rda")
+load("../data/gene2_level2_lookup.Rda")
+load("../data/gene_data.Rda")
+
+## Only include genes that were used in our pathway analysis
+supplemental_gene <- gdc_gene_exp_adj %>% .[rownames(.) %in% rownames(gene2level2_lookup),] %>%
+  rownames_to_column(var = "ensembl_gene_id") %>%
+  left_join(., gene_data[,c("ensembl_gene_id", "external_gene_name")]) %>%
+  dplyr::select(-ensembl_gene_id) %>%
+  column_to_rownames(var = "external_gene_name") %>%
+  t() %>% as.data.frame()
+
+save(supplemental_gene, file = "../data/supplemental_gene.Rda")
+rm(list = ls(all.names = T))
+gc()
+```
+
+```{r gene-widet, echo = FALSE}
+load("../data/supplemental_gene.Rda")
+
+gene <- colnames(supplemental_gene) ## get gene names
+gene <- gene[order(gene)] ## order alphabetically
+
+selectInput("gene", label = "Gene",
+              choices = gene, selected = "TP53")
+```
+
+```{r gene-plot}
+
+renderPlot({
+  par(mfrow = c(1,2), mai = c(0.1, 0.1, 0.1, 0.1)) ## creating plot layout 1 x 2
+  par(mar = c(2,2,0,0))
+  with(supplemental_gene %>% dplyr::select(input$gene) %>% ## filtering for gene
+    "colnames<-" ("selectedgene") %>% ## rename column
+    rownames_to_column(var = "sample_id") %>% ## move sample id to column
+    left_join(umap_cancertype[,c("plot_x", "plot_y", "plot_z", "sample_id")], ., by = "sample_id") %>% ## left join data by sample_id
+    filter(selectedgene == 1), ## only select tumor samples that have a mutation in the selected gene
+    scatter3D(plot_y, -plot_z, plot_x, 
+                                bg = "grey", pch = 21, cex = 0.8, lwd = 0.2,
+                                theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+                                colvar = NULL))
+  title(xlab="UMAP 2", line=-3, cex = 1.2)
+})
+```
+
+### Pathway
+```{r pathway-widget}
+load("../data/gdc_reactome_path_analysis.Rda")
+
+pathway <- rownames(gdc_reactome_path_analysis) ## get pathway names
+pathway <- pathway[order(pathway)] ## order alphabetically
+
+selectInput("pathway", label = "Pathway",
+              choices = pathway, selected = "Cellular response to hypoxia")
+```
+
+```{r pathway-plot}
+
+renderPlot({
+  par(mfrow = c(1,2), mai = c(0.1, 0.1, 0.1, 0.1)) ## creating plot layout 1 x 2
+  par(mar = c(2,2,0,0))
+  with(gdc_reactome_path_analysis %>% t() %>% as.data.frame() %>% ## transpose data for left_joining later
+    dplyr::select(input$pathway) %>% ## filtering for pathway
+    "colnames<-" ("selectedpath") %>% ## rename column
+    rownames_to_column(var = "sample_id") %>% ## move sample id to column
+    left_join(umap_cancertype[,c("plot_x", "plot_y", "plot_z", "sample_id")], ., by = "sample_id") %>% ## left join data by sample_id
+    filter(selectedpath == 1), ## only select tumor samples that have a mutation in the selected gene
+    scatter3D(plot_y, -plot_z, plot_x, 
+                                bg = "grey", pch = 21, cex = 0.8, lwd = 0.2,
+                                theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+                                colvar = NULL))
+  title(xlab="UMAP 2", line=-3, cex = 1.2)
+})
+```
