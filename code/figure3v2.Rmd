@@ -1,34 +1,29 @@
 ```{r figure-3-plot, message=FALSE, warning=FALSE, fig.width= 9, fig.height= 3}
 umap_cancertype <- fread("../data/umap_3d_coors.tsv")
+load("../data/kelly.colours.rda")
 
-kelly.colours <- c("gray95", "gray13", "gold2", "plum4", "darkorange1",
-                   "lightskyblue2", "firebrick", "burlywood3", "gray51", "springgreen4",
-                   "lightpink2", "deepskyblue4", "lightsalmon2", "mediumpurple4",
-                   "orange", "maroon", "yellow3", "brown4", "yellow4", "sienna4", "chocolate", "gray19")
-## mutation burden plot
+## Arranging mutation freq for each cluster
 mut_order <- list() ## store data in list 
 for(n in 1:max(as.numeric(as.character(umap_cancertype$clust_knn)))) { ## loop through all the clusters
-  message(n)
   mut_order[[n]] <- umap_cancertype %>% filter(clust_knn == n) %>%  ## filter for specific class
     dplyr::select(sample_id, plot_x, plot_y, clust_knn, mut_count) %>% ## select relevant columns
     arrange(mut_count) ## arrange mutation in increasing order
 }
 mut_order <- mut_order %>% do.call(rbind, .) %>% as.data.frame() ## rbind list
 
+## Convert sample_id and clust_knn into factor
 mut_order$sample_id <- factor(mut_order$sample_id, levels = mut_order$sample_id)
 mut_order$clust_knn <- factor(mut_order$clust_knn, levels = c(1:10))
 
-## Need the breaks positions for the x-axis
+## Determing the breaks positions for the x-axis
 previous_class <- 0 ## starting position 1
 position_of_previous_class <- 0 ## starting position 2
-xaxis_breaks <- list() ## list for for loop
-for(n in 1) { ## loop through 1 to 12 clusters
-  message(n)
+xaxis_breaks <- list() ## list for the for loop
+for(n in 1) { ## loop through 1 to 10 clusters
   class_spec <- round(mut_order %>% filter(clust_knn == n) %>% nrow(.) / 2, digits = 0) ## calculate halfway mark of class 
   xaxis_breaks[[n]] <- class_spec + previous_class + position_of_previous_class ## adding up all variables
   previous_class <- class_spec ## storing class halfway mark
   for(n in 2:max(as.numeric(as.character(mut_order$clust_knn)))) {
-    message(n)
     position_of_previous_class <- xaxis_breaks[[n-1]] ## getting the previous class position
     class_spec <- round(mut_order %>% filter(clust_knn == n) %>% nrow(.) / 2, digits = 0) ## calculate halfway mark of new class
     xaxis_breaks[[n]] <- class_spec + previous_class + position_of_previous_class ## adding up all variables
@@ -42,11 +37,12 @@ total_n <- as.data.frame(table(mut_order$clust_knn)) ## getting total n in clust
 
 mut_order$log10mut <- log10(mut_order$mut_count + 1) ## mutation count log transformation + pseudo count
 
+## Calculate median for each class
 mut_median <- mut_order %>% 
   group_by(clust_knn) %>% 
-  dplyr::summarize(mut_med = median(log10mut)) ## calculate median for each class
+  dplyr::summarize(mut_med = median(log10mut)) 
 
-## Need to add 50 pseudo samples front and end of data so they don't touch the y-axis
+## Need to add 100 pseudo samples front and end of data so they don't touch the y-axis
 mut_order <- mut_order[,c("sample_id", "clust_knn", "log10mut")] ## selecting relevant column
 
 begin_NA <- data.frame(sample_id = paste0("sample", 1:100), 
@@ -65,8 +61,8 @@ fig1G <- ggplot(mut_order, aes(x = sample_id, y = log10mut, color = clust_knn)) 
   ylab("Log10(Mutation Count)") + 
   xlab("") +
   theme_classic() +
-  facet_wrap(~ factor(clust_knn, levels = c(1:10)), ncol = 10, scales = "free_x") +
-  geom_hline(data= mut_median, aes(yintercept=mut_med)) +
+  facet_wrap(~ factor(clust_knn, levels = c(1:10)), ncol = 10, scales = "free_x") + ## facet by cluster
+  geom_hline(data= mut_median, aes(yintercept=mut_med)) + ## add median line
   scale_y_continuous(sec.axis = sec_axis(~.)) + ## dup y-axis
   scale_x_discrete(breaks = c(as.character(mut_order$sample_id[1]), as.character(xaxis_breaks$sample_id)), labels = c("n =" ,total_n$Freq)) +
   theme(axis.text.x = element_text(size = 10),
@@ -85,10 +81,11 @@ fig1G <- ggplot(mut_order, aes(x = sample_id, y = log10mut, color = clust_knn)) 
 
 ## code to keep only the bottom border line of the facet
 fig1G <- ggplotGrob(fig1G)
-lg <- linesGrob(x=unit(c(0,1),"npc"), y=unit(c(0,0),"npc"), 
+
+lg <- linesGrob(x=unit(c(0,1),"npc"), y=unit(c(0,0),"npc"), ## All lines off expect bottom line of facet
                    gp=gpar(col="black", lwd=4))
 
-for (k in grep("strip-t",fig1G$layout$name)) {
+for (k in grep("strip-t",fig1G$layout$name)) { ## turn off 3 lines from the facet border text
   fig1G$grobs[[k]]$grobs[[1]]$children[[1]] <- lg
 }
 

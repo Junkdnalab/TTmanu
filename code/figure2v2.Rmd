@@ -1,261 +1,91 @@
-```{r figure-2-data-generation, eval = FALSE}
-####################
-## Figure 1B data ##
-####################
-gdc_path <- gdc_reactome_path_analysis %>%
-  t() %>%
-  as.data.frame() %>%
-  rownames_to_column(var = "sample") %>% ## move path_names to column
-  .[match(tumor_samples$submitted_sample_id, .$sample), ]
-
-gdc_path_mca <- left_join(gdc_path, tumor_samples[, c("project_code", "submitted_sample_id")],
-  by = c("sample" = "submitted_sample_id")) %>%
-  column_to_rownames(var = "sample")
-
-gdc_path_sample_names <- rownames(gdc_path_mca) ## Getting sample id order
-gdc_path_tumor_types <- gdc_path_mca$project_code ## Getting cancer type order
-
-gdc_path_mca$project_code <- NULL ## Remove project_code column from df
-
-## create a categorical variable from the boolean variable
-pathway_list <- make_clean_names(colnames(gdc_path_mca))
-pathway_count <- length(pathway_list)
-gdc_path_mca <- as.data.frame(lapply(gdc_path_mca, function(x) {
-  factor(x, levels = c(0, 1), labels = c("no", "yes"))
-}))
-colnames(gdc_path_mca) <- pathway_list
-gdc_path_mca$project_code <- gdc_path_tumor_types
-rownames(gdc_path_mca) <- gdc_path_sample_names
-
-## perform mca
-mca_res <- MCA(X = gdc_path_mca[, pathway_list], graph = FALSE)
-
-expl_var <- mca_res$eig[, 2]
-expl_var_perm <- matrix(NA, ncol = length(mca_res$eig[, 2]), nrow = 100)
-
-set.seed(4242)
-for (k in seq(100)) {
-  gdc_perm <- as.data.frame(lapply(gdc_path_mca[, pathway_list], sample))
-  MCA_perm <- MCA(X = gdc_perm, graph = FALSE)
-  expl_var_perm[k, ] <- MCA_perm$eig[, 2]
-}
-
-randomize <- tibble(
-  eigenvalue = 1:length(expl_var),
-  expl_var = expl_var,
-  perm = colMeans(expl_var_perm),
-  pvalue = rowSums(t(expl_var_perm) >= expl_var) / 100
-)
-
-optimal_mca_dimensions <- randomize %>%
-  filter(pvalue < 0.05) %>%
-  filter(eigenvalue == max(eigenvalue)) %>%
-  pull(eigenvalue)
-
-mca_res <- MCA(
-  X = gdc_path_mca[, pathway_list],
-  ncp = optimal_mca_dimensions, graph = FALSE
-)
-
-save(randomize, mca_res, file = "figure1B_data.rda")
-
-####################
-## Figure 1C data ##
-####################
-n_iter <- 40
-max_n_pt <- 200
-rng <- RNGseq(max_n_pt * n_iter, 42)
-r <- rng[[3649]]
-
-rngtools::setRNG(r)
-gdc.umap <- umap(mca_res$ind$coord, 
-                 n_components = 3,
-                 n_neighbors = round(sqrt(nrow(mca_res$ind$coord))), # 87
-                 n_epochs = 1000,
-                 n_threads = 1)
-gdc_umap_coors <- as.data.frame(gdc.umap) %>%
-  rename(plot_x = V1, plot_y = V2, plot_z = V3)
-rownames(gdc_umap_coors) <- rownames(gdc_path_mca)
-
-####################
-## Figure 1D data ##
-####################
-n_iter <- 40
-max_n_pt <- 200
-score_mca <- matrix(as.numeric(NA), nrow = max_n_pt - 2, ncol = n_iter)
-
-n_tumors <- nrow(mca_res$ind$coord)
-
-cl <- makeCluster(8)
-registerDoParallel(cl)
-
-for (i in 3:max_n_pt) {
-  print(paste0("MIN POINTS = ", i))
-  score_iter <- foreach(1:n_iter,
-    .combine = c,
-    .export = c("mca_res"),
-    .packages = c("dbscan", "uwot"),
-    r = rng[(i - 1) * n_iter + 1:n_iter]
-  ) %dopar% {
-    rngtools::setRNG(r)
-    umap_init_mca <- umap(mca_res$ind$coord, 
-                          min_dist = 1e-6, 
-                          n_components = 3, 
-                          n_neighbors = round(sqrt(nrow(mca_res$ind$coord))), 
-                          n_epochs = 1000, 
-                          n_threads = 1)
-    res <- hdbscan(umap_init_mca, minPts = i)
-    score_iter_temp <- sum(res$membership_prob < 0.05) / n_tumors
-    return(score_iter_temp)
-  }
-  score_mca[i - 2, ] <- score_iter
-}
-
-score <- rowMeans(score_mca)
-score_df <- tibble(minPts = 3:max_n_pt, score = score)
-
-sample_df <- score_mca %>%
-  as.data.frame() %>%
-  as_tibble() %>%
-  add_column(minPts = 3:max_n_pt, .before = 1) %>%
-  pivot_longer(-minPts) %>%
-  group_by(minPts)
-
-optimal_minPts <- score_df %>%
-  filter(score == min(score)) %>%
-  pull(minPts)
-
-save(score_df, sample_df, optimal_minPts, file = "optimal_minpts_score.rda")
-
-####################
-## Figure 1E data ##
-####################
-rngtools::setRNG(r)
-
-cluster_umap <- umap(mca_res$ind$coord,
-  min_dist = 1e-6,
-  n_components = 3,
-  n_neighbors = round(sqrt(nrow(mca_res$ind$coord))),
-  n_epochs = 1000,
-  n_threads = 1
-)
-colnames(cluster_umap) <- c("cluster_x", "cluster_y", "cluster_z")
-hdb_cluster_assignment <- hdbscan(cluster_umap, minPts = optimal_minPts)
-umap_3d_coors <- gdc_umap_coors %>%
-  bind_cols(as.data.frame(cluster_umap)) %>%
-  mutate(
-    n_pathways_mut = rowSums(gdc_path[, -1]),
-    clust = as.factor(hdb_cluster_assignment$cluster),
-    member_prob = hdb_cluster_assignment$membership_prob,
-    sample_id = rownames(gdc_umap_coors)
-  )
-## clust 0 is unclassified cluster                       
-
-####################
-## Figure 1F data ##
-####################
-## reclassifying clust 0 using our classified cluster as training test and unclassified as test set
-umap_3d_coors$clust_knn <- umap_3d_coors$clust
-umap_3d_coors$clust_knn[umap_3d_coors$clust == 0] <- class::knn(
-  train = umap_3d_coors[which(umap_3d_coors$clust != 0), c("cluster_x", "cluster_y", "cluster_z")],
-  test = umap_3d_coors[which(umap_3d_coors$clust == 0), c("cluster_x", "cluster_y", "cluster_z")],
-  cl = umap_3d_coors$clust[umap_3d_coors$clust != 0], k = 87
-)
-```
-
 ```{r figure-2-plot, fig.width = 9}
-load("../data/figure1B_data.rda")
-optimal_mca_dimensions <- randomize %>%
-  filter(pvalue < 0.05) %>%
-  filter(eigenvalue == max(eigenvalue)) %>%
-  pull(eigenvalue)
-umap_cancertype <- data.table::fread("../data/umap_3d_coors.tsv")
-kelly.colours <- c("gray95", "gray13", "gold2", "plum4", "darkorange1",
-                   "lightskyblue2", "firebrick", "burlywood3", "gray51", "springgreen4",
-                   "lightpink2", "deepskyblue4", "lightsalmon2", "mediumpurple4",
-                   "orange", "maroon", "yellow3", "brown4", "yellow4", "sienna4", "chocolate", "gray19")
-ditto_color <- c(
-  "#E69F00", "#56B4E9", "#009E73", "#F0E442",
-  "#0072B2", "#D55E00", "#CC79A7", "#666666",
-  "#AD7700", "#1C91D4", "#007756", "#D5C711",
-  "#005685", "#A04700", "#B14380", "#4D4D4D",
-  "#FFBE2D", "#80C7EF", "#00F6B3", "#F4EB71",
-  "#06A5FF", "#FF8320", "#D99BBD", "#8C8C8C",
-  "#FFCB57", "#9AD2F2", "#2CFFC6", "#F6EF8E",
-  "#38B7FF", "#FF9B4D", "#E0AFCA", "#A3A3A3",
-  "#8A5F00", "#1674A9", "#005F45", "#AA9F0D",
-  "#00446B", "#803800", "#8D3666", "#3D3D3D")
-cluster.colours <- c("grey", kelly.colours[c(3:12)])
-names(cluster.colours) <- c(0:10)
+load("../data/figure1B_data.rda") ## Load in data processed in figure1.Rmd
 load("../data/optimal_minpts_score.rda")
+umap_cancertype <- data.table::fread("../data/umap_3d_coors.tsv")
+load("../data/kelly.colours.rda")
+load("../data/ditto.colours.rda")
 
-opar <- par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1))
-par(mar = c(4,6,2,0) + 0.1)
-with(randomize %>% filter(eigenvalue < 50), plot(x = eigenvalue, y = expl_var / 100, 
+opar <- par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1)) ## plot layout 2x3
+par(mar = c(4,6,2,0) + 0.1) ## setting plot margins for the following plots
+## Figure 2A: Explained variance of eigenvalues
+with(randomize %>% filter(eigenvalue < 50), plot(x = eigenvalue, y = expl_var / 100, ## plotting the explained variance of observed
                                                  type = "l", yaxt = "n", bty = "l",
                                                  col = "#998ec3", 
                                                  xlab = "", ylab = ""))
-with(randomize %>% filter(eigenvalue < 50), lines(x = eigenvalue, y = perm / 100,
+with(randomize %>% filter(eigenvalue < 50), lines(x = eigenvalue, y = perm / 100, ## plotting the explained variance of permuted
                                                   col = "#f1a340"))
 yticks_val <- scales::breaks_pretty(n=5)(randomize %>% filter(eigenvalue < 50) %>% pull(expl_var) / 100)
-axis(2, at=yticks_val, lab=scales::percent(yticks_val), las = 1)
+axis(2, at=yticks_val, lab=scales::percent(yticks_val), las = 1) ## Axis labels
 title(ylab = "explained variance", line = 3.5)
 title(xlab = "MCA Eigenvalues", line = 2)
 legend("topright", legend=c("Eigenvalues", "Permuted Eigenvalues"),
        col=c("#998ec3", "#f1a340"), lty=1, cex=0.8)
-mtext("A", side=3, line=0, cex=1.2, adj=-0.35)
-### C
-par(mar = c(2,2,0,0), bg = NA)
+mtext("A", side=3, line=0, cex=1.2, adj=-0.35) ## plot tag
+
+par(mar = c(2,2,0,0), bg = NA) ## setting plot margins for the following plots
+## Figure 2C: MCA projected down to 3 dimensions (UMAP)
 with(umap_cancertype, scatter3D(plot_y, -plot_z, plot_x, 
                                 bg = "white", pch = 21, cex = 0.8, lwd = 0.2,
                                 theta = 0, phi = 65, scale = F,
                                 xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
                                 colvar = NULL))
 title(xlab="UMAP 2", line=0)
-mtext("C", side=3, line=-2.05, cex=1.2, adj=0)
-### D
-par(mar = c(4,6,2,0) + 0.1)
+mtext("C", side=3, line=-2.05, cex=1.2, adj=0) ## plot tag
+
+par(mar = c(4,6,2,0) + 0.1) ## setting plot margins for the following plots
+## Figure 2D: Optimization of HDBscan
 with(sample_df, plot(x = minPts, y = value, 
                      col = "grey", pch = 20, yaxt = "n",
                      xlab = "", ylab = "", bty = "l",
                      las = 1, cex = 0.3))
 with(score_df, lines(x = minPts, y = score,
                      col = "black", las = 1))
-abline(v = optimal_minPts, col = "red")
+abline(v = optimal_minPts, col = "red") ## Red vertical line to show optimal minimum point for HDBscan
 title(ylab = "score", line = 3.5)
 title(xlab = "Minimum Cluster Size", line = 2)
 axis(2, at=c(0.25, 0.35, 0.45, 0.55), las = 1)
-mtext("D", side=3, line=0, cex=1.2, adj=-0.27)
-### B
-with(randomize %>% filter(eigenvalue < 50), plot(x = eigenvalue, y = pvalue, 
+mtext("D", side=3, line=0, cex=1.2, adj=-0.27) ## plot tag
+
+## Figure 2B: pvalue of eigenvalue 
+with(randomize %>% filter(eigenvalue < 50), plot(x = eigenvalue, y = pvalue,  ## line plot
                                                  type = "l", bty = "l",
                                                  col = "black", las = 1,
                                                  xlab = "", ylab = ""))
-with(randomize %>% filter(eigenvalue < 50), points(x = eigenvalue, y = pvalue, pch = 20,
+with(randomize %>% filter(eigenvalue < 50), points(x = eigenvalue, y = pvalue, pch = 20, ## add dots to line plot
                                                    col = "black"))
-abline(v = optimal_mca_dimensions, col = "red")
-title(main = paste0("Significant dimensions = ", optimal_mca_dimensions), adj = 0, font = 3, cex.main = .8)
+
+## Determining the optimal mca dimension
+optimal_mca_dimensions <- randomize %>%
+  filter(pvalue < 0.05) %>% ## filtering for pvalue < 0.05
+  filter(eigenvalue == max(eigenvalue)) %>% ## filtering for the maximum eigenvalue
+  pull(eigenvalue) 
+
+abline(v = optimal_mca_dimensions, col = "red") ## Red vertical line to show optimal MCA dimension
+title(main = paste0("Significant dimensions = ", optimal_mca_dimensions), adj = 0, font = 3, cex.main = .8) ## Axis labels
 title(ylab = "P-value", line = 3.5)
 title(xlab = "MCA Eigenvalues", line = 2)
-mtext("B", side=3, line=0, cex=1.2, adj=-0.35)
-### E
-par(mar = c(2,2,0,0), bg = NA)
-with(umap_cancertype, scatter3D(plot_y, -plot_z, plot_x, 
-                                bg = cluster.colours[as.character(clust)], pch = 21, cex = 0.8, lwd = 0.2,
-                                theta = 0, phi = 65, scale = F,
-                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
-                                colvar = NULL))
-title(xlab="UMAP 2", line=0)
-mtext("E", side=3, line=-2.05, cex=1.2, adj=0)
-### F
-with(umap_cancertype, scatter3D(plot_y, -plot_z, plot_x, 
-                                bg = cluster.colours[as.character(clust_knn)], pch = 21, cex = 0.8, lwd = 0.2,
-                                theta = 0, phi = 65, scale = F,
-                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
-                                colvar = NULL))
-title(xlab="UMAP 2", line=0)
-mtext("F", side=3, line=-2.05, cex=1.2, adj=0)
+mtext("B", side=3, line=0, cex=1.2, adj=-0.35) ## plot tag
 
-plot.new()
+par(mar = c(2,2,0,0), bg = NA) ## setting plot margins for the following plots
+## Figure 2E: HDBscan
+cluster.colours <- c("grey", kelly.colours[c(3:12)]) ## Color scheme for cluster
+names(cluster.colours) <- c(0:10) ## assigning cluster to the colors
+with(umap_cancertype, scatter3D(plot_y, -plot_z, plot_x, 
+                                bg = cluster.colours[as.character(clust)], pch = 21, cex = 0.8, lwd = 0.2, # clust is hdbscan result
+                                theta = 0, phi = 65, scale = F,
+                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+                                colvar = NULL))
+title(xlab="UMAP 2", line=0)
+mtext("E", side=3, line=-2.05, cex=1.2, adj=0) ## plot tag
+
+## FIgure 2F: kNN 
+with(umap_cancertype, scatter3D(plot_y, -plot_z, plot_x, 
+                                bg = cluster.colours[as.character(clust_knn)], pch = 21, cex = 0.8, lwd = 0.2, # clust_knn is knn result
+                                theta = 0, phi = 65, scale = F,
+                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+                                colvar = NULL))
+title(xlab="UMAP 2", line=0)
+mtext("F", side=3, line=-2.05, cex=1.2, adj=0) ## plot tag
+
 ```
 
