@@ -256,6 +256,6 @@ with(umap_cancertype, scatter3D(plot_y, -plot_z, plot_x,
 title(xlab="UMAP 2", line=0)
 mtext("F", side=3, line=-2.05, cex=1.2, adj=0)
 
-plot.new()
+#plot.new()
 ```
 

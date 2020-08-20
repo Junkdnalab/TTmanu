@@ -1,4 +1,3 @@
-<div style="text-align: right"> Table 1 Data </div>
 ```{r table-1-data-generation, eval = FALSE}
 tumor_clusters <- fread("../data/umap_3d_coors.tsv") ## load in data
 load("../data/moderate_enrich_prob.Rda") ## load data
@@ -105,7 +104,7 @@ save(cluster_spec_enrich_table, file = "../data/cluster_spec_enrich_table.Rda")
 rm(list = ls(all.names = T))
 gc()
 ```
-<p style="FONT-SIZE:10px; COLOR:#000000; LINE-HEIGHT:12px;">**Table 1: Most frequently mutated gene in class-specific enriched pathways (effect size >= 0.30) for specific cancer**</p>
+
 ```{r table-1}
 load("../data/cluster_spec_enrich_table.Rda")
 tumor_clusters <- fread("../data/umap_3d_coors.tsv") ## load in data
