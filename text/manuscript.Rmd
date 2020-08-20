@@ -75,7 +75,9 @@ suppressPackageStartupMessages(c(
   library(poibin),
   library(flextable),
   library(plot3D),
-  library(ggfortify)
+  library(ggfortify),
+  library(maftool),
+  library(survival)
 ))
 ```
 

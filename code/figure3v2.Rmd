@@ -15,7 +15,7 @@ mut_order <- mut_order %>% do.call(rbind, .) %>% as.data.frame() ## rbind list
 mut_order$sample_id <- factor(mut_order$sample_id, levels = mut_order$sample_id)
 mut_order$clust_knn <- factor(mut_order$clust_knn, levels = c(1:10))
 
-## Determing the breaks positions for the x-axis
+## Determining the breaks positions for the x-axis
 previous_class <- 0 ## starting position 1
 position_of_previous_class <- 0 ## starting position 2
 xaxis_breaks <- list() ## list for the for loop

@@ -78,7 +78,7 @@ with(umap_cancertype, scatter3D(plot_y, -plot_z, plot_x,
 title(xlab="UMAP 2", line=0)
 mtext("E", side=3, line=-2.05, cex=1.2, adj=0) ## plot tag
 
-## FIgure 2F: kNN 
+## Figure 2F: kNN 
 with(umap_cancertype, scatter3D(plot_y, -plot_z, plot_x, 
                                 bg = cluster.colours[as.character(clust_knn)], pch = 21, cex = 0.8, lwd = 0.2, # clust_knn is knn result
                                 theta = 0, phi = 65, scale = F,

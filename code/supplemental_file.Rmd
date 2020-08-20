@@ -19,11 +19,49 @@ library(shiny),
 library(tidyverse),
 library(SummarizedExperiment),
 library(plot3D),
-library(data.table)
+library(data.table),
+library(rgl),
+library(htmltools),
+library(dplyr),
+library(rgl),
+library(htmltools)
 ))
 ```
 
 ## Interactive Supplemental File {.tabset}
+
+### UMAP cluster
+```{r}
+umap_cancertype <- fread("../data/umap_3d_coors.tsv") ## load data
+load("../data/kelly.colours.rda")
+
+cluster.colours <- c(kelly.colours[c(3:12)], "grey") ## Color scheme
+names(cluster.colours) <- c(1:11) ## Assign cluster to color
+
+
+ui <- (fluidPage(
+#sliderInput("sld", label = "Slider", min = 0., max = 4*pi, value = 0., step = .1),
+playwidgetOutput("player"),
+ rglwidgetOutput("plot",  width = 500, height = 350)
+))
+
+
+server <- (function(input, output) {
+
+  output$plot <- renderRglwidget ({
+    open3d(useNULL=TRUE)
+    plot3d(umap_cancertype[, c("plot_x", "plot_y", "plot_z"),],
+  type = "s", size = 2.5,
+  xlab = "UMAP 1", ylab = "UMAP 2", zlab = "UMAP 3",
+  aspect = c(8.3, 10.5, 7.6),
+  col = cluster.colours[as.character(umap_cancertype$clust_knn)])["data"]
+    rglwidget()
+
+    })
+
+  })   
+shinyApp(ui = ui, server = server)
+```
 
 ### Cancer type
 ```{r shiny-widget, echo = FALSE}
@@ -63,9 +101,6 @@ ditto_color <- c(
   "#38B7FF", "#FF9B4D", "#E0AFCA", "#A3A3A3",
   "#8A5F00", "#1674A9", "#005F45", "#AA9F0D",
   "#00446B", "#803800", "#8D3666", "#3D3D3D")
-
-cluster.colours <- c(kelly.colours[c(3:12)])
-names(cluster.colours) <- c(1:10)
 
 renderPlot({
   par(mfrow = c(1,2), mai = c(0.1, 0.1, 0.1, 0.1))
