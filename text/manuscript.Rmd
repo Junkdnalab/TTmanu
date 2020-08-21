@@ -75,7 +75,10 @@ suppressPackageStartupMessages(c(
   library(poibin),
   library(flextable),
   library(plot3D),
-  library(ggfortify)
+  library(ggfortify),
+  library(maftools),
+  library(survival),
+  library(ggalluvial)
 ))
 ```
 
@@ -187,7 +190,7 @@ cat("\\newpage")
 ```
 
 #### Figure 2
-```{r child='../code/figure2v2.Rmd'}
+```{r child='../code/figure2.Rmd'}
 ```
 
 **Figure 2: Method for tumor classification using pathway aberration data** 
@@ -228,7 +231,7 @@ cat("\\newpage")
 ```
 
 #### Figure 3
-```{r child = '../code/figure4v2.Rmd'}
+```{r child = '../code/figure3.Rmd'}
 ```
 
 **Figure 3: Pathway-based classification is independent of tissue-of-origin features.** 
@@ -314,7 +317,7 @@ cat("\\newpage")
 ```
 
 #### Figure 4
-```{r child = '../code/figure3v2.Rmd'}
+```{r child = '../code/figure4.Rmd'}
 ```
 
 **Figure 4: Somatic mutation frequencies for tumors in each class** 
@@ -357,7 +360,7 @@ cat("\\newpage")
 ```
 
 #### Figure 5
-```{r child = '../code/figure2.Rmd'}
+```{r child = '../code/figure5.Rmd'}
 ```
 
 **Figure 5: Pan-cancer enrichment of pathway disruptions.** 
@@ -438,7 +441,7 @@ cat("\\newpage")
 ```
 
 #### Figure 6
-```{r child = '../code/figure4.Rmd'}
+```{r child = '../code/figure6.Rmd'}
 ```
 
 **Figure 6: Gene level analysis reveals tissue-specific class signatures.** 
@@ -487,7 +490,7 @@ cat("\\newpage")
 ```
 
 #### Table 1
-```{r child = '../code/table2.Rmd'}
+```{r child = '../code/table1.Rmd'}
 ```
 
 **Table 1: Cluster-specific enriched pathways (effect size >= 0.30) in metastatsis.**

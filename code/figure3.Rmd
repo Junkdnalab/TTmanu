@@ -1,196 +1,157 @@
-```{r group-pathway-enrichment-data-generation, eval=FALSE}
-tumor_clusters <- fread("../data/umap_3d_coors.tsv") ## load in data
-tumor_clusters <- tumor_clusters %>% as.data.frame() %>% dplyr::select(sample_id, clust_knn) ## select the relevant columns
+```{r sankey-plot}
+umap_cancertype <- fread("../data/umap_3d_coors.tsv") ## load data
+load("../data/kelly.colours.rda")
+load("../data/ditto.colours.rda")
 
-## Getting the total number of tumor samples in each cluster
-n_tumor_in_clust <- as.data.frame(table(tumor_clusters$clust_knn)) %>% ## table the number of tumors in each cluster
-  'colnames<-' (c("clust", "tot_n_clust")) %>% ## move cluster number to rownames
-  mutate(clust = as.character(clust)) ## convert factor to character
+sankey.data <- umap_cancertype %>% dplyr::select(sample_id, project_code, clust_knn) %>% ## select relevant columns
+  gather(., key = "type", value = "value", -sample_id) ## wide to long format
 
-## Organizing rBeta data
-load("../data/gdc_reactome_path_analysis.Rda")
-clust_group <- n_tumor_in_clust$clust
-cluster_path_count <- list()
-for(n in clust_group) {
-  print(n)
-  sample_id <- tumor_clusters %>% filter(clust_knn == n) %>% ## filter for tumor class
-    .[,"sample_id"] ## get sample_ids
-  path_mutation <- gdc_reactome_path_analysis %>% .[,names(.) %in% sample_id] %>% ## getting the tumor samples from path analysis
-    rowSums() %>% as.data.frame() %>% ## getting the observed mutation count of tumor class
-    'colnames<-' (n) ## change colname to cluster number
-  cluster_path_count[[n]] <- path_mutation
-  rm(path_mutation, sample_id, n)
-  gc()
-}
-cluster_path_count <- do.call(cbind, cluster_path_count) ## Combine the list together
+## Cancer names in alphabetical order
+cancerorder <- unique(umap_cancertype$project_code)
+cancerorder <- cancerorder[order(cancerorder)]
+## Cluster in numerical order
+clustorder <- unique(umap_cancertype$clust_knn)
+clustorder <- as.character(clustorder[order(clustorder)])
 
-global_path_mut <- cluster_path_count %>% rowSums() %>% as.data.frame() %>% ## global pathway mutation count
-  .[rep(1:ncol(.), each = max(tumor_clusters$clust_knn))] %>% ## replicate the column 0 times for the 10 tumor classes
-  'colnames<-' (clust_group) %>% ## rename column with tumor class
-  rownames_to_column(var = "path") %>% ## move rownames to column (pathways) %>%
-  gather(., key = "clust", value = "global_mut", -path)
+## Factor to force ordering
+sankey.data$type <- factor(sankey.data$type, levels = c( "clust_knn", "project_code"))
+sankey.data$value <- factor(sankey.data$value, levels= c(cancerorder, clustorder))
 
-rbeta_path_analysis <- cluster_path_count %>% rownames_to_column(var="path") %>%
-  gather(key = "clust", value = "clust_mut", -path) %>% ## Wide to long format
-  left_join(., global_path_mut, by = c("path", "clust")) %>% ## add global mutation count 
-  left_join(., n_tumor_in_clust, by = "clust") %>% ## add total number of tumor samples per clust 
-  mutate(global_sample = sum(n_tumor_in_clust$tot_n_clust)) ## add total number of tumor samples
+## Color scheme for sankey plot
+sankey.colours <- c(ditto_colours[2:24],kelly.colours[3:12])
+names(sankey.colours) <- c(cancerorder, clustorder)
 
-rm(global_path_mut, cluster_path_count, n_tumor_in_clust, clust_group, tumor_clusters, gdc_reactome_path_analysis)
-gc()
-
-enrich_prob_uncertainity_in_bg <- data.frame(path = rbeta_path_analysis$path,
-                                            clust = rbeta_path_analysis$clust,
-                                            fg_mut = rbeta_path_analysis$clust_mut,
-                                            fg_not_mut = rbeta_path_analysis$tot_n_clust - rbeta_path_analysis$clust_mut,
-                                            bg_mut = rbeta_path_analysis$global_mut,
-                                            bg_not_mut = rbeta_path_analysis$global_sample - rbeta_path_analysis$global_mut
-                                            )
-fg_mut_rate <- list()
-bg_mut_rate <- list()
-for(n in 1:max(as.numeric(unique(enrich_prob_uncertainity_in_bg$clust)))) {
-  print(n)
-  df <- subset(enrich_prob_uncertainity_in_bg, clust == n)
-  fg_denominator <- nrow(df) * (df$fg_mut[1] + df$fg_not_mut[1]) ## n_path * tot_n_clust_x
-  fg_numerator <- sum(df$fg_mut)
-  bg_denominator <- nrow(df) * (df$bg_mut[1] + df$bg_not_mut[1])
-  bg_numerator <- sum(df$bg_mut)
-  fg_mut_rate[[n]] <- fg_numerator / fg_denominator
-  bg_mut_rate[[n]] <- bg_numerator / bg_denominator
-  rm(df)
-}
-
-fg_mut_rate <- fg_mut_rate %>% do.call(rbind, .) %>% as.data.frame() %>% ## rbind the mut rates from list
-  'colnames<-' ("fg_mut_rate") %>% ## rebind col names
-  rownames_to_column(var = "clust") ## move rownames to col
-bg_mut_rate <- bg_mut_rate %>% do.call(rbind, .) %>% as.data.frame() %>% ## rbind the mut rates from list
-  'colnames<-' ("bg_mut_rate") %>% ## rebind col names
-  rownames_to_column(var = "clust") ## move rownames to col
-
-enrich_prob_uncertainity_in_bg <- enrich_prob_uncertainity_in_bg %>% left_join(., fg_mut_rate, by = "clust") %>%
-  left_join(., bg_mut_rate, by = "clust") %>%
-  mutate(rel_odds = .$fg_mut_rate / .$bg_mut_rate) %>%
-  mutate(denominator = (.$bg_mut * .$rel_odds) + (.$bg_not_mut / .$rel_odds)) %>%
-  mutate(x_adj =(.$fg_mut + .$fg_not_mut) * (.$bg_mut * .$rel_odds) / .$denominator) %>%
-  mutate(y_adj = (.$fg_mut + .$fg_not_mut) - .$x_adj)
-rm(fg_mut_rate, bg_mut_rate, rbeta_path_analysis)
-gc()
-
-moderate_fg <- apply(enrich_prob_uncertainity_in_bg[,c("fg_mut", "fg_not_mut")], MARGIN = 1, function(x) {
-  rbeta(n = 1e5, shape1=x["fg_mut"], shape2=x["fg_not_mut"])
-})
-
-moderate_bg <- apply(enrich_prob_uncertainity_in_bg[,c("x_adj", "y_adj")], MARGIN = 1, function(x) {
-  rbeta(n = 1e5, shape1=x["x_adj"], shape2=x["y_adj"])
-})
-
-## ModerateEnrichment probability 
-prob <- moderate_fg > moderate_bg ## boolean data
-mean_prob <- apply(prob, MARGIN = 2, function(x) {
-  mean(x)
-})
-rm(prob)
-gc()
-## Moderate Difference
-CI <- 0.025 ## setting a 95% confidence interval
-
-diff_fg_bg <- moderate_fg - moderate_bg ## fg - bg
-rm(moderate_fg, moderate_bg)
-gc()
-
-sig_fg_bg <- as.data.frame(apply(diff_fg_bg, MARGIN = 2, function(x) {
-  sum(x < 0 ) ## out of 1e5 simulations, how many times is fg-bg less than 0
-}))
-quant_diff <- t(apply(diff_fg_bg, MARGIN = 2, function(x) {
-  quantile(x, c(CI, 0.5, 1-CI))
-}))
-
-moderate_enrich_prob <- data.frame(path = enrich_prob_uncertainity_in_bg$path,
-                                   clust = enrich_prob_uncertainity_in_bg$clust,
-                                   probability = mean_prob,
-                                   signif = sig_fg_bg[,1],
-                                   difference = quant_diff[,2],
-                                   lower = quant_diff[,1],
-                                   upper = quant_diff[,3])
-rm(enrich_prob_uncertainity_in_bg, mean_prob, quant_diff, sig_fg_bg, diff_fg_bg)
-gc()
-save(moderate_enrich_prob, file = "../data/moderate_enrich_prob.Rda")
-load("../data/moderate_enrich_prob.Rda")
-
-diff_heatmap <- moderate_enrich_prob[,c("path", "clust", "difference")]
-diff_heatmap <- spread(diff_heatmap, key = "clust", value = "difference")
-diff_heatmap <- diff_heatmap %>% remove_rownames() %>% column_to_rownames(var="path")
-
-effect_size <- pheatmap(diff_heatmap,
-         show_rownames = F,
-         show_colnames = T,
-         cluster_cols = T,
-         cluster_rows = T,
-         cellwidth = 10,
-         cellheight = 0.76,
-         color = rev(c('#7f3b08','#b35806','#e08214','#fdb863','#fee0b6','white', '#d8daeb','#b2abd2','#8073ac','#542788','#2d004b')),
-         breaks = c(seq(from = -1, -0.2, 0.2), -0.0001, 0.0001, seq(from = 0.2, to = 1, by = 0.2)),
-         clustering_method = "ward.D2")
-
-effect_row_order <- effect_size$tree_row$order
-effect_row_order <- diff_heatmap %>% .[effect_row_order,] %>% rownames() ## getting row order of pheatmap
-
-effect_heatmap <- diff_heatmap %>% rownames_to_column(var = "path_name") %>% 
-  gather(., key = "cluster", value = "effect_size", -path_name) 
-
-effect_heatmap$path_name <- factor(effect_heatmap$path_name, levels = c(rev(effect_row_order)))
-effect_heatmap$cluster <- factor(effect_heatmap$cluster, levels = c(1:max(as.numeric(effect_heatmap$cluster))))
-effect_segments <- c(seq(from = -1, -0.2, 0.2), -0.0001, 0.0001, seq(from = 0.2, to = 1, by = 0.2))
-
-effect_heatmap <- effect_heatmap %>% mutate(discrete_color = case_when(
-  effect_size > effect_segments[1] & effect_size <= effect_segments[2] ~ "1",
-  effect_size > effect_segments[2] & effect_size <= effect_segments[3] ~ "2",
-  effect_size > effect_segments[3] & effect_size <= effect_segments[4] ~ "3",
-  effect_size > effect_segments[4] & effect_size <= effect_segments[5] ~ "4",
-  effect_size > effect_segments[5] & effect_size <= effect_segments[6] ~ "5",
-  effect_size > effect_segments[6] & effect_size <= effect_segments[7] ~ "6",
-  effect_size > effect_segments[7] & effect_size <= effect_segments[8] ~ "7",
-  effect_size > effect_segments[8] & effect_size <= effect_segments[9] ~ "8",
-  effect_size > effect_segments[9] & effect_size <= effect_segments[10] ~ "9",
-  effect_size > effect_segments[10] & effect_size <= effect_segments[11] ~ "10",
-  effect_size > effect_segments[11] & effect_size <= effect_segments[12] ~ "11"
-))
-effect_heatmap$discrete_color <- factor(effect_heatmap$discrete_color, levels = c(1:11))
-
-save(effect_heatmap, file = "../data/effect_heatmap.Rda")
-rm(list = ls(all.names = T))
-gc()
-```
-
-```{r group-pathway-enrichment heatmap, fig.width= 5, fig.height= 10, fig.align= 'center', fig.cap="**Figure 3. Pathway-specific enrichment within clusters.** Heatmap shows relative enrichment of each pathway (rows) within each numbered cluster (columns). The annotation at left indicates the Reactome pathway group at the second level (check this)."}
-load("../data/effect_heatmap.Rda") ## load data
-
-effect_colors = c("1" = "#2d004b", "2" = "#542788", "3" = "#8073ac", "4" = "#b2abd2", "5" = "#d8daeb", "6" = "white", "7" = "#fee0b6", "8" = "#fdb863", "9" = "#e08214","10" = "#b35806","11" ="#7f3b08") ## color scheme
-
-fig3 <- ggplot(data = effect_heatmap, aes(x=cluster, y=path_name)) + 
-  geom_tile(size = 0.6, aes(fill = discrete_color)) +
-  scale_fill_manual(values = effect_colors) +
-  ylab("377 Reactome Pathways") +
-  xlab("Cluster") +
-  theme(axis.text.x = element_text(size = 10),
-        axis.text.y = element_blank(),
-        axis.title.x = element_text(size = 12),
-        axis.title.y = element_text(size = 12),
-        axis.ticks = element_blank(),
-        legend.position = "none")
-fig3_legend <- ggplot(data = data.frame(x = 1:11, y = 1), aes(x = x, y = y, fill = as.factor(x))) +
-  geom_bar(stat = "identity", width = 1) +
+## Sankey plot
+ggplot(sankey.data,
+       aes(x = type, stratum = value, alluvium = sample_id,
+           fill = value, label = value)) +
+  scale_fill_manual(values = sankey.colours) +
+  geom_flow(stat = "alluvium", lode.guidance = "frontback") +
+  geom_stratum(alpha = 0.5) +
+  geom_text(stat = "stratum", size = 3) +
   theme_classic() +
-  scale_fill_manual(values = effect_colors) + 
-  scale_x_continuous(labels= c("-1", "-0.5","0", "0.5", "1")) +
+  xlab(label = "") +
   theme(legend.position = "none",
+        axis.text.x = element_text(size = 10),
         axis.text.y = element_blank(),
         axis.ticks = element_blank(),
-        axis.title.x = element_blank(),
-        axis.title.y = element_blank(),
-        axis.line = element_blank())
-
-fig3_legend <- plot_grid(NULL, fig3_legend, NULL, ncol = 3)
-
-plot_grid(fig3, fig3_legend, ncol = 1, rel_heights = c(15, 1))
+        axis.line.x = element_blank(),
+        axis.line.y = element_blank()) +
+  scale_x_discrete(labels= c("Cluster", "Cancer Type"))
 ```
+
+
+```{r figure-4-plot, fig.width = 9}
+### Figure A - Cancer Type
+par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1)) ## plot layout 2x3
+par(mar = c(2,2,0,0)) ## setting plot margins for the following plots
+
+selectedcancer <- c("BRCA", "COAD", "HNSC", "PAAD") ## selecting the 4 cancer types we're interested in
+A_colors <- c('#fb9a99', '#b15928', '#6a3d9a', 'springgreen4') ## Color scheme for cancer type
+names(A_colors) <- selectedcancer ## Assigning cancertype a color
+
+with(umap_cancertype %>% 
+       mutate(A_color = case_when(project_code %in% selectedcancer ~ project_code, ## Create a new col named A color
+                                  TRUE ~ "Other")) %>% ## Convert all cancer type that isn't the selected cancers to "Other"
+       filter(A_color != "Other"), ## Remove "Other" type
+     scatter3D(plot_y, -plot_z, plot_x, 
+               bg = A_colors[A_color], pch = 21, cex = 0.8, lwd = 0.2,
+               theta = 0, phi = 65, scale = F,
+               xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+               colvar = NULL))
+## Axis labels
+legend("top", inset = c(0), legend=rev(names(A_colors[1:2])), col=rev(A_colors[1:2]), pch = 20, bty = "n", horiz = T, cex = 1.2)
+legend("top", inset = c(0.10), legend=rev(names(A_colors[3:4])), col=rev(A_colors[3:4]), pch = 20, bty = "n", horiz = T, cex = 1.2)
+title(xlab="UMAP 2", line=0)
+mtext("A", side=3, line=-2.05, cex=1.2, adj=0)
+
+### Figure B - BRCA subtype
+brca_subtype <- umap_cancertype %>% filter(project_code == "BRCA") %>% ## Filter for selected cancer type
+  dplyr::select(plot_x, plot_y, plot_z, Subtype_Selected) ## Select relevant column 
+brca_subtype[is.na(brca_subtype)] <- "NA" ## Convert NA to character "NA"
+  
+## Color scheme for subtype
+B_name <- unique(brca_subtype$Subtype_Selected) ## What are the subtype names
+B_name <- B_name[order(B_name,na.last=T)] ## Order the names ABC and have NA last
+B_color <- ditto_colours[c(2:(length(B_name) + 1))] ## Selecting enough colors from ditto
+names(B_color) <- B_name ## Assigning subtypes to color
+
+with(brca_subtype,
+     scatter3D(plot_y, -plot_z, plot_x, 
+               bg = B_color, pch = 21, cex = 0.8, lwd = 0.2,
+               theta = 0, phi = 65, scale = F,
+               xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+               colvar = NULL))
+## Axis labels
+legend("top", inset = c(0), legend=names(B_color[1:2]), col=B_color[1:2], pch = 20, bty = "n", horiz = T, cex = 1.2)
+legend("top", inset = c(0.10), legend=names(B_color[3:4]), col=B_color[3:4], pch = 20, bty = "n", horiz = T, cex = 1.2)
+legend("top", inset = c(0.20), legend=names(B_color[5:6]), col=B_color[5:6], pch = 20, bty = "n", horiz = T, cex = 1.2)
+title(xlab="UMAP 2", line=0)
+mtext("B", side=3, line=-2.05, cex=1.2, adj=0)
+
+### Figure C - BRCA Somatic Mutations
+load("../data/gdc_gene_exp_adj.Rda")
+load("../data/gene_data.Rda")
+brca <- gene_data %>% .[.$external_gene_name %in% c("BRCA1", "BRCA2"),] %>% dplyr::select(ensembl_gene_id, external_gene_name) ## Getting BRCA gene information
+brca <- gdc_gene_exp_adj %>% .[rownames(.) %in% brca$ensembl_gene_id, ] %>% ## Include BRCA gene
+  rownames_to_column(var = "ensembl_gene_id") %>% ## Move ensembl id to column
+  left_join(., brca, by = "ensembl_gene_id") %>% ## left join with brca df 
+  remove_rownames()  %>% column_to_rownames(var = "external_gene_name") %>% ## replace row with gene symbol
+  dplyr::select(-ensembl_gene_id) %>% ## get rid of ensembl_id col
+  t() %>% as.data.frame() %>% ## correct orientation for umap_cancertype df
+  rownames_to_column(var = "sample_id") %>% ## getting data ready for leftjoin 
+  mutate(BRCA1 = case_when(BRCA1 == "1" ~ "BRCA1", ## Convert booleans to categorical variables
+                           BRCA1 == "0" ~ "NA"),
+         BRCA2 = case_when(BRCA2 == "1" ~ "BRCA2",
+                           BRCA2 == "0" ~ "NA")) %>%
+  mutate(mut_type = gsub('NA,|,NA', '', paste(.$BRCA1, .$BRCA2, sep = ","))) %>% ## combine mutation cause some patients can have both
+  dplyr::select(-BRCA1, -BRCA2) %>% ## remove col we don't need
+  left_join(., umap_cancertype[,c("sample_id", "plot_x", "plot_y", "plot_z", "project_code")], by = "sample_id") ## leftjoin by sample id
+
+C_colors <- c('#33a02c', '#e31a1c', '#ff7f00') ## Color scheme 
+names(C_colors) <- c("BRCA1", "BRCA2", "BRCA1,BRCA2") ## Assigning mutation type to color
+with(brca %>% filter(mut_type != "NA"), ## Filter samples that do not have a mutation in BRCA1 or BRCA2
+     scatter3D(plot_y, -plot_z, plot_x, 
+               bg = C_colors, pch = 21, cex = 0.8, lwd = 0.2,
+               theta = 0, phi = 65, scale = F,
+               xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+               colvar = NULL))
+## Axis labels
+legend("top", inset = c(0), legend=names(C_colors[c(1:2)]), col=C_colors[c(1:2)], pch = 20, bty = "n", horiz = T, cex = 1.2)
+legend("top", inset = c(0.10), legend=names(C_colors[c(3)]), col=C_colors[3], pch = 20, bty = "n", horiz = T, cex = 1.2)
+title(xlab="UMAP 2", line=0)
+mtext("C", side=3, line=-2.05, cex=1.2, adj=0)
+
+### Figure D - Stage
+D_colors <- c('darkgoldenrod3','dodgerblue3','yellow3','tomato2') ## Color scheme
+names(D_colors) <- c("Stage I", "Stage II", "Stage III", "Stage IV") ## Assign stage to color
+with(umap_cancertype %>% filter(ajcc_pathologic_tumor_stage != "Not Available"), ## Filter samples that do not have stage info
+     scatter3D(plot_y, -plot_z, plot_x, 
+               bg = D_colors, pch = 21, cex = 0.8, lwd = 0.2,
+               theta = 0, phi = 65, scale = F,
+               xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+               colvar = NULL))
+## Axis labels
+legend("top", inset = c(0), legend=names(D_colors[1:2]), col=D_colors[1:2], pch = 20, bty = "n", horiz = T, cex = 1.2)
+legend("top", inset = c(0.10), legend=names(D_colors[3:4]), col=D_colors[3:4], pch = 20, bty = "n", horiz = T, cex = 1.2)
+title(xlab="UMAP 2", line=0)
+mtext("D", side=3, line=-2.05, cex=1.2, adj=0)
+
+### Figure E - Metastasis
+E_colors <- c('#a6cee3','#1f78b4') ## Color scheme
+names(E_colors) <- c("M0", "M1") ## Assign metastasis to color
+with(umap_cancertype %>% filter(ajcc_metastasis_pathologic_pm %in% c("M0", "M1")), ## Only M0 and M1 tumor samples
+     scatter3D(plot_y, -plot_z, plot_x, 
+               bg = E_colors, pch = 21, cex = 0.8, lwd = 0.2,
+               theta = 0, phi = 65, scale = F,
+               xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+               colvar = NULL))
+## Axis labels
+legend("top", inset = c(0), legend=names(E_colors), col=E_colors, pch = 20, bty = "n", horiz = T, cex = 1.2)
+title(xlab="UMAP 2", line=0)
+mtext("E", side=3, line=-2.05, cex=1.2, adj=0)
+
+plot.new()
+```
+
+

@@ -9,13 +9,12 @@ a) MCA analysis was performed to determine the eigenvalue with the most
 explanatory power from the categorical data. Average of 100 permutations of the
 data was used as a baseline. b) The p-value of each eigenvalue was plotted and
 the max eigenvalue with a pvalue < 0.05 was selected. c) The resulting MCA was
-projected down to 3 dimensions for the purpose of density based clustering (only
-the first 2 dimensions are shown). Each dot represents a tumor d) HDBSCAN was
-used to perform hierarchical density based clustering tuned to minimize the
-fraction of unassigned tumors. e) HDBSCAN clustered tumors were visualized on
-the UMAP projection; tumors are colored by cluster membership (see legend). This
-results in some tumors remaining unclassified (grey points). f) kNN was used to
-assign membership to the remaining tumors.
+projected down to 3 dimensions for the purpose of density based clustering. 
+Each dot represents a tumor d) HDBSCAN was used to perform hierarchical density 
+based clustering tuned to minimize the fraction of unassigned tumors. e) HDBSCAN 
+clustered tumors were visualized on the UMAP projection; tumors are colored by 
+cluster membership (see legend). This results in some tumors remaining unclassified
+(grey points). f) kNN was used to assign membership to the remaining tumors.
 
 **Figure 3: Pathway-based classification is independent of tissue-of-origin features.** 
 a) Projection of cancer type identity onto UMAP. Abbrevs: BRCA = Breast cancer,
