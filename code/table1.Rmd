@@ -1,4 +1,4 @@
-```{r table-2-data-generation, eval = FALSE}
+```{r table-1-data-generation, eval = FALSE}
 tumor_clusters <- fread("../data/umap_3d_coors.tsv") ## load in data
 load("../data/gdc_reactome_path_analysis.Rda")
 
@@ -129,6 +129,10 @@ save(m1_minus_m0_per_cluster_rbeta, file = "../data/m1_minus_m0_per_cluster_rbet
 rm(list = ls(all.names = T))
 gc()
 ```
+
+```{r table-1}
+load("../data/cluster_spec_enrich_table.Rda")
+tumor_clusters <- fread("../data/umap_3d_coors.tsv") ## load in data
 
 ```{r table-2, eval = FALSE}
 ## this is for html only

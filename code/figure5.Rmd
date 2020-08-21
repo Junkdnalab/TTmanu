@@ -337,5 +337,5 @@ AAACCCC
 AAACCCC
 '
 
-fig2A + fig2B + fig2C + plot_layout(design = layout) + plot_annotation(tag_levels = "A")
+fig5A + fig5B + fig5C + plot_layout(design = layout) + plot_annotation(tag_levels = "A")
 ```
