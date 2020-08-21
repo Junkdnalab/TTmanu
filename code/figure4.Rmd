@@ -1,231 +1,96 @@
-```{r forest-heatmap-data-generation, eval = FALSE}
+```{r figure-3-plot, message=FALSE, warning=FALSE, fig.width= 9, fig.height= 3}
+umap_cancertype <- fread("../data/umap_3d_coors.tsv")
 load("../data/kelly.colours.rda")
 
-cluster.colors <- kelly.colours[-c(1)]
-names(cluster.colors) <- 0:20
-cluster_colors <- cluster.colors[2:11]
-names(cluster_colors) <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10")
+## Arranging mutation freq for each cluster
+mut_order <- list() ## store data in list 
+for(n in 1:max(as.numeric(as.character(umap_cancertype$clust_knn)))) { ## loop through all the clusters
+  mut_order[[n]] <- umap_cancertype %>% filter(clust_knn == n) %>%  ## filter for specific class
+    dplyr::select(sample_id, plot_x, plot_y, clust_knn, mut_count) %>% ## select relevant columns
+    arrange(mut_count) ## arrange mutation in increasing order
+}
+mut_order <- mut_order %>% do.call(rbind, .) %>% as.data.frame() ## rbind list
 
-### zcat simple_somatic_mutation.open.tsv.gz | grep -Fw -f mutation_classes.txt > simple_somatic_mutation.open.selmuts.tsv
-### cat <(zcat simple_somatic_mutation.open.tsv.gz | head -1) simple_somatic_mutation.open.selmuts.tsv | gzip -c - >simple_somatic_mutation.open.selmuts.tsv.gz
-all_muts <- icgcSimpleMutationToMAF("../data/simple_somatic_mutation.open.selmuts.tsv.gz", removeDuplicatedVariants = FALSE, addHugoSymbol = TRUE)
-all_muts <- distinct(.data = all_muts,
-                     Chromosome, Start_Position, End_Position, 
-                     Reference_Allele, Tumor_Seq_Allele2, consequence_type, 
-                     mutation_type, ens_id, icgc_donor_id, 
-                     submitted_sample_id, .keep_all = TRUE) %>% 
-  rename(icgc_sample_id = Tumor_Sample_Barcode) %>% 
-  mutate(Tumor_Sample_Barcode = stringr::str_trunc(submitted_sample_id, 16, ellipsis = ""))
+## Convert sample_id and clust_knn into factor
+mut_order$sample_id <- factor(mut_order$sample_id, levels = mut_order$sample_id)
+mut_order$clust_knn <- factor(mut_order$clust_knn, levels = c(1:10))
 
-# vep.export <- all_muts %>% select(Chromosome, Start_Position, End_Position, Reference_Allele, Tumor_Seq_Allele2, Strand, icgc_mutation_id)
-# vep.export <- vep.export %>% arrange(Chromosome, Start_Position)
-# vep.export <- distinct(vep.export)
-# vep.export <- with(vep.export,
-#                    paste(Chromosome, Start_Position, End_Position,
-#                          paste(Reference_Allele, Tumor_Seq_Allele2, sep = "/"),
-#                          Strand, icgc_mutation_id, sep = "\t"))
-# writeLines(vep.export, con = "../data/vep.export.tsv")
-# vep settings availible in "../data/VEP_settings.png"
-
-clinical_plus_cluster <- readr::read_csv("../data/clinical_plus_cluster.csv")
-patient_ids <- clinical_plus_cluster$patient_id
-solid_tumor_studies <- unique(clinical_plus_cluster$type)
-tumor_clusters <- readr::read_tsv("../data/umap_3d_coors.tsv", guess_max = 10000)
-
-clinical_plus_cluster <- clinical_plus_cluster %>% rename(Tumor_Sample_Barcode = sample_id)
-clinical_plus_cluster <- left_join(clinical_plus_cluster,
-                                   tumor_clusters %>% 
-                                     select(starts_with(c("plot", "cluster", "clust_knn", "sample_id"))),
-                                   by = c("dna_mutation_id" = "sample_id"))
-all_muts <- all_muts %>% filter(Tumor_Sample_Barcode %in% clinical_plus_cluster$Tumor_Sample_Barcode)
-
-vep_output <- readr::read_tsv("../data/vep_output.basic.txt", na = c("", "NA", "-"), guess_max = 10000)
-
-selected_mut <- c("3_prime_UTR_variant", "5_prime_UTR_premature_start_codon_gain_variant", "5_prime_UTR_variant", 
-                  "frameshift_variant", "missense_variant", "splice_acceptor_variant", "splice_donor_variant",
-                  "stop_lost", "start_lost", "stop_gained")
-selected_mut_alt <- c("3'UTR", "5'UTR", 
-                      "Frame_Shift_Del", "Frame_Shift_Ins",
-                      "Missense_Mutation", 
-                      "Splice_Site", "Translation_Start_Site", 
-                      "Nonsense_Mutation", "Nonstop_Mutation")
-
-vep_output <- vep_output %>% 
-  rename(icgc_mutation_id = "#Uploaded_variation")
-
-all_muts <- all_muts %>% 
-  left_join(vep_output, 
-            by = c("consequence_type" = "Consequence", 
-                   "icgc_mutation_id" = "icgc_mutation_id",
-                   "ens_id" = "Gene"))
-
-clinical_plus_cluster$clust_knn_char <- factor(clinical_plus_cluster$clust_knn, 
-                                               levels = c(1:10), 
-                                               labels = c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10"))
-
-all_muts <- left_join(all_muts, clinical_plus_cluster %>% select(Tumor_Sample_Barcode, clust_knn, clust_knn_char, type) %>% distinct())
-
-for( cluster_c in levels(clinical_plus_cluster$clust_knn_char) ) {
-  c_muts <- read.maf(maf = all_muts %>% filter(clust_knn_char == cluster_c),
-                      clinicalData = clinical_plus_cluster %>% filter(clust_knn_char == cluster_c),
-                      vc_nonSyn = selected_mut_alt, 
-                      removeDuplicatedVariants = FALSE)
-  other_muts <- read.maf(maf = all_muts %>% filter(clust_knn_char != cluster_c),
-                         clinicalData = clinical_plus_cluster %>% filter(clust_knn_char != cluster_c),
-                         vc_nonSyn = selected_mut_alt, 
-                         removeDuplicatedVariants = FALSE)
-  
-  c_compare <- mafCompare( c_muts,
-                           other_muts )
-  c_compare <- c_compare$results %>% 
-    as_tibble() %>% 
-    filter(adjPval < 0.01) %>%
-    arrange(or) %>% 
-    mutate(Hugo_Symbol = factor(Hugo_Symbol, levels = Hugo_Symbol)) %>%
-    mutate(ci.up = log(ci.up), ci.low = log(ci.low), or = log(or)) %>%
-    mutate(cluster = cluster_c)
-  
-  if (cluster_c == "01") {
-    all_compare <- c_compare
-  } else {
-    all_compare <- bind_rows(all_compare, c_compare)
+## Determining the breaks positions for the x-axis
+previous_class <- 0 ## starting position 1
+position_of_previous_class <- 0 ## starting position 2
+xaxis_breaks <- list() ## list for the for loop
+for(n in 1) { ## loop through 1 to 10 clusters
+  class_spec <- round(mut_order %>% filter(clust_knn == n) %>% nrow(.) / 2, digits = 0) ## calculate halfway mark of class 
+  xaxis_breaks[[n]] <- class_spec + previous_class + position_of_previous_class ## adding up all variables
+  previous_class <- class_spec ## storing class halfway mark
+  for(n in 2:max(as.numeric(as.character(mut_order$clust_knn)))) {
+    position_of_previous_class <- xaxis_breaks[[n-1]] ## getting the previous class position
+    class_spec <- round(mut_order %>% filter(clust_knn == n) %>% nrow(.) / 2, digits = 0) ## calculate halfway mark of new class
+    xaxis_breaks[[n]] <- class_spec + previous_class + position_of_previous_class ## adding up all variables
+    previous_class <- class_spec ## storing class halfway mark
   }
 }
+xaxis_breaks <- as.data.frame(do.call(rbind, xaxis_breaks)) ## rbind list
+xaxis_breaks <- mut_order[rownames(mut_order) %in% xaxis_breaks$V1,] ## find the tumor samples in these positions
 
-save(all_compare, all_muts, clinical_plus_cluster, cluster_colors, file = "../data/forest.heatmap.data.rda")
+total_n <- as.data.frame(table(mut_order$clust_knn)) ## getting total n in cluster
+
+mut_order$log10mut <- log10(mut_order$mut_count + 1) ## mutation count log transformation + pseudo count
+
+## Calculate median for each class
+mut_median <- mut_order %>% 
+  group_by(clust_knn) %>% 
+  dplyr::summarize(mut_med = median(log10mut)) 
+
+## Need to add 100 pseudo samples front and end of data so they don't touch the y-axis
+mut_order <- mut_order[,c("sample_id", "clust_knn", "log10mut")] ## selecting relevant column
+
+begin_NA <- data.frame(sample_id = paste0("sample", 1:100), 
+                       clust_knn = min(as.numeric(mut_order$clust_knn)), ## put lowest cluster to prevent a new facet
+                       log10mut = NA) ## put NA values so they don't get plotted
+end_NA <- data.frame(sample_id = paste0("sample", 101:200), ## repeat the step for the ends
+                       clust_knn = max(as.numeric(mut_order$clust_knn)),
+                       log10mut = NA)
+mut_order <- rbind(begin_NA, mut_order, end_NA) ## rbind the data in a specfic order
+
+mut_order$sample_id <- factor(mut_order$sample_id, levels = mut_order$sample_id) ## factor samples
+mut_order$clust_knn <- factor(mut_order$clust_knn, levels = c(1:10)) ## factor clusters
+
+fig1G <- ggplot(mut_order, aes(x = sample_id, y = log10mut, color = clust_knn)) + 
+  geom_point(size = 0.25) + 
+  ylab("Log10(Mutation Count)") + 
+  xlab("") +
+  theme_classic() +
+  facet_wrap(~ factor(clust_knn, levels = c(1:10)), ncol = 10, scales = "free_x") + ## facet by cluster
+  geom_hline(data= mut_median, aes(yintercept=mut_med)) + ## add median line
+  scale_y_continuous(sec.axis = sec_axis(~.)) + ## dup y-axis
+  scale_x_discrete(breaks = c(as.character(mut_order$sample_id[1]), as.character(xaxis_breaks$sample_id)), labels = c("n =" ,total_n$Freq)) +
+  theme(axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
+        axis.ticks.x = element_blank(),
+        axis.line.x = element_line(colour = "black", size = 0.5),
+        axis.line.x.top = element_line(colour = "black", size = 0.5),
+        panel.spacing = unit(1, "lines"),
+        strip.background = element_rect(size = 0.5),
+        strip.placement = "outside",
+        strip.text.x = element_text(size = 10),
+        legend.position = "none") +
+  scale_color_manual(values = kelly.colours[-c(1:2)])
+
+## code to keep only the bottom border line of the facet
+fig1G <- ggplotGrob(fig1G)
+
+lg <- linesGrob(x=unit(c(0,1),"npc"), y=unit(c(0,0),"npc"), ## All lines off expect bottom line of facet
+                   gp=gpar(col="black", lwd=4))
+
+for (k in grep("strip-t",fig1G$layout$name)) { ## turn off 3 lines from the facet border text
+  fig1G$grobs[[k]]$grobs[[1]]$children[[1]] <- lg
+}
+
+fig1G <- as.ggplot(fig1G)
+fig1G
 ```
 
-```{r forest-heatmap-data-plot, fig.align='center', fig.width= 9, fig.height= 8, message=FALSE}
-#fig.width= 16, fig.height= 20,
-load("../data/forest.heatmap.data.rda")
 
-down_compare_plot <- all_compare %>%
-  group_by(cluster) %>%
-  filter(or < 0) %>%
-  filter(adjPval < 0.01) %>%
-  arrange(-or) %>%
-  filter(is.finite(or)) %>%
-  slice_max(order_by = or, n = 10) %>%
-  arrange(cluster, or, .by.group = TRUE)
-down_compare_plot$Hugo_Symbol <- with(down_compare_plot,
-                                      factor(as.character(Hugo_Symbol),
-                                             levels = unique(as.character(Hugo_Symbol))))
-
-up_compare_plot <- all_compare %>%
-  group_by(cluster) %>%
-  filter(or > 0) %>%
-  arrange(-or) %>%
-  filter(is.finite(or)) %>%
-  slice_max(order_by = or, n = 10) %>%
-  arrange(cluster, or, .by.group = TRUE)
-up_compare_plot$Hugo_Symbol <- with(up_compare_plot,
-                                    factor(as.character(Hugo_Symbol),
-                                           levels = unique(as.character(Hugo_Symbol))))
-
-up_p <- ggplot(up_compare_plot, 
-               aes(x = or,
-                   y = Hugo_Symbol,
-                   color = cluster,
-                   group = cluster)) +
-  geom_vline(xintercept = 0, linetype = 2) +
-  geom_pointrange(aes(xmin = ci.low, xmax = ci.up)) +
-  scale_color_manual(values = cluster_colors) +
-  theme_classic() +
-  xlab("log odds ratio") +
-  xlim(c(0, 9)) +
-  ylab("Gene") +
-  facet_grid(cluster ~ ., scales = "free_y", drop = TRUE, space = "free_y", switch = "y") +
-  ggtitle("Enriched") +
-  theme(
-    panel.grid.major.y = element_line(colour = "#f0f0f0"),
-    axis.title.y = element_blank()
-  )
-
-dn_p <- ggplot(down_compare_plot, 
-               aes(x = or, 
-                   y = Hugo_Symbol, 
-                   color = cluster, 
-                   group = cluster)) +
-  geom_vline(xintercept = 0, linetype = 2) +
-  geom_pointrange(aes(xmin = ci.low, xmax = ci.up)) +
-  scale_color_manual(values = cluster_colors, guide = guide_none()) +
-  theme_classic() +
-  xlab("log odds ratio") +
-  xlim(c(-9, 0)) +
-  ylab("Gene") +
-  facet_grid(cluster ~ ., scales = "free_y", drop = TRUE, space = "free_y", switch = "y") +
-  ggtitle("Depleted") +
-  theme(panel.grid.major.y = element_line(colour = "#f0f0f0"))
-
-tdat_up <- all_muts %>%
-  filter(Hugo_Symbol %in% up_compare_plot$Hugo_Symbol) %>%
-  distinct(Tumor_Sample_Barcode, Hugo_Symbol, clust_knn_char, type) %>%
-  select(type, clust_knn_char, Hugo_Symbol) %>%
-  table()
-tdat_up <- left_join(
-  as.data.frame(tdat_up),
-  clinical_plus_cluster %>%
-    select(Tumor_Sample_Barcode, type, clust_knn_char) %>%
-    distinct() %>%
-    group_by(type, clust_knn_char) %>%
-    summarise(ntumors = n())) %>%
-  mutate(prop = Freq / ntumors) %>%
-  mutate(prop = ifelse(is.na(prop), 0, prop)) %>%
-  select(type, clust_knn_char, Hugo_Symbol, prop) %>%
-  rename(cluster = clust_knn_char)
-tdat_up$Hugo_Symbol <- factor(tdat_up$Hugo_Symbol, levels = levels(up_compare_plot$Hugo_Symbol))
-tdat_up <- up_compare_plot %>% left_join(tdat_up)
-
-tdat_up_p <- tdat_up %>% ggplot(aes(type, Hugo_Symbol, fill = prop)) +
-  geom_tile() +
-  scale_fill_viridis_c(option = "E", "Proportion of \nTumor Type \nMutated Within Cluster", limits = c(0, 1)) +
-  xlab("Tumor Type") +
-  ylab("Gene Symbol") +
-  facet_grid(cluster ~ ., scales = "free_y", drop = TRUE, space = "free_y") +
-  theme_classic() +
-  theme(
-    strip.text = element_blank(),
-    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
-    axis.text.y = element_blank(),
-    axis.title.y = element_blank(),
-    panel.grid.major.y = element_line(colour = "#f0f0f0")
-  )
-
-tdat_dn <- all_muts %>%
-  filter(Hugo_Symbol %in% down_compare_plot$Hugo_Symbol) %>%
-  distinct(Tumor_Sample_Barcode, Hugo_Symbol, clust_knn_char, type) %>%
-  select(type, clust_knn_char, Hugo_Symbol) %>%
-  table()
-tdat_dn <- left_join(
-  as.data.frame(tdat_dn),
-  clinical_plus_cluster %>%
-    select(Tumor_Sample_Barcode, type, clust_knn_char) %>%
-    distinct() %>%
-    group_by(type, clust_knn_char) %>%
-    summarise(ntumors = n())) %>%
-  mutate(prop = Freq / ntumors) %>%
-  mutate(prop = ifelse(is.na(prop), 0, prop)) %>%
-  select(type, clust_knn_char, Hugo_Symbol, prop) %>%
-  rename(cluster = clust_knn_char)
-tdat_dn$Hugo_Symbol <- factor(tdat_dn$Hugo_Symbol, levels = levels(down_compare_plot$Hugo_Symbol))
-tdat_dn <- down_compare_plot %>% left_join(tdat_dn)
-
-tdat_dn_p <- tdat_dn %>% ggplot(aes(type, Hugo_Symbol, fill = prop)) +
-  geom_tile() +
-  scale_fill_viridis_c(option = "E", "Proportion of \nTumor Type \nMutated Within Cluster", limits = c(0, 1)) +
-  xlab("Tumor Type") +
-  ylab("Gene Symbol") +
-  facet_grid(cluster ~ ., scales = "free_y", drop = TRUE, space = "free_y") +
-  theme_classic() +
-  theme(
-    strip.text = element_blank(),
-    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
-    axis.text.y = element_blank(),
-    axis.title.y = element_blank(),
-    panel.grid.major.y = element_line(colour = "#f0f0f0")
-  )
-
-layout <- "ABBCDD"
-
-dn_p + tdat_dn_p + up_p + tdat_up_p + plot_layout(guides = 'collect', design = layout) & theme(legend.position = "bottom")
-```

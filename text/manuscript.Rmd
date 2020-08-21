@@ -76,8 +76,9 @@ suppressPackageStartupMessages(c(
   library(flextable),
   library(plot3D),
   library(ggfortify),
-  library(maftool),
-  library(survival)
+  library(maftools),
+  library(survival),
+  library(ggalluvial)
 ))
 ```
 
@@ -460,7 +461,7 @@ cat("\\newpage")
 cat("\\newpage")
 ```
 #### Figure 2
-```{r child='../code/figure2v2.Rmd'}
+```{r child='../code/figure2.Rmd'}
 #
 ```
 
@@ -468,7 +469,7 @@ cat("\\newpage")
 cat("\\newpage")
 ```
 #### Figure 3
-```{r child = '../code/figure4v2.Rmd'}
+```{r child = '../code/figure3.Rmd'}
 #
 ```
 
@@ -476,7 +477,7 @@ cat("\\newpage")
 cat("\\newpage")
 ```
 #### Figure 4
-```{r child = '../code/figure3v2.Rmd'}
+```{r child = '../code/figure4.Rmd'}
 #
 ```
 
@@ -484,7 +485,7 @@ cat("\\newpage")
 cat("\\newpage")
 ```
 #### Figure 5
-```{r child = '../code/figure2.Rmd'}
+```{r child = '../code/figure5.Rmd'}
 #
 ```
 
@@ -492,7 +493,7 @@ cat("\\newpage")
 cat("\\newpage")
 ```
 #### Figure 6
-```{r child = '../code/figure4.Rmd'}
+```{r child = '../code/figure6.Rmd'}
 #
 ```
 
@@ -508,7 +509,7 @@ cat("\\newpage")
 cat("\\newpage")
 ```
 #### Table 1
-```{r child = '../code/table2.Rmd'}
+```{r child = '../code/table1.Rmd'}
 #
 ```
 
