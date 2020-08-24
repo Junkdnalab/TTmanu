@@ -207,7 +207,7 @@ cat("\\newpage")
 ```{r child = '../code/figure3.Rmd'}
 ```
 
-**Figure 3: Pathway-based classification is independent of tissue-of-origin features.** 
+**Figure 3: Pathway-based clustering independent of tissue-of-origin** 
 A) Sankey plot showing correspondence between cancer type and cluster identity.
 B) Projection of cancer type identity onto UMAP. Abbrevs: BRCA = Breast cancer,
 COAD = Colorectal adenocarcinoma, HNSC = Head and neck squamous cell, PAAD =

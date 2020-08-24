@@ -1,3 +1,8 @@
+---
+output:
+  word_document: default
+  html_document: default
+---
 ```{r, fig.width = 9, fig.height= 4}
 load("../data/cancer_disrupt_heatmap.Rda") ## Load  in data processed in figure1.Rmd
 
