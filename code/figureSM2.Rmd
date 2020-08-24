@@ -1,7 +1,4 @@
-```
-{r SM2}
-
-
+```{r SM2}
 load("../code/survival/survmodel.stansave")
 
 
@@ -45,7 +42,5 @@ mortpl <- ggplot(menmort) +
     theme_minimal()
 
 print(mortpl)
-
-
 ```
 
