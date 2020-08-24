@@ -78,7 +78,9 @@ suppressPackageStartupMessages(c(
   library(ggfortify),
   library(maftools),
   library(survival),
-  library(ggalluvial)
+  library(ggalluvial),
+  library(grid),
+  library(gridBase)
 ))
 ```
 
