@@ -456,7 +456,7 @@ cat("\\newpage")
 ```{r child = '../code/table1.Rmd'}
 ```
 
-**Table 1: Cluster-specific enriched pathways (effect size >= 0.30) in metastatsis.**
+**Table 1: Cluster-specific enriched pathways (effect size ≥ 0.30) in metastasis.**
 
 ```{r, results='asis'}
 cat("\\newpage")
