@@ -126,9 +126,9 @@ plotcancertype = function(cancerdat,i){
         ) +
         scale_color_manual(
             values = c(
-                rtime = "#0072b2",
-                stime = "#d55e00",
-                acttime = "#009e73"
+                rtime = "#66c2a5",
+                stime = "#8da0cb",
+                acttime = "#fc8d62"
             ),
             breaks = c("rtime", "stime", "acttime"),
             labels = c(
