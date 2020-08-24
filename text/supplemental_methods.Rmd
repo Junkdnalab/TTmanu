@@ -112,6 +112,8 @@ assign membership to the remaining tumors.
 
 
 ### Survival
+```{r child='../code/figureSM2.Rmd'}
+```
 
 In order to understand how the diagnosis of cancer changes the expectation for
 longevity of patients, we first modeled the longevity of the overall population
