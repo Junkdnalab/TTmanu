@@ -342,27 +342,27 @@ cluster) within each numbered cluster (rows).
 cat("\\newpage")
 ```
 
-To discover what pathways drive the UMAP clustering, we calculated percent
-enrichment for each pathway _within cluster_ relative to all other clusters
-combined (see methods) and ranked pathways for each cluster from highest to
-lowest enrichment. We visualized the enrichment as a heatmap (**figure 5B**).
-Using this approach, we identified 25 pathways highly enriched (enrichment score
-$> 0.3$, see methods) in cluster 2, 9 pathways enriched in cluster 3, 24
-pathways in cluster 4, 10 pathways in cluster 5, 10 pathways in cluster 6, 24
-pathways in cluster 7, 24 pathways in cluster 8, 10 pathways in cluster 9, and 0
-pathways for clusters 1 and 10. Clusters 7, 8, and 9 had several pathways in
-common. To explore the specific pathways marking each cluster, we projected
-disruptions for each of the 377 pathways onto the UMAP (**supplementary figure
-S4**). Clusters 3 and 5 were distinguished by metabolic pathways including RNA
-and protein biosynthesis (**supplementary figure S4**). Similarly, cluster 4 was
-distinguished by mutations affecting regulation of DNA and histone methylation
-("DNA methylation", "PRC2 methylates histones and DNA", and "Nucleosome
-assembly"). Clusters 7-9 have in common mutations in extracellular,
-intracellular, and immune-related signaling pathways (see **figure 5C** and
-**supplementary figure S4**). Cluster 2 had the highest pathway enrichment
-levels of the three, having mutations in hedgehog signaling, "β-catenin
-degradation", "cellular response to hypoxia", "regulation of cell cycle" and
-"apoptosis" among others.
+To discover what pathways are most important for clustering, we calculated
+percent enrichment for each pathway _within cluster_ relative to all other
+clusters combined (see methods) and ranked pathways for each cluster from
+highest to lowest enrichment. We visualized the enrichment as a heatmap
+(**figure 5B**). Using this approach, we identified 25 pathways highly enriched
+(enrichment score $> 0.3$, see methods) in cluster 2, 9 pathways enriched in
+cluster 3, 24 pathways in cluster 4, 10 pathways in cluster 5, 10 pathways in
+cluster 6, 24 pathways in cluster 7, 24 pathways in cluster 8, 10 pathways in
+cluster 9, and 0 pathways for clusters 1 and 10. Clusters 7, 8, and 9 had
+several pathways in common. To explore the specific pathways marking each
+cluster, we projected disruptions for each of the 377 pathways onto the UMAP
+(**supplementary figure S4**). Clusters 3 and 5 were distinguished by metabolic
+pathways including RNA and protein biosynthesis (**supplementary figure S4**).
+Similarly, cluster 4 was distinguished by mutations affecting regulation of DNA
+and histone methylation ("DNA methylation", "PRC2 methylates histones and DNA",
+and "Nucleosome assembly"). Clusters 7-9 have in common mutations in
+extracellular, intracellular, and immune-related signaling pathways (see
+**figure 5C** and **supplementary figure S4**). Cluster 2 had the highest
+pathway enrichment levels of the three, having mutations in hedgehog signaling,
+"β-catenin degradation", "cellular response to hypoxia", "regulation of cell
+cycle" and "apoptosis" among others.
 
 Prior efforts to extract common signatures from pan-cancer datasets met with
 difficulty in distinguishing tumor samples from their tissue-specific -omics
@@ -545,14 +545,18 @@ using the longevity data within the cancer tumor dataset. Our model estimates
 the effect of cancer type and class-specific cancer effects independently,
 resulting in a cancer and class specific estimate of the aging rate multiplier.
 A detailed description of the CDC longevity model and likelihood is provided in
-the supplementary methods.
+the **Supplementary methods**.
 
 ## Acknowledgements
 
+Wish wish to thank David Van Valen, Simon Knott and Kate Lawrenson for critical
+reading of this manuscript, and Ivetth Corona for early discussions and
+feedback.
 
 ## Declarations
 
-The authors have nothing to declare. This work was supported by a grant from the Cedars-Sinai Precision Health Initiative.
+The authors have no conflicts of interest to declare. This work was supported by
+a grant from the Cedars-Sinai Precision Health Initiative.
 
 ```{r, results='asis'}
 cat("\\newpage")
