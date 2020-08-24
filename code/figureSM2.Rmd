@@ -1,5 +1,20 @@
-```
-{r SM2}
+```{r SM2}
+
+
+## mortality data from CDC:
+namesmort = c("agerng","pdead","nsurv","ndie","pyrs","pyrsabove","expectedlife")
+menmort = read_csv("../data/survival/lifetables/Table02.csv",skip=2)
+## drop the final row, it's just a text info statement
+menmort = menmort[1:NROW(menmort)-1,] 
+wommort = read_csv("../data/survival/lifetables/Table03.csv",skip=2)
+wommort = wommort[1:NROW(wommort)-1,]
+
+names(menmort) = namesmort
+names(wommort) = namesmort
+yrs=seq(0,100,by=1);
+menmort$yrnum = yrs
+wommort$yrnum = yrs
+
 
 
 load("../code/survival/survmodel.stansave")
