@@ -112,8 +112,6 @@ assign membership to the remaining tumors.
 
 
 ### Survival
-```{r child='../code/figureSM2.Rmd'}
-```
 
 In order to understand how the diagnosis of cancer changes the expectation for
 longevity of patients, we first modeled the longevity of the overall population
@@ -179,10 +177,24 @@ race is an important category due to differences in access to care and other
 socioeconomic and education related factors. However, due to the low number of
 Black patient tumors, we use ethnicity only to identify the baseline risk
 function, while the tissue and class specific multipliers are not ethnicity
-specific.
+specific. There were too few tumors from other races to obtain good inference so
+we excluded them from our analysis.
 
 **supplementary figure SM2** gives a comparison on log-scale between
 the post-fit survival curves and the CDC data it is based on.
+
+```{r, results='asis'}
+cat("\\newpage")
+```
+
+```{r child='../code/figureSM2.Rmd'}
+```
+
+**SM2 Legend here**
+
+```{r, results='asis'}
+cat("\\newpage")
+```
 
 As an aside, we did not explicitly account for stage at diagnosis in our model
 for the following reasons. In the tumor sample data, stage at diagnosis is
