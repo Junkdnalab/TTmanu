@@ -76,7 +76,7 @@ can increase our expectation of life relative to the comparison group, even if
 it decreases the expectation of life of the individual relative to the
 counterfactual where they did not have cancer.
 
-The degree to which a given cancer accelerates mortality can be determined by
+The degree to which a given cancer accelerates aging can be determined by
 the $k_{tis}$ multiplier (**Figure 8**) multiplied by the cluster modifier
 (**Figure 9**). Looking at the tissue specific multiplier, the least deadly was
 prostate cancer (PRAD), and the most deadly was glioblastoma (GBM) which has a
