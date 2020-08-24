@@ -168,8 +168,15 @@ clustering algorithms).
 cat("\\newpage")
 ```
 
+#### Figure 2
 ```{r, child='../code/figure2.Rmd'}
 ```
+
+**Figure 2: Dimensionality reduction of tumor samples using pathway aberrations data 
+identifies ten well-defined clusters.** Different perspectives of the same data in 
+three-dimensional space are shown using UMAP. Each dot corresponds to a tumor sample. 
+Colors indicate the tumor's cluster identity. 
+
 
 ```{r, results='asis'}
 cat("\\newpage")
