@@ -156,57 +156,20 @@ project.
 cat("\\newpage")
 ```
 
-In order to classify tumors using this dataset, we used multiple correspondence
-analysis (MCA) [@JSSv025i01]. First, we determined the number of dimensions
-containing useful information by selecting the eigenvalue with the most
-explanatory power, using the average of 100 permutations of the data as baseline
-(**figure 2A**). We then chose the maximum eigenvalue for which the p-value
-remained ≤ 0.05 (see cutoff in **figure 2B**). Then we performed a UMAP
-analysis, both in order to summarize the MCA graphically, and as a preprocessing
-step to boost the performance of density based clustering. The resulting map was
-notable for its lobed structure, with several reproducible projections
-regardless of random seed setting. A representative version of this 3D UMAP is
-shown in **figure 2C**, rotated to enhance the visibility of the major features.
-Following this spatial mapping we attempted to define groupings of similar
-tumors within the spatial map using HDBSCAN, which performs hierarchical
-clustering and provides metrics of cluster stability and probabilities of
-cluster membership for each node. However, HDBSCAN is sensitive to several
-parameters; key for our analysis are the minimum number of tumor samples in a
-cluster that capture the maximum number of tumor samples, measured by
-probability of membership of ≥ 5% in at least one class. Thus, we created a
-score metric as the fraction of classified tumors with max probability < 5% in
-one class and chose a cluster size of 92 to minimize the score function
-(**figure 2D**). HDBSCAN with these settings resulted in ten distinct
-high-density clusters which we then projected onto the UMAP (**figure 2E**).
-This classified 6,038 out of 7,607 tumors but still resulted in a significant
-fraction of unclassified tumor samples. Since we ultimately wish to be able to
-classify any tumor using this scheme, we performed k Nearest Neighbors (kNN)
-analysis, which computes a similarity metric to every tumor in the set and then
-lets the _k_ most similar tumors "vote" as to the identity of the query tumor
-sample based on their classification labels. We set _k_ to be the square root of
-the number of tumor samples (87). Using this method, we assigned cluster
-membership to the remaining tumors (**figure 2F**).
+We investigated this dataset further using multiple correspondence analysis
+(MCA), and visually summarized the analysis with UMAP (**figure 2**). We used
+the resulting UMAP graph coordinates to perform density based clustering with
+HDBSCAN, which resulted in identification of 10 well-defined clusters capturing
+about 80% of the tumor samples. To capture the remaining samples into one of
+these 10 clusters we used kNN (see **Supplementary Methods** for details on all
+clustering algorithms).
 
 ```{r, results='asis'}
 cat("\\newpage")
 ```
 
-#### Figure 2
-```{r child='../code/figure2.Rmd'}
+```{r, child='figure2.Rmd'}
 ```
-
-**Figure 2: Method for tumor classification using pathway aberration data** 
-a) MCA analysis was performed to determine the eigenvalue with the most
-explanatory power from the categorical data. Average of 100 permutations of the
-data was used as a baseline. b) The p-value of each eigenvalue was plotted and
-the max eigenvalue with a pvalue < 0.05 was selected. c) The resulting MCA was
-projected down to 3 dimensions for the purpose of density based clustering (only
-the first 2 dimensions are shown). Each dot represents a tumor d) HDBSCAN was
-used to perform hierarchical density based clustering tuned to minimize the
-fraction of unassigned tumors. e) HDBSCAN clustered tumors were visualized on
-the UMAP projection; tumors are colored by cluster membership (see legend). This
-results in some tumors remaining unclassified (grey points). f) kNN was used to
-assign membership to the remaining tumors.
 
 ```{r, results='asis'}
 cat("\\newpage")
@@ -381,27 +344,27 @@ cluster) within each numbered cluster (rows).
 cat("\\newpage")
 ```
 
-To discover what pathways drive the UMAP clustering, we calculated percent
-enrichment for each pathway _within cluster_ relative to all other clusters
-combined (see methods) and ranked pathways for each cluster from highest to
-lowest enrichment. We visualized the enrichment as a heatmap (**figure 5B**).
-Using this approach, we identified 25 pathways highly enriched (enrichment score
-$> 0.3$, see methods) in cluster 2, 9 pathways enriched in cluster 3, 24
-pathways in cluster 4, 10 pathways in cluster 5, 10 pathways in cluster 6, 24
-pathways in cluster 7, 24 pathways in cluster 8, 10 pathways in cluster 9, and 0
-pathways for clusters 1 and 10. Clusters 7, 8, and 9 had several pathways in
-common. To explore the specific pathways marking each cluster, we projected
-disruptions for each of the 377 pathways onto the UMAP (**supplementary figure
-S4**). Clusters 3 and 5 were distinguished by metabolic pathways including RNA
-and protein biosynthesis (**supplementary figure S4**). Similarly, cluster 4 was
-distinguished by mutations affecting regulation of DNA and histone methylation
-("DNA methylation", "PRC2 methylates histones and DNA", and "Nucleosome
-assembly"). Clusters 7-9 have in common mutations in extracellular,
-intracellular, and immune-related signaling pathways (see **figure 5C** and
-**supplementary figure S4**). Cluster 2 had the highest pathway enrichment
-levels of the three, having mutations in hedgehog signaling, "β-catenin
-degradation", "cellular response to hypoxia", "regulation of cell cycle" and
-"apoptosis" among others.
+To discover what pathways are most important for clustering, we calculated
+percent enrichment for each pathway _within cluster_ relative to all other
+clusters combined (see methods) and ranked pathways for each cluster from
+highest to lowest enrichment. We visualized the enrichment as a heatmap
+(**figure 5B**). Using this approach, we identified 25 pathways highly enriched
+(enrichment score $> 0.3$, see methods) in cluster 2, 9 pathways enriched in
+cluster 3, 24 pathways in cluster 4, 10 pathways in cluster 5, 10 pathways in
+cluster 6, 24 pathways in cluster 7, 24 pathways in cluster 8, 10 pathways in
+cluster 9, and 0 pathways for clusters 1 and 10. Clusters 7, 8, and 9 had
+several pathways in common. To explore the specific pathways marking each
+cluster, we projected disruptions for each of the 377 pathways onto the UMAP
+(**supplementary figure S4**). Clusters 3 and 5 were distinguished by metabolic
+pathways including RNA and protein biosynthesis (**supplementary figure S4**).
+Similarly, cluster 4 was distinguished by mutations affecting regulation of DNA
+and histone methylation ("DNA methylation", "PRC2 methylates histones and DNA",
+and "Nucleosome assembly"). Clusters 7-9 have in common mutations in
+extracellular, intracellular, and immune-related signaling pathways (see
+**figure 5C** and **supplementary figure S4**). Cluster 2 had the highest
+pathway enrichment levels of the three, having mutations in hedgehog signaling,
+"β-catenin degradation", "cellular response to hypoxia", "regulation of cell
+cycle" and "apoptosis" among others.
 
 Prior efforts to extract common signatures from pan-cancer datasets met with
 difficulty in distinguishing tumor samples from their tissue-specific -omics
@@ -572,15 +535,30 @@ differences that are not likely to be biologically relevant.
 
 ### Models of survival based on population-specific longevity data
 
-```{r child='survival-methods.Rmd'}
-```
+We used Bayesian inference to explore the relative impact of cancer diagnosis on
+survival at the time of diagnosis. Our model assumes that at birth each person
+has a small initial probability per unit time to die, and that this probability
+grows exponentially in time at some baseline rate that matches the observed CDC
+data. The rate of growth in risk is assumed to jump to a higher level at
+diagnosis, which we take as a proxy for onset. This represents an accelerated
+aging type model. To fit the model, we constrain the baseline risks using the
+available CDC life tables. We then constrain the cancer specific multiplier
+using the longevity data within the cancer tumor dataset. Our model estimates
+the effect of cancer type and class-specific cancer effects independently,
+resulting in a cancer and class specific estimate of the aging rate multiplier.
+A detailed description of the CDC longevity model and likelihood is provided in
+the **Supplementary methods**.
 
 ## Acknowledgements
 
+Wish wish to thank David Van Valen, Simon Knott and Kate Lawrenson for critical
+reading of this manuscript, and Ivetth Corona for early discussions and
+feedback.
 
 ## Declarations
 
-The authors have nothing to declare. This work was supported by a grant from the Cedars-Sinai Precision Health Initiative.
+The authors have no conflicts of interest to declare. This work was supported by
+a grant from the Cedars-Sinai Precision Health Initiative.
 
 ```{r, results='asis'}
 cat("\\newpage")

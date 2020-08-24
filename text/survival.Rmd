@@ -5,22 +5,14 @@ output:
 ---
 If our molecular pathway disruption classes represent distinct biological states
 apart from tissue of origin, they may have different prognoses within cancer
-types or across all cancers. Kaplan-Meier plots reveal large differences between
-cancer types as expected, and some modest differences between our classes (not
-shown). These analyses are profoundly limited by confounding factors of age and
-stage at diagnosis, sex, ethnicity, and tissue-specific disease progression, to
-name the obvious ones. To explore these ideas, we tested models of survival
-using public longevity data from the CDC, accounting for age, gender and
-ethnicity. Our model assumes that at birth each person has a small initial
-probability per unit time to die, and that this probability grows exponentially
-in time at some baseline rate that matches the observed CDC data. The rate of
-growth in risk is assumed to jump to a higher level at diagnosis, which we take
-as a proxy for onset. This represents an accelerated aging type model. To fit
-the model, we constrain the baseline risks using the available CDC life tables.
-We then constrain the cancer specific multiplier using the longevity data within
-the cancer tumor dataset. Our model estimates the effect of cancer type and
-class-specific cancer effects independently, resulting in a cancer and class
-specific estimate of the aging rate multiplier.
+types or across all cancers. These analyses are profoundly limited by
+confounding factors of age and stage at diagnosis, sex, ethnicity, and
+tissue-specific disease progression, to name the obvious ones. To explore these
+ideas, we used Bayesian inference to test models of survival using public
+longevity data from the CDC, accounting for age, gender and ethnicity. Our model
+estimates the effect of cancer type and class-specific cancer effects
+independently, resulting in a cancer and class specific estimate of the aging
+rate multiplier.
 
 To understand the model, we show in **Figure 7A** simulated survival time curves
 for four related groups. We start with a cohort of women aged 30 and show their
