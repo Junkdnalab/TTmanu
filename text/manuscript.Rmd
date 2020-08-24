@@ -207,11 +207,10 @@ cat("\\newpage")
 ```
 
 **Figure 3: Pathway-based classification is independent of tissue-of-origin features.** 
-a) Projection of cancer type identity onto UMAP. Abbrevs: BRCA = Breast cancer,
-COAD = Colorectal adenocarcinoma, HNSC = Head and neck squamous cell, PAAD =
-Pancreatic adenocarcinoma. b) Projection of breast cancer subtypes onto the
-UMAP. c) Projection of BRCA1/2 somatic mutation onto the UMAP. d) Projection of
-tumor stage onto the UMAP, regardless of cancer type. e) Projection of
+a) Sankey diagram (flow is left to right) of the tumor type make up in a cluster. Cluster 
+membership is on the left. Cancer type is on the right. b) Projection of breast cancer
+subtypes onto the UMAP. c) Projection of BRCA1/2 somatic mutation onto the UMAP. d) 
+Projection of tumor stage onto the UMAP, regardless of cancer type. e) Projection of
 metastatic status onto the UMAP. Abbrevs: M0 = non-metastatic tumors, M1 =
 metastatic tumors.
 
@@ -317,10 +316,9 @@ disease and metastasis, regardless and independent of overall mutational burden
 
 ### Tissue specific genes define cluster membership
 
-In order to visualize pathway disruption enrichment across all cancers
-(pan-cancer), we created waterfall plots, replacing genes with pathways
-(**figure 5A**). A complete list of pathway disruptions with percent mutated
-samples and top genes is provided in **supplementary table ST1**. As expected,
+In order to identify pathway disruption enrichment across all cancers
+(pan-cancer), we created a list of pathway disruptions with percent mutated
+samples and top genes (**supplementary table ST1**). As expected,
 these analyses reveal the broad importance of many well known pathways that are
 disrupted in cancer, including "PIP3 activates Akt signaling" (77% of samples),
 "MAP1K/MAP3K signaling" (70% of samples), "Mitotic G2-G2/M phases" (67% of
@@ -336,14 +334,9 @@ cat("\\newpage")
 ```
 
 **Figure 5: Pan-cancer enrichment of pathway disruptions.** 
-a) Waterfall plot; columns represent tumors. Each row represents a pathway. The
-pathways are ranked such that the pathway with the most disruptions across all
-7,607 tumors is the first row _etc._ and tumors are ordered to prioritize the
-top pathway disruptions successively. The top 100 most mutated pathways are
-shown. Red signifies pathway disrupted pathways, grey signifies not disrupted.
-b) Heatmap shows the relative enrichment of each pathway (columns) within each
+a) Heatmap shows the relative enrichment of each pathway (columns) within each
 numbered cluster (rows). Effect size is displayed as colors (orange, enrichment;
-purple, depletion). c) Proportion of mutated samples in the each significant
+purple, depletion). b) Proportion of mutated samples in the each significant
 pathway (columns; union set of pathways with effect size >= 0.30 in each
 cluster) within each numbered cluster (rows).
 
@@ -558,7 +551,7 @@ the **Supplementary methods**.
 
 ## Acknowledgements
 
-Wish wish to thank David Van Valen, Simon Knott and Kate Lawrenson for critical
+We wish to thank David Van Valen, Simon Knott and Kate Lawrenson for critical
 reading of this manuscript, and Ivetth Corona for early discussions and
 feedback.
 
@@ -566,13 +559,6 @@ feedback.
 
 The authors have no conflicts of interest to declare. This work was supported by
 a grant from the Cedars-Sinai Precision Health Initiative.
-
-```{r, results='asis'}
-cat("\\newpage")
-```
-
-```{r child='../text/fig_legend.Rmd'}
-```
 
 ```{r, results='asis'}
 cat("\\newpage")

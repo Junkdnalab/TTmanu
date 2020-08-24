@@ -1,4 +1,4 @@
-```{r figure-2-plot, fig.width = 9}
+```{r figure-2-plot, fig.width = 9, echo = FALSE}
 umap_cancertype <- data.table::fread("../data/umap_3d_coors.tsv") ## load data
 load("../data/kelly.colours.rda")
 cluster.colours <- c("grey", kelly.colours[c(3:12)]) ## Color scheme for cluster
@@ -8,7 +8,7 @@ theta <- c(0, 90, 270)
 phi <- c(65, 15, 15)
 
 opar <- par(mfrow = c(1,3), mai = c(0.1, 0.1, 0.1, 0.1)) ## plot layout 2x3
-par(mar = c(2,2,0,0), bg = NA) ## setting plot margins for the following plots
+par(mar = c(0,2,0,0), bg = NA) ## setting plot margins for the following plots
 
 for(n in 1) {
   with(umap_cancertype, scatter3D(plot_y, -plot_z, plot_x, 
@@ -23,6 +23,11 @@ for(n in 1) {
                                 theta = theta[p], phi = phi[p], scale = T,
                                 xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
                                 colvar = NULL))
+        if(p == 2) {
+      mtext("Cluster", side=3, line=-3.5, cex=1.2, adj=0.5)
+      legend("top", inset = c(0.10), legend=names(cluster.colours[2:6]), col=cluster.colours[2:6], pch = 20, bty = "n", horiz = T, cex = 1.2)
+      legend("top", inset = c(0.15), legend=names(cluster.colours[7:11]), col=cluster.colours[7:11], pch = 20, bty = "n", horiz = T, cex = 1.2)
+    }
   }
 }
 
