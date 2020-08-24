@@ -43,16 +43,16 @@ women (light blue) to an equal sized group of 30 year old women with cancer, k =
 we compare a randomly selected group of people with ages uniformly distributed
 from 30 to 70 (dark blue) and a randomly selected group with uniformly
 distributed ages and cancer k = 2 (dark orange). B,C,D,E) We compare a randomly
-selected group with correct age distribution for the given cancer (blue) to the
-model predicted survival for the given average k (red) and the actual survival
-for the patients in our dataset (CHOOSE COLOR HERE, NOT GREEN). As can be seen,
-Stomach Cancer (STAD), Glioblastoma (GBM), and Pancreatic Cancer (PAAD) are all
-very deadly. The modeled results fit the general trend for the actual patients.
-Thyroid Cancer (THCA) on the other hand has very little if any effect on life
-expectancy, in fact there may be a slight benefit which may be associated with a
-bias in diagnosis towards patients who are more health conscious, or higher
-socioeconomic status, with more access to care compared to random population
-members.
+selected group with correct age distribution for the given cancer (turqoise) to
+the model predicted survival for the given average k (blue) and the actual
+survival for the patients in our dataset (orange). As can
+be seen, Stomach Cancer (STAD), Glioblastoma (GBM), and Pancreatic Cancer (PAAD)
+are all very deadly. The modeled results fit the general trend for the actual
+patients.  Thyroid Cancer (THCA) on the other hand has very little if any effect
+on our estimates of life expectancy, in fact there may be a slight benefit which
+may be associated with a bias in diagnosis towards patients who are more health
+conscious, or higher socioeconomic status, with more access to care compared to
+random population members.
 
 ```{r, results='asis'}
 cat("\\newpage")
@@ -63,9 +63,19 @@ the general population. For example in **Figure 7B-E** we see three particularly
 deadly cancers (Stomach:STAD, Glioblastoma:GBM, and Pancreatic:PAAD), and one
 cancer where diagnosis apparently decreases risk relative to background
 (Thyroid: THCA). Cancers with posterior probability for relative risk of less
-than 1 such as THCA may be those where diagnosis is associated with patients who
-have relatively healthy behaviors, are seen regularly by doctors, and comply
-with health recommendations.
+than 1 such as THCA should be interpreted carefully. This Bayesian model is a
+model for a state of information. The information that a person is diagnosed
+with cancer may lead us to expect that they will live a shorter time than the
+general population of matched age (k > 1), or a longer time than the general
+population of matched age (k < 1). One mechanism for a shorter result is that
+the cancer is aggressive and we can expect it to rapidly injure the body,
+causing death. One explanation for longer results may be that the cancer is
+relatively mild, and therefore diagnosis is potentially an informational signal
+that the patient is health conscious, with the comparison group having more
+people whose cancers go undiagnosed. It's important to note that the diagnosis
+can increase our expectation of life relative to the comparison group, even if
+it decreases the expectation of life of the individual relative to the
+counterfactual where they did not have cancer.
 
 The degree to which a given cancer accelerates aging can be determined by the
 $k_{tis}$ multiplier (**Figure 8**) multiplied by the class specific modifier
