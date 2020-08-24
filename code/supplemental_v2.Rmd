@@ -787,7 +787,7 @@ load("../data/table_st1.Rda")
 write.xlsx(table_st1, file = "../data/table_st1.xlsx", row.names = FALSE)
 ```
 
-**Supplementary Table 1. Cluster-specific enriched pathways (effect size >= 0.30).**
+**Supplementary Table 2. Cluster-specific enriched pathways (effect size >= 0.30).**
 ```{r enrich-pathway-in-clust, fig.width= 9}
 ## docx friendly
 load("../data/moderate_enrich_prob.Rda")
