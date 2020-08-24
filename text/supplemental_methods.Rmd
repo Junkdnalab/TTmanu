@@ -12,7 +12,7 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, dpi=600, warning = FALSE)
+knitr::opts_chunk$set(echo = FALSE, dpi=600, warning = FALSE, message = FALSE)
 library(foreach)
 library(sqldf)
 library(tidyverse)
