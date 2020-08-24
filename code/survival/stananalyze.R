@@ -94,63 +94,6 @@ tryCatch(load("survmodel.stansave"),error=function(e){
     samps = sampling(smodel,data=standata,chains=3,warmup=2000,iter=3000,cores=4,control=list(max_treedepth=9)) #,init=list(start,start2,start3));
     save("samps",file="survmodel.stansave")
 })
-load("survmodel.stansave")
-
-
-sampsum = summary(samps)
-sampsum
-
-asamps = as.array(samps)
-
-
-pdf("agebasedmodel-noeth.pdf")
-mcmc_intervals(asamps,regex_pars="ktis")
-mcmc_intervals(asamps,regex_pars=c("r20","agerate"))
-
-r20f = mean(asamps[,,"r20[1]"])
-r20m = mean(asamps[,,"r20[2]"])
-agrf = mean(asamps[,,"agerate[1]"])
-agrm = mean(asamps[,,"agerate[2]"])
-
-sprintf("r20f mean = %f",r20f)
-sprintf("r20m mean = %f",r20m)
-sprintf("agrf mean = %f", agrf)
-sprintf("agrm mean = %f", agrm)
-
-
-ourlccdf = function(t,age,agerate,k,r20){
-    r20 = r20 * 1e-5
-    agerate = agerate*.05
-    return(-r20*((365*exp((agerate*k*t)/365+age*agerate-20*agerate))/(agerate*k)
-        -(365*exp(age*agerate-20*agerate))/(agerate*k)));
-}
-
-ccdfsimpmkr = function(r20,agert){
-    function(age){
-        exp(ourlccdf(age*365,0,agert,1,r20))
-    }
-}
-
-mccdf = ccdfsimpmkr(r20m,agrm)
-fccdf = ccdfsimpmkr(r20f,agrf)
-
-mortpl <- ggplot(menmort) + 
-    geom_line(aes(yrnum,log(nsurv/100000)),col="blue",data=menmort) +
-    geom_line(aes(yrnum,log(nsurv/100000)),col="red",data=wommort)+
-    stat_function(fun=function(x) log(mccdf(x)),col="green")+
-    stat_function(fun=function(x) log(fccdf(x)),col="orange")+labs(title="Log(1-cdf(age)) for Men and Women (CDC and model fit)",x="Age (yrs)",y="log(1-cdf)") +
-    theme_minimal()
-
-
-ggsave(filename = '../../figures/agemodel.png', plot = mortpl, height = 4, width = 6)
-
-ctypes = levels(as.factor(cancerdat$type))
-for(i in 1:23){
-    print(mcmc_intervals(asamps,regex_pars=paste("k\\[",i,",",sep=""))+labs(title=sprintf("Cancer Type: %s",ctypes[i])))
-}
-dev.off()
-#system("evince agebasedmodel.pdf&")
-
 
 
 
