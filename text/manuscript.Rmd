@@ -168,7 +168,7 @@ clustering algorithms).
 cat("\\newpage")
 ```
 
-```{r, child='figure2.Rmd'}
+```{r, child='../code/figure2.Rmd'}
 ```
 
 ```{r, results='asis'}

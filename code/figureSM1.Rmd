@@ -1,4 +1,4 @@
-```{r figure-2-plot, fig.width = 9}
+```{r figure-SM1-plot, fig.width = 9}
 load("../data/figure1B_data.rda") ## Load in data processed in figure1.Rmd
 load("../data/optimal_minpts_score.rda")
 umap_cancertype <- data.table::fread("../data/umap_3d_coors.tsv")
