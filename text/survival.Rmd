@@ -5,14 +5,13 @@ output:
 ---
 If our molecular pathway disruption classes represent distinct biological states
 apart from tissue of origin, they may have different prognoses within cancer
-types or across all cancers. These analyses are profoundly limited by
-confounding factors of age and stage at diagnosis, sex, ethnicity, and
-tissue-specific disease progression, to name the obvious ones. To explore these
-ideas, we used Bayesian inference to test models of survival using public
-longevity data from the CDC, accounting for age, gender and ethnicity. Our model
-estimates the effect of cancer type and class-specific cancer effects
-independently, resulting in a cancer and class specific estimate of the aging
-rate multiplier.
+types or across all cancers. These analyses are limited by confounding factors
+of age and stage at diagnosis, sex, ethnicity, and tissue-specific disease
+progression. To explore these ideas, we used Bayesian inference to test models
+of survival using public longevity data from the CDC, accounting for age, gender
+and ethnicity. Our model estimates the effect of cancer type and
+cluster-specific cancer effects independently, resulting in a cancer and
+cluster-specific estimate of the aging rate multiplier, k.
 
 To understand the model, we show in **Figure 7A** simulated survival time curves
 for four related groups. We start with a cohort of women aged 30 and show their
@@ -24,8 +23,8 @@ without any malignancy. Adding a $k=2$ malignancy further reduces expected
 lifespan (red). We can see that for different tissues, simply due to the change
 in distribution of age-at-diagnosis, we should expect equally deadly cancers to
 have *different* survival curves. The model takes this into account and the
-aggressiveness of the cancer can be estimated without the confounding aspect of
-age.
+aggressiveness of the cancer can be estimated accurately without the confounding
+effect of age.
 
 ```{r, results='asis'}
 cat("\\newpage")
@@ -36,21 +35,21 @@ cat("\\newpage")
 ```
 
 **Figure 7: Comparison of different cancers, simulated and actual results
-results.** A) To understand the risk model, we plot survival of four simulated
-cohorts. Compare survival of a group consisting of randomly selected 30 year old
+results.** To illustrate the risk model, we plot survival of four simulated
+cohorts. A) Compare survival of a group consisting of randomly selected 30 year old
 women (light blue) to an equal sized group of 30 year old women with cancer, k =
-2 (light orange). To understand how the mix of ages alters the survival curve,
+2 (light orange). To illustrate how the mix of ages alters the survival curve,
 we compare a randomly selected group of people with ages uniformly distributed
 from 30 to 70 (dark blue) and a randomly selected group with uniformly
 distributed ages and cancer k = 2 (dark orange). B,C,D,E) We compare a randomly
 selected group with correct age distribution for the given cancer (turqoise) to
 the model predicted survival for the given average k (blue) and the actual
-survival for the patients in our dataset (orange). As can
-be seen, Stomach Cancer (STAD), Glioblastoma (GBM), and Pancreatic Cancer (PAAD)
-are all very deadly. The modeled results fit the general trend for the actual
-patients.  Thyroid Cancer (THCA) on the other hand has very little if any effect
-on our estimates of life expectancy, in fact there may be a slight benefit which
-may be associated with a bias in diagnosis towards patients who are more health
+survival for the patients in our dataset (orange). As can be seen, Stomach
+Cancer (STAD), Glioblastoma (GBM), and Pancreatic Cancer (PAAD) are all very
+deadly. The modeled results fit the general trend for the actual patients.
+Thyroid Cancer (THCA) on the other hand has very little if any effect on our
+estimates of life expectancy, in fact there may be a slight benefit which may be
+associated with a bias in diagnosis towards patients who are more health
 conscious, or higher socioeconomic status, with more access to care compared to
 random population members.
 
