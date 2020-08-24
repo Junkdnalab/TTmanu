@@ -22,7 +22,7 @@ sankey.colours <- c(ditto_colours[2:24],kelly.colours[3:12])
 names(sankey.colours) <- c(cancerorder, clustorder)
 
 ## Sankey plot
-ggplot(sankey.data,
+sankey.plot <- ggplot(sankey.data,
        aes(x = type, stratum = value, alluvium = sample_id,
            fill = value, label = value)) +
   scale_fill_manual(values = sankey.colours) +
@@ -32,40 +32,43 @@ ggplot(sankey.data,
   theme_classic() +
   xlab(label = "") +
   theme(legend.position = "none",
-        axis.text.x = element_text(size = 10),
+        axis.text.x = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks = element_blank(),
         axis.line.x = element_blank(),
-        axis.line.y = element_blank()) +
-  scale_x_discrete(labels= c("Cluster", "Cancer Type"))
+        axis.line.y = element_blank(),
+        plot.margin = unit(c(-0.4, -3, -1, -2.5), "cm"),
+        panel.background = element_rect(fill = "transparent"))
 ```
 
+```{r, fig.width= 6, fig.height= 6}
+# start new page
+plot.new()
 
-```{r figure-4-plot, fig.width = 9}
-### Figure A - Cancer Type
-par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1)) ## plot layout 2x3
-par(mar = c(2,2,0,0)) ## setting plot margins for the following plots
+# setup layout
+gl <- grid.layout(nrow=8, ncol=3)
 
-selectedcancer <- c("BRCA", "COAD", "HNSC", "PAAD") ## selecting the 4 cancer types we're interested in
-A_colors <- c('#fb9a99', '#b15928', '#6a3d9a', 'springgreen4') ## Color scheme for cancer type
-names(A_colors) <- selectedcancer ## Assigning cancertype a color
+## Setup viewports - How figures will be laid out
+vp.1 <- viewport(layout.pos.col=1:2, layout.pos.row=1:8)
+vp.2 <- viewport(layout.pos.col=3, layout.pos.row=1:2) 
+vp.3 <- viewport(layout.pos.col=3, layout.pos.row=3:4) 
+vp.4 <- viewport(layout.pos.col=3, layout.pos.row=5:6) 
+vp.5 <- viewport(layout.pos.col=3, layout.pos.row=7:8)
 
-with(umap_cancertype %>% 
-       mutate(A_color = case_when(project_code %in% selectedcancer ~ project_code, ## Create a new col named A color
-                                  TRUE ~ "Other")) %>% ## Convert all cancer type that isn't the selected cancers to "Other"
-       filter(A_color != "Other"), ## Remove "Other" type
-     scatter3D(plot_y, -plot_z, plot_x, 
-               bg = A_colors[A_color], pch = 21, cex = 0.8, lwd = 0.2,
-               theta = 0, phi = 65, scale = F,
-               xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
-               colvar = NULL))
-## Axis labels
-legend("top", inset = c(0), legend=rev(names(A_colors[1:2])), col=rev(A_colors[1:2]), pch = 20, bty = "n", horiz = T, cex = 1.2)
-legend("top", inset = c(0.10), legend=rev(names(A_colors[3:4])), col=rev(A_colors[3:4]), pch = 20, bty = "n", horiz = T, cex = 1.2)
-title(xlab="UMAP 2", line=0)
-mtext("A", side=3, line=-2.05, cex=1.2, adj=0)
+# init layout
+pushViewport(viewport(layout=gl))
 
-### Figure B - BRCA subtype
+## vp.1 - Figure A - sankey plot
+pushViewport(vp.1) ## Enter vp.1 viewpoint
+print(sankey.plot, newpage = FALSE) ## Plot ggplot
+mtext("A", side=3, line=2.6, cex=1.2, adj=-0.17)
+popViewport() ## Exit vp.1 viewpoint
+
+## vp.2 - Figure B - BRCA subtype
+pushViewport(vp.2)
+par(new=TRUE, fig=gridFIG())
+par(mar = c(0,0,0,0), mai=c(0.1,0.1,0.1,0.1), cex.lab = 0.8, cex = 0.8) ## setting plot parameters
+
 brca_subtype <- umap_cancertype %>% filter(project_code == "BRCA") %>% ## Filter for selected cancer type
   dplyr::select(plot_x, plot_y, plot_z, Subtype_Selected) ## Select relevant column 
 brca_subtype[is.na(brca_subtype)] <- "NA" ## Convert NA to character "NA"
@@ -78,20 +81,28 @@ names(B_color) <- B_name ## Assigning subtypes to color
 
 with(brca_subtype,
      scatter3D(plot_y, -plot_z, plot_x, 
-               bg = B_color, pch = 21, cex = 0.8, lwd = 0.2,
+               bg = B_color, pch = 21, cex = 0.8, lwd = 0.2, 
                theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
                colvar = NULL))
 ## Axis labels
-legend("top", inset = c(0), legend=names(B_color[1:2]), col=B_color[1:2], pch = 20, bty = "n", horiz = T, cex = 1.2)
-legend("top", inset = c(0.10), legend=names(B_color[3:4]), col=B_color[3:4], pch = 20, bty = "n", horiz = T, cex = 1.2)
-legend("top", inset = c(0.20), legend=names(B_color[5:6]), col=B_color[5:6], pch = 20, bty = "n", horiz = T, cex = 1.2)
-title(xlab="UMAP 2", line=0)
-mtext("B", side=3, line=-2.05, cex=1.2, adj=0)
+legend("top", inset = c(0), legend=names(B_color[1:2]), col=B_color[1:2], pch = 20, bty = "n", horiz = T, cex = 0.8)
+legend("top", inset = c(0.07), legend=names(B_color[3:4]), col=B_color[3:4], pch = 20, bty = "n", horiz = T, cex = 0.8)
+legend("top", inset = c(0.14), legend=names(B_color[5:6]), col=B_color[5:6], pch = 20, bty = "n", horiz = T, cex = 0.8)
+title(xlab="UMAP 2", line=-0.25)
+mtext("B", side=3, line=-1.2, cex=1.2, adj=0)
 
-### Figure C - BRCA Somatic Mutations
-load("../data/gdc_gene_exp_adj.Rda")
+popViewport() ## exit
+
+## vp.3 - Figure C - BRCA somatic mutations
+pushViewport(vp.3)
+par(new=TRUE, fig=gridFIG())
+par(mar = c(0,0,0,0), mai=c(0.1,0.1,0.1,0.1), cex.lab = 0.8, cex = 0.8) ## setting plot parameters
+
+load("../data/gdc_gene_exp_adj.Rda") ## load data
 load("../data/gene_data.Rda")
+
 brca <- gene_data %>% .[.$external_gene_name %in% c("BRCA1", "BRCA2"),] %>% dplyr::select(ensembl_gene_id, external_gene_name) ## Getting BRCA gene information
 brca <- gdc_gene_exp_adj %>% .[rownames(.) %in% brca$ensembl_gene_id, ] %>% ## Include BRCA gene
   rownames_to_column(var = "ensembl_gene_id") %>% ## Move ensembl id to column
@@ -114,30 +125,44 @@ with(brca %>% filter(mut_type != "NA"), ## Filter samples that do not have a mut
      scatter3D(plot_y, -plot_z, plot_x, 
                bg = C_colors, pch = 21, cex = 0.8, lwd = 0.2,
                theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
                colvar = NULL))
 ## Axis labels
-legend("top", inset = c(0), legend=names(C_colors[c(1:2)]), col=C_colors[c(1:2)], pch = 20, bty = "n", horiz = T, cex = 1.2)
-legend("top", inset = c(0.10), legend=names(C_colors[c(3)]), col=C_colors[3], pch = 20, bty = "n", horiz = T, cex = 1.2)
-title(xlab="UMAP 2", line=0)
-mtext("C", side=3, line=-2.05, cex=1.2, adj=0)
+legend("top", inset = c(0), legend=names(C_colors[c(1:2)]), col=C_colors[c(1:2)], pch = 20, bty = "n", horiz = T, cex = 0.8)
+legend("top", inset = c(0.07), legend=names(C_colors[c(3)]), col=C_colors[3], pch = 20, bty = "n", horiz = T, cex = 0.8)
+title(xlab="UMAP 2", line=-0.25)
+mtext("C", side=3, line=-1.2, cex=1.2, adj=0)
 
-### Figure D - Stage
+popViewport()
+
+## vp.4 - Figure D - Stage
+pushViewport(vp.4)
+par(new=TRUE, fig=gridFIG())
+par(mar = c(0,0,0,0), mai=c(0.1,0.1,0.1,0.1), cex.lab = 0.8, cex = 0.8) ## setting plot parameters
+
 D_colors <- c('darkgoldenrod3','dodgerblue3','yellow3','tomato2') ## Color scheme
 names(D_colors) <- c("Stage I", "Stage II", "Stage III", "Stage IV") ## Assign stage to color
 with(umap_cancertype %>% filter(ajcc_pathologic_tumor_stage != "Not Available"), ## Filter samples that do not have stage info
      scatter3D(plot_y, -plot_z, plot_x, 
                bg = D_colors, pch = 21, cex = 0.8, lwd = 0.2,
                theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
                colvar = NULL))
 ## Axis labels
-legend("top", inset = c(0), legend=names(D_colors[1:2]), col=D_colors[1:2], pch = 20, bty = "n", horiz = T, cex = 1.2)
-legend("top", inset = c(0.10), legend=names(D_colors[3:4]), col=D_colors[3:4], pch = 20, bty = "n", horiz = T, cex = 1.2)
-title(xlab="UMAP 2", line=0)
-mtext("D", side=3, line=-2.05, cex=1.2, adj=0)
+legend("top", inset = c(0), legend=names(D_colors[1:2]), col=D_colors[1:2], pch = 20, bty = "n", horiz = T, cex = 0.8)
+legend("top", inset = c(0.07), legend=names(D_colors[3:4]), col=D_colors[3:4], pch = 20, bty = "n", horiz = T, cex = 0.8)
+title(xlab="UMAP 2", line=-0.25)
+mtext("D", side=3, line=-1.2, cex=1.2, adj=0)
 
-### Figure E - Metastasis
+popViewport()
+
+## vp.5 - Figure E - Metastasis
+pushViewport(vp.5)
+par(new=TRUE, fig=gridFIG())
+par(mar = c(0,0,0,0), mai=c(0.1,0.1,0.1,0.1), cex.lab = 0.8, cex = 0.8) ## setting plot parameters
+
 E_colors <- c('#a6cee3','#1f78b4') ## Color scheme
 names(E_colors) <- c("M0", "M1") ## Assign metastasis to color
 with(umap_cancertype %>% filter(ajcc_metastasis_pathologic_pm %in% c("M0", "M1")), ## Only M0 and M1 tumor samples
@@ -147,11 +172,9 @@ with(umap_cancertype %>% filter(ajcc_metastasis_pathologic_pm %in% c("M0", "M1")
                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
                colvar = NULL))
 ## Axis labels
-legend("top", inset = c(0), legend=names(E_colors), col=E_colors, pch = 20, bty = "n", horiz = T, cex = 1.2)
-title(xlab="UMAP 2", line=0)
-mtext("E", side=3, line=-2.05, cex=1.2, adj=0)
+legend("top", inset = c(0), legend=names(E_colors), col=E_colors, pch = 20, bty = "n", horiz = T, cex = 0.8)
+title(xlab="UMAP 2", line=-0.25)
+mtext("E", side=3, line=-1.2, cex=1.2, adj=0)
 
-plot.new()
+popViewport()
 ```
-
-

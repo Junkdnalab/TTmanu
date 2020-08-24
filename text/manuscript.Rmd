@@ -78,7 +78,9 @@ suppressPackageStartupMessages(c(
   library(ggfortify),
   library(maftools),
   library(survival),
-  library(ggalluvial)
+  library(ggalluvial),
+  library(grid),
+  library(gridBase)
 ))
 ```
 
@@ -166,7 +168,7 @@ clustering algorithms).
 cat("\\newpage")
 ```
 
-```{r, child='figure2.Rmd'}
+```{r, child='../code/figure2.Rmd'}
 ```
 
 ```{r, results='asis'}
