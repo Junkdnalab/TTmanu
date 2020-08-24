@@ -458,7 +458,7 @@ cat("\\newpage")
 ```{r child = '../code/table1.Rmd'}
 ```
 
-**Table 1: Cluster-specific enriched pathways (effect size >= 0.30) in metastatsis.**
+**Table 1: Cluster-specific enriched pathways (effect size ≥ 0.30) in metastasis.**
 
 ```{r, results='asis'}
 cat("\\newpage")
@@ -479,8 +479,8 @@ cat("\\newpage")
 All code for producing the analyses and figures herein are included in this
 fully reproducible manuscript in R markdown format. R markdown files and all
 other models are available from [our
-repositories](https://github.com/dennishazelett/TTmanu) in the following
-locations on the distributed version control site GitHub.
+repositories](https://github.com/dennishazelett/TTmanu) on the distributed
+version control site, GitHub.
 
 ### Selection of pathways
 
