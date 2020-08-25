@@ -110,6 +110,9 @@ the UMAP projection; tumors are colored by cluster membership (see legend). This
 results in some tumors remaining unclassified (grey points). f) kNN was used to
 assign membership to the remaining tumors.
 
+```{r, results='asis'}
+cat("\\newpage")
+```
 
 ### Survival
 
