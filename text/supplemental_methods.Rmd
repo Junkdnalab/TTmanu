@@ -98,16 +98,16 @@ cat("\\newpage")
 ```
 
 **Figure SM1: Method for tumor classification using pathway aberration data** 
-a) MCA analysis was performed to determine the eigenvalue with the most
+A) MCA analysis was performed to determine the eigenvalue with the most
 explanatory power from the categorical data. Average of 100 permutations of the
-data was used as a baseline. b) The p-value of each eigenvalue was plotted and
-the max eigenvalue with a pvalue < 0.05 was selected. c) The resulting MCA was
+data was used as a baseline. B) The p-value of each eigenvalue was plotted and
+the max eigenvalue with a pvalue < 0.05 was selected. C) The resulting MCA was
 projected down to 3 dimensions for the purpose of density based clustering (only
-the first 2 dimensions are shown). Each dot represents a tumor d) HDBSCAN was
+the first 2 dimensions are shown). Each dot represents a tumor D) HDBSCAN was
 used to perform hierarchical density based clustering tuned to minimize the
-fraction of unassigned tumors. e) HDBSCAN clustered tumors were visualized on
+fraction of unassigned tumors. E) HDBSCAN clustered tumors were visualized on
 the UMAP projection; tumors are colored by cluster membership (see legend). This
-results in some tumors remaining unclassified (grey points). f) kNN was used to
+results in some tumors remaining unclassified (grey points). F) kNN was used to
 assign membership to the remaining tumors.
 
 ```{r, results='asis'}
@@ -172,7 +172,7 @@ baseline rates. Thus, a value of $k=2$ means that a given cancer causes you to
 experience the same risk in time $dt$ as a non-cancer patient would experience
 at the same age, in time $2dt$.
 
-Using this model, we split the data by Male/Female sex, and by White, _vs._
+Using this model, we split the data by Male/Female sex, and by White _vs._
 Black race as these were the main well-identified categories available to us in
 the dataset. Sex is known to be a risk factor for death, with males dying at
 slightly higher rates for all ages of interest in our dataset. Black _vs._ White

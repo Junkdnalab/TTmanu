@@ -276,7 +276,7 @@ this hypothesis, the backbone starts with a cluster of tumors (class 1) that has
 the fewest point mutations and culminates in a cluster (class 10) which has
 nearly every pathway disrupted (**figure 4**). However, outside of class 10 we
 don't observe an obvious trend in the overall mutation burden across the
-backbone of the UMAP (**figure 1H**). Nonetheless, to test the hypothesis that
+backbone of the UMAP. Nonetheless, to test the hypothesis that
 the molecular-pathway disruption clusters represent advancement through stages,
 we projected staging data onto the UMAP. Similar to tissue of origin and other
 categories of tumor, we did not observe any bias among the stages to specific
@@ -333,7 +333,7 @@ highest to lowest enrichment. We visualized the enrichment as a heatmap
 (enrichment score ≥ 0.3, 95% confidence; see methods) in cluster 2, 9 pathways
 enriched in cluster 3, 24 pathways in cluster 4, 10 pathways in cluster 5, 10
 pathways in cluster 6, 24 pathways in cluster 7, 24 pathways in cluster 8, 10
-pathways in cluster 9, and 0 pathways for clusters 1 and 10. Clusters 7, 8, and
+pathways in cluster 9, and 0 pathways for clusters 1 and 10 (**supplementary table ST2**). Clusters 7, 8, and
 9 had several pathways in common. To explore the specific pathways marking each
 cluster, we projected disruptions for each of the 377 pathways onto the UMAP
 (**supplementary figure S4**). Clusters 3 and 5 were distinguished by metabolic
