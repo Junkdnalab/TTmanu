@@ -16,7 +16,8 @@ suppressPackageStartupMessages(c(
   library(plot3D),
   library(flextable),
   library(knitr),
-  library(kableExtra)
+  library(kableExtra),
+  library(xlsx)
 ))
 ```
 
@@ -783,21 +784,19 @@ load("../data/table_st1.Rda")
 #   align(part = "all") %>% 
 #   width(., width = c(4,0.5,0.5,0.5,0.5)) %>% 
 #   fontsize(size = 8, part = "body")
-
-write.xlsx(table_st1, file = "../data/table_st1.xlsx", row.names = FALSE)
 ```
 
-**Supplementary Table 2. Cluster-specific enriched pathways (effect size >= 0.30).**
-```{r enrich-pathway-in-clust, fig.width= 9, eval = FALSE}
+```{r st2, fig.width= 9, eval = FALSE}
+##**Supplementary Table 2. Cluster-specific enriched pathways (effect size >= 0.30).**
 ## docx friendly
 load("../data/moderate_enrich_prob.Rda")
 
 table_st2 <- moderate_enrich_prob %>% filter(difference >= 0.30 & signif <= 2500) %>% ## filter effect size >= 0.20 and enrichment at a 95% CI
   dplyr::select(path, clust, signif, difference) %>% 'colnames<-' (c("Pathway", "Cluster", "Signif", "Enrichment_Score")) ## select relevant column and rename col
 
-st1$log10pvalue <- round(-log10((st1$Signif + 1) / 1E5), digits = 2) ## Getting p value ## adding 1 for pseudo count.. 1E5 is the n simulations performed
-st1$Enrichment_Score <- round(st1$Enrichment_Score, digits = 2)
-st1$Signif <- NULL ## we don't need this anymore
+table_st2$log10pvalue <- round(-log10((table_st2$Signif + 1) / 1E5), digits = 2) ## Getting p value ## adding 1 for pseudo count.. 1E5 is the n simulations performed
+table_st2$Enrichment_Score <- round(table_st2$Enrichment_Score, digits = 2)
+table_st2$Signif <- NULL ## we don't need this anymore
 
 # st1 <- st1 %>% flextable() %>% 
 #   set_caption(caption = "") %>%
@@ -805,11 +804,17 @@ st1$Signif <- NULL ## we don't need this anymore
 #   width(., width = c(4,0.75,1,1)) %>% 
 #   fontsize(size = 10, part = "body")
 # 
-# knitr::knit_print(st1)
-names(st1) <- c("Pathway", "Cluster", "Effect Size", "-log(p)")
- st1 %>%  knitr::kable(format = "latex", longtable = TRUE, align = c("l", rep("c",3))) %>%
-   kable_styling(latex_options=c("scale_down", "repeat_header"), full_width = FALSE, font_size = 12) %>%
-   column_spec(1, color = "black", width = "4in")
+
+# names(st1) <- c("Pathway", "Cluster", "Effect Size", "-log(p)")
+#  st1 %>%  knitr::kable(format = "latex", longtable = TRUE, align = c("l", rep("c",3))) %>%
+#    kable_styling(latex_options=c("scale_down", "repeat_header"), full_width = FALSE, font_size = 12) %>%
+#    column_spec(1, color = "black", width = "4in")
+
+## Saving st1 and st2 in excel
+
+write.xlsx(table_st1, file="supplemental.table.xlsx", sheetName="ST1", row.names=FALSE)
+write.xlsx(table_st2, file="supplemental.table.xlsx", sheetName="ST2", append=TRUE, row.names=FALSE)
 ```
+
 
 
