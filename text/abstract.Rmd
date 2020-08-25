@@ -2,8 +2,7 @@ Cancer is a complex disease involving dysfunctional cellular metabolism, other
 basic biochemical processes, and the microenvironment. However, in spite of some
 generally agreed upon unifying principles [@weinberg2000; @hallmarks_II],
 molecular signatures remain largely indistinguishable from tissue-of-origin,
-thus obscuring opportunities for novel mechanistic insights and potential
-treatment vulnerabilities that hold true across different cancer types. To
+presenting a major barrier for precision health and individualized medicine. To
 address this challenge, we reduced mutation data to disruptions in a select set
 of pathways relevant to basic cell biology, from DNA replication to cellular
 communication. Using dimensionality reduction techniques, we assigned tumor
@@ -13,17 +12,17 @@ classes vary in prognosis by modeling relative risk of death in different
 classes and cancer types. We identify cluster-specific mutations in different
 tissues, demonstrating that tissue-specific signatures contribute to common
 cellular phenotypes. Moreover, driver gene mutations involved in replication
-fidelity and genome stability, such as _BRCA1_ and _Rb1_, are equally distributed
-among our clusters, contrary to the expectation that such genes are avatars of
-molecular subtype. We also investigated pathways that distinguish between
-metastatic and non-metastatic tumors, and found that most meaningful differences
-are cluster-specific. Some metastasis enriched pathways from one cluster are
-cluster-specific pathways from non-metastatic tumors of another cluster,
-suggesting phenotypic convergence, and potentially highlighting key pathways to
-focus on for prevention of cluster-specific relapse. Taken as a whole, our
-observations suggest that common driver genes combine with tissue-specific
-disruptions in complementary sets of tumor-promoting pathways to produce a
-limited number of distinct molecular phenotypes. Eventually these signatures
-converge on one or more end-stage disease phenotypes. Thus, we present a
-coherent view of global tumor biology, and explain how common cellular
-dysfunction might arise from tissue-specific mutations.
+fidelity and genome stability, such as _BRCA1_ and _Rb1_, are equally
+distributed among our clusters, contrary to the expectation that such genes are
+avatars of molecular subtype. We also investigated pathways that distinguish
+between metastatic and non-metastatic tumors, and found that most meaningful
+differences are cluster-specific. Some metastasis enriched pathways from one
+cluster are cluster-specific pathways from non-metastatic tumors of another
+cluster, suggesting phenotypic convergence, and potentially highlighting key
+pathways to focus on for prevention of cluster-specific relapse. Taken as a
+whole, our observations suggest that common driver genes combine with
+tissue-specific disruptions in tumor-promoting pathways to produce a limited
+number of distinct molecular phenotypes. Eventually these signatures converge on
+one or more end-stage disease phenotypes. Thus, we present a coherent view of
+global tumor biology, and explain how common cellular dysfunction might arise
+from tissue-specific mutations.

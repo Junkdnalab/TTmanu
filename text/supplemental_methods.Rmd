@@ -75,9 +75,9 @@ clustering and provides metrics of cluster stability and probabilities of
 cluster membership for each node. However, HDBSCAN is sensitive to several
 parameters; key for our analysis are the minimum number of tumor samples in a
 cluster that capture the maximum number of tumor samples, measured by
-probability of membership of ≥ 5% in at least one class. Thus, we created a
+probability of membership of ≥ 5% in at least one cluster. Thus, we created a
 score metric as the fraction of classified tumors with max probability < 5% in
-one class and chose a cluster size of 92 to minimize the score function
+one cluster and chose a cluster size of 92 to minimize the score function
 (**figure SM1D**). HDBSCAN with these settings resulted in ten distinct
 high-density clusters which we then projected onto the UMAP (**figure SM1E**).
 This classified 6,038 out of 7,607 tumors but still resulted in a significant
@@ -85,7 +85,7 @@ fraction of unclassified tumor samples. Since we ultimately wish to be able to
 classify any tumor using this scheme, we performed k Nearest Neighbors (kNN)
 analysis, which computes a similarity metric to every tumor in the set and then
 lets the _k_ most similar tumors "vote" as to the identity of the query tumor
-sample based on their classification labels. We set _k_ to be the square root of
+sample based on their cluster labels. We set _k_ to be the square root of
 the number of tumor samples (87). Using this method, we assigned cluster
 membership to the remaining tumors (**figure SM1F**).
 
@@ -112,8 +112,6 @@ assign membership to the remaining tumors.
 
 
 ### Survival
-```{r child='../code/figureSM2.Rmd'}
-```
 
 In order to understand how the diagnosis of cancer changes the expectation for
 longevity of patients, we first modeled the longevity of the overall population
@@ -154,7 +152,7 @@ $$p(T) = R(T) \exp(-\int_0^T R(t)dt)$$
 
 The $R(T)$ function has two important parameters, the $a$ value which represents
 the background risk rates, and the $k$ value, which is a function of both cancer
-tissue type, and the cancer genomic class.
+tissue type, and the cancer cluster identity.
 
 $$k = k_{tis} k_{cl}$$
 
@@ -178,11 +176,31 @@ slightly higher rates for all ages of interest in our dataset. Black _vs._ White
 race is an important category due to differences in access to care and other
 socioeconomic and education related factors. However, due to the low number of
 Black patient tumors, we use ethnicity only to identify the baseline risk
-function, while the tissue and class specific multipliers are not ethnicity
-specific.
+function, while the tissue- and cluster-specific multipliers are not ethnicity
+specific. There were too few tumors from other races to obtain good inference so
+we excluded them from our analysis.
 
-**supplementary figure SM2** gives a comparison on log-scale between
-the post-fit survival curves and the CDC data it is based on.
+### Survival
+```{r child='../code/figureSM2.Rmd'}
+```
+
+**supplementary figure SM2** gives a comparison between the post-fit
+survival curves for men and women vs the CDC data it is based on. This
+comparison does not distinguish on ethnicity for simplicity in
+visualization.
+
+```{r, results='asis'}
+cat("\\newpage")
+```
+
+```{r child='../code/figureSM2.Rmd'}
+```
+
+**SM2 Legend here**
+
+```{r, results='asis'}
+cat("\\newpage")
+```
 
 As an aside, we did not explicitly account for stage at diagnosis in our model
 for the following reasons. In the tumor sample data, stage at diagnosis is
