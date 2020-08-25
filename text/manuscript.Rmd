@@ -162,7 +162,7 @@ We investigated this dataset further using multiple correspondence analysis
 density based clustering with HDBSCAN [@hdbscan], which resulted in
 identification of 10 well-defined clusters capturing about 80% of the tumor
 samples. To capture the remaining samples into one of these 10 clusters we used
-kNN (see **Supplementary Methods** for details on all clustering algorithms).
+kNN (see **Supplementary Methods** for details on clustering methods).
 
 ```{r, results='asis'}
 cat("\\newpage")
@@ -190,7 +190,7 @@ understand whether different cancer types segregated into one or more
 predominant classes. To our surprise, most cancer types were not heavily biased
 in one class, and all well-represented cancer types had tumors in every class
 (see **figure 3A** and full tumor profiles in **supplementary figure S1**, see
-also interactive media from **supplementary file 1 (html)**), suggesting that,
+also interactive media from **supplementary file 1**), suggesting that,
 in principle at least, our pathway-disruptions identify clusters of molecular
 pathology largely independent of tissue-of-origin. As an example of one type of
 cancer that does have a biased pathway profile, pancreatic adenocarcinoma (PAAD)
@@ -225,7 +225,7 @@ expression or other -omics profiles or pathology lab results. These subtypes
 often have different standards of care owing to different overall drug
 sensitivity (or other factors). If the histological subtypes represent true
 molecular phenotypes, one predicts that histological subtypes should segregate
-with our pathway-based classes, therefore providing support for the classes as
+with our pathway-based clusters, therefore providing support for the clusters as
 proxies for molecular pathology sub-typing. To our surprise, we find a similar
 result to the previous analysis of cancer types projected onto the UMAP of
 pathway disruptions. To illustrate this, we projected annotations for each of
@@ -280,8 +280,8 @@ backbone of the UMAP (**figure 1H**). Nonetheless, to test the hypothesis that
 the molecular-pathway disruption clusters represent advancement through stages,
 we projected staging data onto the UMAP. Similar to tissue of origin and other
 categories of tumor, we did not observe any bias among the stages to specific
-pathway disruption classes (**figure 3D**), suggesting that stage is not an
-determining factor in pathway disruption classes.
+pathway disruption clusters (**figure 3D**), suggesting that stage is not a
+contributing factor to cluster identity.
 
 ```{r, results='asis'}
 cat("\\newpage")
@@ -292,10 +292,10 @@ cat("\\newpage")
 ```
 
 **Figure 4: Somatic mutation frequencies for tumors in each class** 
-Column uses a logarithmic axis to represent mutation count. Row represents the
-tumor samples. Each dot corresponds to the sample mutation count for tumors in
-each class, ordered by mutation counts. The median mutation count in each
-cluster is indicated by the horizontal line.
+Vertical axis shows log mutation count, horizontal axis is cluster identity.
+Each dot represents an individual tumor sample, ranked lowest to highest by
+mutation count. The median mutation count in each cluster is indicated by the
+horizontal line.
 
 ```{r, results='asis'}
 cat("\\newpage")
@@ -325,6 +325,28 @@ disrupted in cancer, including "PIP3 activates Akt signaling" (77% of samples),
 samples), "Cellular senescence" (64% of samples), "G2/M Checkpoints" (62% of
 samples), _etc._
 
+To discover what pathways are most important for clustering, we calculated
+percent enrichment for each pathway _within cluster_ relative to all other
+clusters combined (see methods) and ranked pathways for each cluster from
+highest to lowest enrichment. We visualized the enrichment as a heatmap
+(**figure 5A**). Using this approach, we identified 25 pathways highly enriched
+(enrichment score ≥ 0.3, 95% confidence; see methods) in cluster 2, 9 pathways
+enriched in cluster 3, 24 pathways in cluster 4, 10 pathways in cluster 5, 10
+pathways in cluster 6, 24 pathways in cluster 7, 24 pathways in cluster 8, 10
+pathways in cluster 9, and 0 pathways for clusters 1 and 10. Clusters 7, 8, and
+9 had several pathways in common. To explore the specific pathways marking each
+cluster, we projected disruptions for each of the 377 pathways onto the UMAP
+(**supplementary figure S4**). Clusters 3 and 5 were distinguished by metabolic
+pathways including RNA and protein biosynthesis (**supplementary figure S4**).
+Similarly, cluster 4 was distinguished by mutations affecting regulation of DNA
+and histone methylation ("DNA methylation", "PRC2 methylates histones and DNA",
+and "Nucleosome assembly"). Clusters 7-9 have in common mutations in
+extracellular, intracellular, and immune-related signaling pathways (see
+**figure 5B** and **supplementary figure S4**). Cluster 2 had the highest
+pathway enrichment levels of the three, having mutations in hedgehog signaling,
+"β-catenin degradation", "cellular response to hypoxia", "regulation of cell
+cycle" and "apoptosis" among others.
+
 ```{r, results='asis'}
 cat("\\newpage")
 ```
@@ -344,28 +366,6 @@ cluster) within each numbered cluster (rows).
 cat("\\newpage")
 ```
 
-To discover what pathways are most important for clustering, we calculated
-percent enrichment for each pathway _within cluster_ relative to all other
-clusters combined (see methods) and ranked pathways for each cluster from
-highest to lowest enrichment. We visualized the enrichment as a heatmap
-(**figure 5B**). Using this approach, we identified 25 pathways highly enriched
-(enrichment score > 0.3, see methods) in cluster 2, 9 pathways enriched in
-cluster 3, 24 pathways in cluster 4, 10 pathways in cluster 5, 10 pathways in
-cluster 6, 24 pathways in cluster 7, 24 pathways in cluster 8, 10 pathways in
-cluster 9, and 0 pathways for clusters 1 and 10. Clusters 7, 8, and 9 had
-several pathways in common. To explore the specific pathways marking each
-cluster, we projected disruptions for each of the 377 pathways onto the UMAP
-(**supplementary figure S4**). Clusters 3 and 5 were distinguished by metabolic
-pathways including RNA and protein biosynthesis (**supplementary figure S4**).
-Similarly, cluster 4 was distinguished by mutations affecting regulation of DNA
-and histone methylation ("DNA methylation", "PRC2 methylates histones and DNA",
-and "Nucleosome assembly"). Clusters 7-9 have in common mutations in
-extracellular, intracellular, and immune-related signaling pathways (see
-**figure 5C** and **supplementary figure S4**). Cluster 2 had the highest
-pathway enrichment levels of the three, having mutations in hedgehog signaling,
-"β-catenin degradation", "cellular response to hypoxia", "regulation of cell
-cycle" and "apoptosis" among others.
-
 Prior efforts to extract common signatures from pan-cancer datasets met with
 difficulty in distinguishing tumor samples from their tissue-specific -omics
 data signatures. Given our pathway-disruption based clustering, this raises
@@ -380,14 +380,13 @@ multiple enrichment in signaling pathways, are largely driven by mutations in
 _PI3K_ and its orthologs and _Ras_ genes, respectively (compare _PIK3CA_ and
 _KRAS_ panels of **Supplementary figure S5**). Interestingly, cluster 9, which
 also shared multiple enrichment in signaling pathways with clusters 7 and 8, is
-enriched for both _PIK3CA_ and _KRAS_. This result suggests that tumors in this
-cluster could be derivative of either cluster 7 or 8. Clusters 3 and 5, defined
-by enrichment in metabolic pathways, had mutations in ribosomal proteins and
-nuclear pore complex, respectively. Cluster 4 had mutations in genes responsible
-for nucleosome structure. Cluster 2 had mutations in proteasomal subunit genes
+enriched for both _PIK3CA_ and _KRAS_. Clusters 3 and 5, defined by enrichment
+in metabolic pathways, had mutations in ribosomal proteins and nuclear pore
+complex, respectively. Cluster 4 had mutations in genes responsible for
+nucleosome structure. Cluster 2 had mutations in proteasomal subunit genes
 involved in protein degradation. We also observed that genes that were enriched
-for one cluster are depleted from others ( _e.g. TP53_ is enriched in cluster
-6, but depleted in cluster 7; _PIK3CA_ is enriched in cluster 7, but depleted in
+for one cluster are depleted from others ( _e.g. TP53_ is enriched in cluster 6,
+but depleted in cluster 7; _PIK3CA_ is enriched in cluster 7, but depleted in
 clusters 3 and 8). Next, we investigated the proportion of samples per cancer
 type for the significant genes within a cluster (**Figure 6**; heatmap).
 Surprisingly, cluster-specific tumors were not predominated by one or more
@@ -413,12 +412,12 @@ cat("\\newpage")
 Odds ratio plot; Column uses a logarithmic axis to represent odds ratio with a
 95% confidence interval. Row represents the significant genes from each cluster.
 Each cluster was compared against the background (all other clusters) to find
-deferentially mutated genes. Significant genes (pvalue < 0.01) were selected and
-limited to the top ten results for each clusters. Heatmap; Column represents the
-cancer type. Row represents the significant genes as described above. The
-heatmap shows the proportion of samples per cluster, per cancer type that is
-mutated for each of the significant genes. Depleted significant genes (left).
-Enriched significant genes (right).
+differentially mutated genes. Significant genes (pvalue < 0.01) were selected
+and limited to the top ten results for each clusters. Heatmap; Column represents
+the cancer type. Row represents the significant genes as described above. The
+heatmap shows the proportion of samples per cluster and cancer type that are
+mutated for each gene. Depleted significant genes (left). Enriched significant
+genes (right).
 
 ```{r, results='asis'}
 cat("\\newpage")
@@ -427,27 +426,26 @@ cat("\\newpage")
 ### Enrichment of pathways in metastasis is cluster-specific
 
 Following the same logic we used to investigate cluster-specific enrichment of
-pathways (**figure 5B**) we compared metastatic _vs._ non-metastatic
-tumors, as we find that metastatic tumors are distributed across all ten
-clusters ( _e.g._ **figure 3E**). Using all non-metastatic tumors as background,
-we found very low levels of enrichment (≤ 10%) in a handful of pathways. We
-reasoned that the individual clusters might be too different to detect global
-metastasis enrichment signal given the small sample size (n = 215 metastatic
-tumor samples).
+pathways we compared metastatic _vs._ non-metastatic tumors, as we find that
+metastatic tumors are distributed across all ten clusters ( _e.g._ **figure
+3E**). Using all non-metastatic tumors as background, we found very low levels
+of enrichment (< 10%) in a handful of pathways. We reasoned that the individual
+clusters might be too different to detect global metastasis enrichment signal
+given the small sample size (n = 215 metastatic tumor samples).
 
 Therefore, we calculated cluster-specific enrichment in metastatic tumors and
-found a total of 31 enriched pathways across all clusters (**table 1**). A
-number of enrichments were found in multiple clusters represented by pathways
-that were already shown to be enriched in a neighboring cluster. For example,
-“Signaling by _PTK6_” is enriched in non-metastatic samples of cluster 8 (see
-**supplementary figure S4**) but not in 7 and 9. This pathway is enriched in
-metastatic tumors of clusters 7 and 9 ($p < 10^{-3}$, **table 1**). This is also
-true of “Erythropoietin activates _RAS_”, which is enriched in non-metastatic
-tumors of cluster 8 (**supplementary figure S4**) and also in metastatic tumors
-of clusters 7 and 9. Cluster 4 metastatic samples were enriched for “Fc epsilon
-receptor (FCERI) signaling”, a key neutrophil pathway, which is also specific to
-clusters 2, 7 and 8 non-metastatic tumors. Thus, pathway lesions specific to
-metastases tend toward complementary mutations that are otherwise specific to
+found a total of 31 enriched pathways (significant with enrichment score ≥ 0.3)
+across all clusters (**table 1**). A number of enrichments were found in
+multiple clusters represented by pathways that were already shown to be enriched
+in a neighboring cluster. For example, “Signaling by _PTK6_” is enriched in
+non-metastatic samples of cluster 8 (see **supplementary figure S4**) but not in
+7 and 9. This pathway is enriched in metastatic tumors of clusters 7 and 9 ($p <
+10^{-3}$, **table 1**). This is also true of “Erythropoietin activates _RAS_”,
+which is enriched in non-metastatic tumors of cluster 8 (**supplementary figure
+S4**) and also in metastatic tumors of clusters 7 and 9. Cluster 4 metastatic
+samples were enriched for “Fc epsilon receptor (FCERI) signaling”, a key
+neutrophil pathway, which is also specific to clusters 2, 7 and 8 non-metastatic
+tumors. Thus, metastatic-enriched pathways from one cluster are often enriched in 
 non-metastatic tumors of other clusters.
 
 ```{r, results='asis'}

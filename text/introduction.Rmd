@@ -2,9 +2,9 @@ Recent advances in technology have greatly expanded our view into the mechanisms
 of cancer at the systems biology level. Array and next-generation sequencing
 technologies have made it possible to assay germline and somatic mutations,
 expression profiles, DNA methylation, and copy number variations from the same
-tissue samples. To take advantage of these tools several large consortia,
+tissue samples. To take advantage of these tools, several large consortia,
 including the cancer genome atlas (TCGA) and pan-cancer analysis of whole
-genomes (PCAWG), sequenced large numbers of tumors and collected data from
+genomes (PCAWG) sequenced large numbers of tumors and collected data from
 multiple assays that could be analyzed together, with the goal of integration
 and increased understanding of the mechanisms of cancer.
 
@@ -18,7 +18,7 @@ when genes are mutated at a greater rate than expected due to chance. It has
 been estimated that fewer than five mutations in key oncogenes and/or tumor
 suppressors would be sufficient to transform a normal cell to a cancerous state
 [@vogelsteinPathCancerThree2015; @Iranzo-Network]. Somewhat paradoxically,
-mutations in cancer driver genes are commonplace in somatic tissues and
+mutations in cancer driver genes are commonplace in healthy tissue and
 correlate with age and environmental exposures [@mutations-healthy-tissues].
 
 Other studies provide a comprehensive view of mutations, gene expression and
@@ -41,7 +41,7 @@ More recently, attempts have been made to consider pan-cancer mutations and
 other data as disruptions of normal pathway activity. @PCAWG-PATH carried out
 near-exhaustive analysis of pathway enrichment using whole genome data. Network
 approaches address the sparseness of mutations, allowing genes to be influenced
-by the aggregate of mutations in the nearest network neighbors
+by mutations in the nearest network neighbors
 [@hornNetSigNetworkbasedDiscovery2018; @Iranzo-Network]. These methods are
 powerful especially when applied to a small number (on the order of hundreds) of
 tumors. One of the challenges in the field remains that beyond a couple hundred
@@ -52,8 +52,8 @@ groups have attempted to address this challenge by applying machine learning to
 cancer data sets to discover groups of functionally related genes as they
 interact with larger pathways and networks [@kimPancancerAnalysisSomatic2018;
 @mourikis-ml-pathways; @moonlight]. These studies have proven very effective at
-highlighting some potentially fundamental disease phenotypes at the pathway
-level that cross cancers with different origins at the cellular and tissue
+highlighting fundamental disease phenotypes at the pathway
+level across cancers with different origins at the cellular and tissue
 level.
 
 In this study, we attempt to address these questions by focusing on discrete
