@@ -1,6 +1,4 @@
 ```{r SM2}
-
-
 ## mortality data from CDC:
 namesmort = c("agerng","pdead","nsurv","ndie","pyrs","pyrsabove","expectedlife")
 menmort = read_csv("../data/survival/lifetables/Table02.csv",skip=2)
@@ -21,7 +19,6 @@ load("../code/survival/survmodel.stansave")
 
 
 sampsum = summary(samps)
-sampsum
 
 asamps = as.array(samps)
 
@@ -53,14 +50,12 @@ mccdf = ccdfsimpmkr(r20m,agrm)
 fccdf = ccdfsimpmkr(r20f,agrf)
 
 mortpl <- ggplot(menmort) + 
-    geom_line(aes(yrnum,nsurv/100000),col="blue",data=menmort) +
-    geom_line(aes(yrnum,nsurv/100000),col="red",data=wommort)+
-    stat_function(fun=function(x) mccdf(x),col="green")+
-    stat_function(fun=function(x) fccdf(x),col="orange")+labs(title="1-cdf(age) for Men and Women (CDC Data vs  model fit)",x="Age (yrs)",y="1-cdf") +
+    geom_line(aes(yrnum,nsurv/100000),col="#0072B2",data=menmort) +
+    geom_line(aes(yrnum,nsurv/100000),col="#D55E00",data=wommort)+
+    stat_function(fun=function(x) mccdf(x),col="#009E73")+
+    stat_function(fun=function(x) fccdf(x),col="#E69F00")+labs(title="1-cdf(age) for Men and Women (CDC Data vs  model fit)",x="Age (yrs)",y="1-cdf") +
     theme_minimal()
 
 print(mortpl)
-
-
 ```
 
