@@ -61,7 +61,7 @@ kcancplot = function(dfsamps,tisnames){
 	dim(tisnames) = c(length(tisnames),1)
 
 	dfktis$cancname = as.factor(sapply(dfktis$parname,function(x) tisnames[x]))
-	ggplot(dfktis,aes_(quote(value),quote(cancname))) + geom_density_ridges()+ theme_minimal() + scale_fill_brewer(palette="Paired") + xlim(0,22) + labs(x="ktis multiplier",y="Cancer Type",title="Tissue Specific Effects")
+	ggplot(dfktis,aes_(quote(value),quote(cancname))) + geom_density_ridges()+ theme_minimal() + scale_fill_brewer(palette="Paired") + xlim(0,22) + labs(x=expression(paste("k"["tis"], " multiplier")),y="Cancer Type",title="Tissue Specific Effects")
 }
 
 

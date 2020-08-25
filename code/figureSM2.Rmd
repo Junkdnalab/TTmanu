@@ -49,12 +49,37 @@ ccdfsimpmkr = function(r20,agert){
 mccdf = ccdfsimpmkr(r20m,agrm)
 fccdf = ccdfsimpmkr(r20f,agrf)
 
+mytheme = theme(
+#    axis.text.x = element_blank(),
+#    axis.text.y = element_blank(),
+    axis.title.x = element_text(size = 10),
+    axis.title.y = element_text(size = 10),
+#    axis.ticks = element_blank(),
+#    axis.line = element_blank(),
+    strip.text.y.right = element_text(angle = 0),
+    strip.background = element_blank(),
+    legend.key.height = unit(0.4, "lines"),
+    legend.title = element_blank(),
+    #legend.position = "none",
+    title = element_text(size=10)
+  )
+
+
 mortpl <- ggplot(menmort) + 
-    geom_line(aes(yrnum,nsurv/100000),col="#0072B2",data=menmort) +
-    geom_line(aes(yrnum,nsurv/100000),col="#D55E00",data=wommort)+
-    stat_function(fun=function(x) mccdf(x),col="#009E73")+
-    stat_function(fun=function(x) fccdf(x),col="#E69F00")+labs(title="1-cdf(age) for Men and Women (CDC Data vs  model fit)",x="Age (yrs)",y="1-cdf") +
-    theme_minimal()
+    geom_line(aes(yrnum,nsurv/100000, color = "CDC men"),data=menmort) +
+    geom_line(aes(yrnum,nsurv/100000, color ="CDC women"),data=wommort) +
+    stat_function(fun=function(x) mccdf(x), aes(color = "Model fit men")) +
+    stat_function(fun=function(x) fccdf(x), aes(color = "Model fit women")) + 
+    labs(title="1-cdf(age) for Men and Women (CDC Data vs model fit)",x="Age (yrs)",y="1-cdf", color = "") +
+    theme_classic() +
+    theme(axis.title.x = element_text(size = 10),
+          axis.title.y = element_text(size = 10),
+          title = element_text(size = 10),
+          legend.position = c(0.85, 0.9),
+          legend.text = element_text(size = 8),
+          legend.key.size = unit(0.4,"cm")) +
+    scale_color_manual(values = c("CDC men" = "#0072B2", "CDC women" = "#D55E00", 
+                                  "Model fit men" = "#009E73", "Model fit women" = "#E69F00"))
 
 print(mortpl)
 ```
