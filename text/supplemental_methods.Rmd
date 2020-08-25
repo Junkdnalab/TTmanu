@@ -180,11 +180,7 @@ function, while the tissue- and cluster-specific multipliers are not ethnicity
 specific. There were too few tumors from other races to obtain good inference so
 we excluded them from our analysis.
 
-### Survival
-```{r child='../code/figureSM2.Rmd'}
-```
-
-**supplementary figure SM2** gives a comparison between the post-fit
+**Supplementary figure SM2** gives a comparison between the post-fit
 survival curves for men and women vs the CDC data it is based on. This
 comparison does not distinguish on ethnicity for simplicity in
 visualization.
@@ -193,10 +189,13 @@ visualization.
 cat("\\newpage")
 ```
 
+#### Figure SM2
+
 ```{r child='../code/figureSM2.Rmd'}
 ```
 
-**SM2 Legend here**
+**Supplementary Figure SM2** Comparison between CDC data and ODE model fit for
+males and females of European descent.
 
 ```{r, results='asis'}
 cat("\\newpage")
