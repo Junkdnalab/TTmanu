@@ -64,30 +64,30 @@ containing useful information by selecting the eigenvalue with the most
 explanatory power, using the average of 100 permutations of the data as baseline
 (**figure SM1A**). We then chose the maximum eigenvalue for which the p-value
 remained ≤ 0.05 (see cutoff in **figure SM1B**). Then we performed a UMAP
-analysis, both in order to summarize the MCA graphically, and as a preprocessing
-step to boost the performance of density based clustering. The resulting map was
-notable for its lobed structure, with several reproducible projections
-regardless of random seed setting. A representative version of this 3D UMAP is
-shown in **figure SM1C**, rotated to enhance the visibility of the major features.
-Following this spatial mapping we attempted to define groupings of similar
-tumors within the spatial map using HDBSCAN, which performs hierarchical
-clustering and provides metrics of cluster stability and probabilities of
-cluster membership for each node. However, HDBSCAN is sensitive to several
-parameters; key for our analysis are the minimum number of tumor samples in a
-cluster that capture the maximum number of tumor samples, measured by
-probability of membership of ≥ 5% in at least one cluster. Thus, we created a
-score metric as the fraction of classified tumors with max probability < 5% in
-one cluster and chose a cluster size of 92 to minimize the score function
-(**figure SM1D**). HDBSCAN with these settings resulted in ten distinct
+analysis [@McInnes2018], both in order to summarize the MCA graphically, and as
+a preprocessing step to boost the performance of density based clustering. The
+resulting map was notable for its lobed structure, with several reproducible
+projections regardless of random seed setting. A representative version of this
+3D UMAP is shown in **figure SM1C**, rotated to enhance the visibility of the
+major features. Following this spatial mapping we attempted to define groupings
+of similar tumors within the spatial map using HDBSCAN, which performs
+hierarchical clustering and provides metrics of cluster stability and
+probabilities of cluster membership for each node [@hdbscan]. However, HDBSCAN
+is sensitive to several parameters; key for our analysis are the minimum number
+of tumor samples in a cluster that capture the maximum number of tumor samples,
+measured by probability of membership of ≥ 5% in at least one cluster. Thus, we
+created a score metric as the fraction of classified tumors with max probability
+< 5% in one cluster and chose a cluster size of 92 to minimize the score
+function (**figure SM1D**). HDBSCAN with these settings resulted in ten distinct
 high-density clusters which we then projected onto the UMAP (**figure SM1E**).
 This classified 6,038 out of 7,607 tumors but still resulted in a significant
 fraction of unclassified tumor samples. Since we ultimately wish to be able to
 classify any tumor using this scheme, we performed k Nearest Neighbors (kNN)
 analysis, which computes a similarity metric to every tumor in the set and then
 lets the _k_ most similar tumors "vote" as to the identity of the query tumor
-sample based on their cluster labels. We set _k_ to be the square root of
-the number of tumor samples (87). Using this method, we assigned cluster
-membership to the remaining tumors (**figure SM1F**).
+sample based on their cluster labels. We set _k_ to be the square root of the
+number of tumor samples (87). Using this method, we assigned cluster membership
+to the remaining tumors (**figure SM1F**).
 
 ```{r, results='asis'}
 cat("\\newpage")

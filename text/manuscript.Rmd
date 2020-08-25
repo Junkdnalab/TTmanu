@@ -157,12 +157,12 @@ cat("\\newpage")
 ```
 
 We investigated this dataset further using multiple correspondence analysis
-(MCA) [@JSSv025i01], and visually summarized the analysis with UMAP (**figure 2**). We used
-the resulting UMAP graph coordinates to perform density based clustering with
-HDBSCAN, which resulted in identification of 10 well-defined clusters capturing
-about 80% of the tumor samples. To capture the remaining samples into one of
-these 10 clusters we used kNN (see **Supplementary Methods** for details on all
-clustering algorithms).
+(MCA)  [@JSSv025i01], and visually summarized the analysis with UMAP (**figure
+2**) [@McInnes2018]. We used the resulting UMAP graph coordinates to perform
+density based clustering with HDBSCAN [@hdbscan], which resulted in
+identification of 10 well-defined clusters capturing about 80% of the tumor
+samples. To capture the remaining samples into one of these 10 clusters we used
+kNN (see **Supplementary Methods** for details on all clustering algorithms).
 
 ```{r, results='asis'}
 cat("\\newpage")
