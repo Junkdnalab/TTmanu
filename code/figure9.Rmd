@@ -16,7 +16,8 @@ kclassplot = function(dfsamps,tisnames){
 	dfclas$tiss = tisnames[as.numeric(gsub("k\\[(.*),(.*)\\]","\\1",dfclas$coefname))]
 	ggplot(dfclas,aes_(quote(value),quote(class), fill = quote(class))) + geom_density_ridges() +
 		facet_wrap(. ~ tiss,nrow=3) + theme_minimal() + scale_fill_brewer(palette = "Paired") +
-		xlim(0,3) + theme(legend.position = "none") + ggtitle("Class Specific Coefficients")
+		xlim(0,3) + theme(legend.position = "none") + ggtitle("Class Specific Coefficients") +
+	  labs(x = expression(paste("k"["cl"])), y = "Cluster Identity")
 }
 
 
