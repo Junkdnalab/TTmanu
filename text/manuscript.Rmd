@@ -157,7 +157,7 @@ cat("\\newpage")
 ```
 
 We investigated this dataset further using multiple correspondence analysis
-(MCA), and visually summarized the analysis with UMAP (**figure 2**). We used
+(MCA) [@JSSv025i01], and visually summarized the analysis with UMAP (**figure 2**). We used
 the resulting UMAP graph coordinates to perform density based clustering with
 HDBSCAN, which resulted in identification of 10 well-defined clusters capturing
 about 80% of the tumor samples. To capture the remaining samples into one of
@@ -207,7 +207,6 @@ cat("\\newpage")
 ```{r child = '../code/figure3.Rmd'}
 ```
 
-<<<<<<< HEAD
 **Figure 3: Pathway-based clustering independent of tissue-of-origin** 
 A) Sankey plot showing correspondence between cancer type and cluster identity.
 B) Projection of breast cancer subtypes onto the UMAP. C) Projection of BRCA1/2
@@ -335,7 +334,6 @@ cat("\\newpage")
 ```
 
 **Figure 5: Pan-cancer enrichment of pathway disruptions.** 
-<<<<<<< HEAD
 A) Heatmap shows the relative enrichment of each pathway (rows) within each
 numbered cluster (columns). Effect size is displayed as colors representing
 percent enrichment. B) Proportion of mutated samples in the each significant

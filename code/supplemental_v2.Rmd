@@ -788,11 +788,11 @@ write.xlsx(table_st1, file = "../data/table_st1.xlsx", row.names = FALSE)
 ```
 
 **Supplementary Table 2. Cluster-specific enriched pathways (effect size >= 0.30).**
-```{r enrich-pathway-in-clust, fig.width= 9}
+```{r enrich-pathway-in-clust, fig.width= 9, eval = FALSE}
 ## docx friendly
 load("../data/moderate_enrich_prob.Rda")
 
-st1 <- moderate_enrich_prob %>% filter(difference >= 0.30 & signif <= 2500) %>% ## filter effect size >= 0.20 and enrichment at a 95% CI
+table_st2 <- moderate_enrich_prob %>% filter(difference >= 0.30 & signif <= 2500) %>% ## filter effect size >= 0.20 and enrichment at a 95% CI
   dplyr::select(path, clust, signif, difference) %>% 'colnames<-' (c("Pathway", "Cluster", "Signif", "Enrichment_Score")) ## select relevant column and rename col
 
 st1$log10pvalue <- round(-log10((st1$Signif + 1) / 1E5), digits = 2) ## Getting p value ## adding 1 for pseudo count.. 1E5 is the n simulations performed
