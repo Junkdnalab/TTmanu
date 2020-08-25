@@ -114,8 +114,8 @@ precision treatment regimens.
 
 Our results illustrate how unique combinations of mutations in pan-cancer driver
 genes with tissue-specific pathway disruptions result in common categories when
-viewed at the level of the pathway knowledge-base. Top cancer driver genes (e.g.
-PIK3C and TP53) are found in most of the clusters, in spite of the fact that
+viewed at the level of the pathway knowledge-base. Top cancer driver genes (_e.g.
+PIK3CA_ and _TP53_) are found in most of the clusters, in spite of the fact that
 they contribute to many cluster-specific pathways. This can only be explained as
 a result of other less common driver genes complementing the pathway disruption
 of the unique combination of driver genes that are disrupted in each tumor, and
@@ -179,7 +179,7 @@ factors that relate to genome stability and immortality, as "enabling
 characteristics" of the cancer phenotype [@hallmarks_II]. Such pathways are
 disrupted in all or most of the defined clusters
 and are frequently the result of aberrations involving common driver genes such
-as BRCA1/2, MMR genes, mitotic checkpoints, Cohesion complexes, _etc._
+as BRCA1/2, MMR genes, mitotic checkpoints, cohesion complexes, _etc._
 Cluster-specific
 evolution must involve the acquisition of disruptions to pathways that may
 individually be harmful ( _e.g._ highly proliferative cells are more likely to

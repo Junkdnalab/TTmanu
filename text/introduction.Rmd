@@ -32,7 +32,7 @@ data [@hoadleyMultiplatformAnalysis2014]. The principal finding was that
 tissue-of-origin is the predominant driving factor, though a significant
 proportion of tumors (~10%) could be reclassified independent of
 tissue-of-origin. In a second study involving 33 cancer types and a much greater
-number of tumors [@shenIntegrativeClusteringMultiple2009], the authors identify
+number of tumors, the authors identify
 28 clusters that could be further subdivided into organ specific groups,
 including pan-gastrointestinal, pan-gynecological, pan-squamous,
 pan-gynecological/squamous and pan-kidney [@hoadleyCellofOriginPatternsDominate2018].
