@@ -7,15 +7,15 @@ address this challenge, we reduced mutation data to disruptions in a select set
 of pathways relevant to basic cell biology, from DNA replication to cellular
 communication. Using dimensionality reduction techniques, we assigned tumor
 samples into ten clusters distinct from their tissues-of-origin and largely free
-of bias from mutational burden or clinical stage. We showed that these tumor
+of bias from mutational burden or clinical stage. We show that these tumor
 classes vary in prognosis by modeling relative risk of death in different
 classes and cancer types. We identify cluster-specific mutations in different
 tissues, demonstrating that tissue-specific signatures contribute to common
 cellular phenotypes. Moreover, driver gene mutations involved in replication
 fidelity and genome stability, such as _BRCA1_ and _Rb1_, are equally
 distributed among our clusters, contrary to the expectation that such genes are
-avatars of molecular subtype. We also investigated pathways that distinguish
-between metastatic and non-metastatic tumors, and found that most meaningful
+avatars of molecular subtype. We also investigate pathways that distinguish
+between metastatic and non-metastatic tumors, and show that most meaningful
 differences are cluster-specific. Some metastasis enriched pathways from one
 cluster are cluster-specific pathways from non-metastatic tumors of another
 cluster, suggesting phenotypic convergence, and potentially highlighting key
