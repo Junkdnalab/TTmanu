@@ -158,7 +158,8 @@ cat("\\newpage")
 
 We investigated this dataset further using multiple correspondence analysis
 (MCA)  [@JSSv025i01], and visually summarized the analysis with UMAP (**figure
-2**) [@McInnes2018]. We used the resulting UMAP graph coordinates to perform
+2** and see interactive media from [**supplemental file 1**](https://junkdnalab.shinyapps.io/PANCAN_supplemental/)) [@McInnes2018]. 
+We used the resulting UMAP graph coordinates to perform
 density based clustering with HDBSCAN [@hdbscan], which resulted in
 identification of 10 well-defined clusters capturing about 80% of the tumor
 samples. To capture the remaining samples into one of these 10 clusters we used
@@ -195,7 +196,7 @@ in principle at least, our pathway-disruptions identify clusters of molecular
 pathology largely independent of tissue-of-origin. As an example of one type of
 cancer that does have a biased pathway profile, pancreatic adenocarcinoma (PAAD)
 was predominantly found in class 8 (**figure 3A** and **supplementary figure
-S1**). But even PAAD comprises tumors from the nine remaining classes, meaning
+S1** and **supplementary file 1**). But even PAAD comprises tumors from the nine remaining classes, meaning
 that patients suffering these tumors have potentially different underlying
 molecular pathologies.
 
@@ -233,13 +234,13 @@ the breast cancer subtypes, composed of Triple-negative/Basal-like, Her2
 positive, normal-like, and luminal A and B subtypes onto the UMAP. These are
 among the most heavily studied molecular subtypes in cancer, which each have
 different prognoses and standards of care. We did not observe any exclusive
-segregation by pathway for these subtype annotations (**Figure 3B** and
-**supplemental file 1**). We also projected histological subtype data for the
-remaining cancers (see **supplementary figure S2** for the full set of
-projections); we find that the subtypes, though often biased towards one or more
-classes, are almost never exclusive. We interpret these data in aggregate to
-mean that our pathway disruption classes do not correspond to previously
-identified molecular subtypes within the parent cancer type.
+segregation by pathway for these subtype annotations (**Figure 3B**). We also 
+projected histological subtype data for the remaining cancers (see 
+**supplementary figure S2** for the full set of projections and see interactive
+media from [**supplemental file 1**](https://junkdnalab.shinyapps.io/PANCAN_supplemental/)); we find that the subtypes, though often 
+biased towards one or more classes, are almost never exclusive. We interpret 
+these data in aggregate to mean that our pathway disruption classes do not 
+correspond to previously identified molecular subtypes within the parent cancer type.
 
 #### Independence from drivers of genome instability.
 
@@ -253,11 +254,12 @@ these genes confer elevated risk for breast, prostate and ovarian cancers. The
 mechanism of risk is thought to involve loss of heterozygosity resulting in loss
 of the wildtype, functional allele [@brca-loh], so we projected the somatic
 mutations for _BRCA1_ and _BRCA2_ genes onto the UMAP, but did not observe
-segregation of these mutations into specific clusters (**figure 3C**). We made
-similar projections for the mismatch repair (MMR) genes _MSH2_, _MSH6_, _MLH1_,
-_MLH3_, _PMS1_ and _PMS2_; _BRIP1_, _RAD51_, _CHEK2_ and _APC_. None of these
-genes except for _APC_ exhibited any remarkable specificity with respect to
-cluster assignment (**supplementary figure S3**). To look at other risk factors
+segregation of these mutations into specific clusters (**figure 3C** and see 
+interactive media from [**supplemental file 1**](https://junkdnalab.shinyapps.io/PANCAN_supplemental/)). We made similar projections 
+for the mismatch repair (MMR) genes _MSH2_, _MSH6_, _MLH1_, _MLH3_, _PMS1_ 
+and _PMS2_; _BRIP1_, _RAD51_, _CHEK2_ and _APC_. None of these genes except 
+for _APC_ exhibited any remarkable specificity with respect to cluster assignment 
+(**supplementary figure S3**). To look at other risk factors
 such as maintenance of DNA methylation levels and telomere length, we projected
 somatic mutations of the _TET2_ and _TET3_ genes, plus _TERT_, _TEP1_, and
 _DKC1_, and observed similar lack of segregation by cluster (**supplementary
@@ -336,9 +338,10 @@ pathways in cluster 6, 24 pathways in cluster 7, 24 pathways in cluster 8, 10
 pathways in cluster 9, and 0 pathways for clusters 1 and 10 (**supplementary table ST2**). Clusters 7, 8, and
 9 had several pathways in common. To explore the specific pathways marking each
 cluster, we projected disruptions for each of the 377 pathways onto the UMAP
-(**supplementary figure S4**). Clusters 3 and 5 were distinguished by metabolic
-pathways including RNA and protein biosynthesis (**supplementary figure S4**).
-Similarly, cluster 4 was distinguished by mutations affecting regulation of DNA
+(**supplementary figure S4** and see interactive media from [**supplemental file 1**](https://junkdnalab.shinyapps.io/PANCAN_supplemental/)). 
+Clusters 3 and 5 were distinguished by metabolic pathways including RNA and 
+protein biosynthesis (**supplementary figure S4**). Similarly, cluster 4 was 
+distinguished by mutations affecting regulation of DNA
 and histone methylation ("DNA methylation", "PRC2 methylates histones and DNA",
 and "Nucleosome assembly"). Clusters 7-9 have in common mutations in
 extracellular, intracellular, and immune-related signaling pathways (see
@@ -378,7 +381,8 @@ selected the top ten enriched and depleted genes (pvalue < 0.01) for each
 cluster (**Figure 6**; odds ratios plot). Clusters 7 and 8, which shared
 multiple enrichment in signaling pathways, are largely driven by mutations in
 _PI3K_ and its orthologs and _Ras_ genes, respectively (compare _PIK3CA_ and
-_KRAS_ panels of **Supplementary figure S5**). Interestingly, cluster 9, which
+_KRAS_ panels of **Supplementary figure S5** and see interactive media from 
+[**supplemental file 1**](https://junkdnalab.shinyapps.io/PANCAN_supplemental/)). Interestingly, cluster 9, which
 also shared multiple enrichment in signaling pathways with clusters 7 and 8, is
 enriched for both _PIK3CA_ and _KRAS_. Clusters 3 and 5, defined by enrichment
 in metabolic pathways, had mutations in ribosomal proteins and nuclear pore
