@@ -1,5 +1,7 @@
 ## library
 suppressPackageStartupMessages(c(
+    library(BiocManager),
+    options(repos = BiocManager::repositories()),
     library(shiny),
     library(shinyWidgets),
     library(tidyverse),
@@ -17,12 +19,12 @@ suppressPackageStartupMessages(c(
 ))
 
 ## Load data
-umap_cancertype <- fread("../../data/umap_3d_coors.tsv")
-load("../../data/kelly.colours.rda")
-load("../../data/ditto.colours.rda")
-load("../../data/tumor_samples.Rda")
-load("../../data/supplemental_gene.Rda")
-load("../../data/gdc_reactome_path_analysis.Rda")
+umap_cancertype <- fread("umap_3d_coors.tsv")
+load("kelly.colours.rda")
+load("ditto.colours.rda")
+load("tumor_samples.Rda")
+load("supplemental_gene.Rda")
+load("gdc_reactome_path_analysis.Rda")
 
 cluster.colours <- c(kelly.colours[c(3:12)], "grey") ## Color scheme
 names(cluster.colours) <- c(1:11) ## Assign cluster to color
@@ -43,12 +45,14 @@ pathwayname <- pathwayname[order(pathwayname)] ## order alphabetically
 ui <- (fluidPage(
     ## App title
     titlePanel("Interactive Supplemental File"),
+    h3("Nguyen et al. 2020"),
     ## Interactive settings
     playwidgetOutput("player"),
     
     mainPanel(
         tabsetPanel(type = "tabs",
-                    tabPanel(title = "Pan-cancer", rglwidgetOutput("pancan",  width = 500, height = 500)),
+                    tabPanel(title = "Pan-cancer", h5("Pan and zoom enabled"),
+                             rglwidgetOutput("pancan",  width = 500, height = 500)),
                     tabPanel(title = "Cancer Type",
                              
                              pickerInput("cancer_type", label = "Cancer type:", ## Cancer type
@@ -83,7 +87,6 @@ server <- (function(input, output, session) {
     
     ## Cancer type plot code
         output$cancertype <- renderPlot({
-            
             # setup layout
             gl <- grid.layout(nrow=2, ncol=2) 
             ## Setup viewports - How figures will be laid out
