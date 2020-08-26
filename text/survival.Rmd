@@ -129,8 +129,8 @@ cat("\\newpage")
 Our estimates of tissue-specific cluster effects, in contrast, ranged from less
 than 1 up to about 3 or 4, reflecting that some clusters are either less deadly
 or more deadly than other clusters within each cancer type (**Figure 9**). A
-cluster-specific rate of 1 represents typical rate for this tissue type. For
-several cancers ( _e.g._ PRAD, kidney chromophobe (KICH), diffuse large B-cell
+cluster-specific rate of 1 represents the typical rate for this tissue type. For
+several cancers (_e.g._ PRAD, kidney chromophobe (KICH), diffuse large B-cell
 lymphoma (DBLC), thyroid cancer (THCA)) the posterior estimates are largely
 indistinguishable from the prior, reflecting that either there were too few
 mortalities in the data to make an estimate (as expected for PRAD and THCA) or
