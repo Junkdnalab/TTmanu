@@ -1,5 +1,5 @@
 Cancer is a complex disease involving dysfunctional cellular metabolism, other
-basic biochemical processes, and the microenvironment. However, in spite of some
+basic biochemical processes, and the microenvironment. However, despite some
 generally agreed upon unifying principles [@weinberg2000; @hallmarks_II],
 molecular signatures remain largely indistinguishable from tissue-of-origin,
 presenting a major barrier for precision health and individualized medicine. To
