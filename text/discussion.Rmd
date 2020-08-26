@@ -14,12 +14,11 @@ biochemical pathways, which we accomplished by translating gene-level mutations
 into pathway level disruptions. Our approach differs from previously described
 methods [@PATHNET] in that we chose to focus on the pathway (defined in the
 methods) as the unit of disruption instead of the gene, where individual
-mutations may be sufficient to disrupt or misdirect pathway activity (as is
-often the case with driver mutations). Rather than evaluating the burden of
-mutations on each pathway within or across tumors, which can be biased by the
-number of genes or the coverage of pathway-linked genes in the genome, we scored
-each pathway in binary fashion, allowing one mutation or multiple mutations to
-count equally for each sample.
+mutations may be sufficient to disrupt or misdirect pathway activity. Rather
+than evaluating the burden of mutations on each pathway within or across tumors,
+which can be biased by the number of genes or the coverage of pathway-linked
+genes in the genome, we scored each pathway in binary fashion, allowing one
+mutation or multiple mutations to count equally for each sample.
 
 To our knowledge, this approach has not previously been attempted in spite of
 its relative simplicity. We limited our analysis to mutations with likely
