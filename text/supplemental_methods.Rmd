@@ -206,9 +206,8 @@ cat("\\newpage")
 
 As an aside, we did not explicitly account for stage at diagnosis in our model
 for the following reasons. In the tumor sample data, stage at diagnosis is
-confounded with cancer type because some cancers are screened aggressively (
-_e.g._ colorectal and prostate cancers) while others are diagnosed typically
-after they become problematic for the patient's lifestyle ( _e.g._ ovarian and
+confounded with cancer type because some cancers are screened aggressively (_e.g._ colorectal and prostate cancers) while others are diagnosed typically
+after they become problematic for the patient's lifestyle (_e.g._ ovarian and
 pancreatic cancers). Secondly, such a model specification would suffer from
 added noise because the staging data are not well standardized across cancer
 types, have different criteria, and because it is unclear what the relationship

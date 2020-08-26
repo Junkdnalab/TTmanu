@@ -109,11 +109,11 @@ splicing mutations. In order to minimize bias from well-studied diseases and
 processes, we selected 377 [Reactome pathways](https://reactome.org/) (see
 supplemental table ST1) of interest corresponding to basic cellular processes
 and biochemical pathways, excluding gene sets that correspond to miscellaneous
-categories (\it{e.g.} “transcription factors”) or disease associations (\it{e.g.}
+categories (_e.g._ “transcription factors”) or disease associations (_e.g._
 “mutated in colon cancer”) and filtered our gene list on membership in these
 pathways (total of 8,940 genes; see methods for details).
 
-To avoid bias toward larger pathways (\it{i.e.} pathways with more member genes),
+To avoid bias toward larger pathways (_i.e._ pathways with more member genes),
 we counted pathways as disrupted if one or more member genes were mutated. We do
 not attempt to calculate enrichment for mutations within a pathway. Data
 binarized by pathway are likely to be noisy for several reasons. First, point
@@ -374,7 +374,7 @@ Prior efforts to extract common signatures from pan-cancer datasets met with
 difficulty in distinguishing tumor samples from their tissue-specific -omics
 data signatures. Given our pathway-disruption based clustering, this raises
 the question, are tumor phenotypes driven entirely by common driver genes, or by
-“silent” tissue-specific effectors (\it{i.e.} too few samples to detect above
+“silent” tissue-specific effectors (_i.e._ too few samples to detect above
 statistical significance thresholds), or a combination of both? To answer this
 question, we compared top pathway genes for each cluster relative to the TCGA
 background to find differentially mutated genes. We ranked odds ratios and
@@ -390,14 +390,14 @@ in metabolic pathways, had mutations in ribosomal proteins and nuclear pore
 complex, respectively. Cluster 4 had mutations in genes responsible for
 nucleosome structure. Cluster 2 had mutations in proteasomal subunit genes
 involved in protein degradation. We also observed that genes that were enriched
-for one cluster are depleted from others (\it{i.e.} is enriched in cluster 6,
+for one cluster are depleted from others (_i.e._ is enriched in cluster 6,
 but depleted in cluster 7; _PIK3CA_ is enriched in cluster 7, but depleted in
 clusters 3 and 8). Next, we investigated the proportion of samples per cancer
 type for the significant genes within a cluster (**Figure 6**; heatmap).
 Surprisingly, cluster-specific tumors were not predominated by one or more
 highly mutated genes across all cancers. Instead, when observing the mutation
 rate for these genes within samples that belong to a cluster, the mutation rate
-is heterogeneous across tumors by tissue origin (\it{e.g.} In cluster 4, CESC was
+is heterogeneous across tumors by tissue origin (_e.g._ In cluster 4, CESC was
 enriched for _H2AFX_, OV was enriched for _HIST1H2BD_, and UCEC was enriched for
 _HIST1H2AC_). Even among the top most mutationally enriched genes within
 clusters there is no global pattern, indicating that our clusters are not driven
@@ -432,7 +432,7 @@ cat("\\newpage")
 
 Following the same logic we used to investigate cluster-specific enrichment of
 pathways we compared metastatic _vs._ non-metastatic tumors, as we find that
-metastatic tumors are distributed across all ten clusters (\it{e.g.} **figure
+metastatic tumors are distributed across all ten clusters (_e.g._ **figure
 3E**). Using all non-metastatic tumors as background, we found very low levels
 of enrichment (< 10%) in a handful of pathways. We reasoned that the individual
 clusters might be too different to detect global metastasis enrichment signal
@@ -494,15 +494,15 @@ complexes to top pathways were downloaded from
 https://reactome.org/download-data. Using these data, we imposed pathway
 criteria to define basic cellular processes and biochemical pathways: (1)
 human-derived pathways (\it{“HSA”}) (2) limited to grandchild node for each
-parent pathway (\it{e.g.} ‘Beta-catenin independent WNT signaling’ in ‘Signal
+parent pathway (_e.g._ ‘Beta-catenin independent WNT signaling’ in ‘Signal
 Transduction’) (3) exclusion of pathways in the parent pathway: "Disease",
 "Muscle contraction", and "Reproduction" or pathway names that include any of
 the following keywords: "disease", "defect", "cancer", "oncogenic", "disorder",
 "mutant", "loss", "infection", "bacteria", or "listeria". While some of the
 excluded pathways have been shown to play an important role in cancer, they are
-highly specialized (\it{e.g.} "PI3K/AKT Signaling in Cancer"). Additionally, for
+highly specialized (_e.g._ "PI3K/AKT Signaling in Cancer"). Additionally, for
 most of the excluded pathways, a neutral version pathway of the pathway exists
-(\it{e.g.} "PIP3 activates Akt signaling"). Finally, we mapped the 18,577
+(_e.g._ "PIP3 activates Akt signaling"). Finally, we mapped the 18,577
 Ensembl IDs from the TCGA dataset to the highly selected Reactome pathways. This
 operation produced a lookup table that consisted of 377 pathways mapped to 8,940
 genes.
@@ -510,7 +510,7 @@ genes.
 ### Filtering genes
 
 We filtered likely erroneous mutations due to transcription coupled repair. Our
-approach was to determine the status of each gene (\it{i.e.} expressed or not
+approach was to determine the status of each gene (_i.e._ expressed or not
 expressed) in each tissue type in order to exclude gene mutations low expressed
 enes. To do this, we obtained the TCGA RNA sequencing data adjusted for batch
 effect dataset (https://pancanatlas.xenahubs.net). Using the data, we removed

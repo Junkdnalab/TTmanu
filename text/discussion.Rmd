@@ -140,7 +140,7 @@ group of hyper-mutated tumors that harbor so many mutations that virtually no
 pathway is unaffected. It seems likely that a significant fraction of the
 “mutant” samples for each pathway are burdened with excess passenger mutations.
 This could be addressed with application of ever-increasingly sophisticated
-filtering of likely passenger mutations [ _e.g._ @spliceAI;
+filtering of likely passenger mutations [_e.g._ @spliceAI;
 @deep-learning-clinical-variants]. In the future, we hope to incorporate these
 other data into a comprehensive pathway-centric analysis as we have done here
 for point mutations and indels.
