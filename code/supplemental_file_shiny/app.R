@@ -1,6 +1,7 @@
 ## library
 suppressPackageStartupMessages(c(
     library(shiny),
+    library(shinyWidgets),
     library(tidyverse),
     library(SummarizedExperiment),
     library(plot3D),
@@ -50,8 +51,9 @@ ui <- (fluidPage(
                     tabPanel(title = "Pan-cancer", rglwidgetOutput("pancan",  width = 500, height = 500)),
                     tabPanel(title = "Cancer Type",
                              
-                             checkboxGroupInput("cancer_type", label = "Cancer type:", ## Cancer type
-                                         choices = cancer_type, selected = "BRCA", inline = TRUE),
+                             pickerInput("cancer_type", label = "Cancer type:", ## Cancer type
+                                         choices = cancer_type, selected = "BRCA", multiple = TRUE,
+                                         options = list(`actions-box` = TRUE)),
                              plotOutput("cancertype")),
                     tabPanel(title = "Gene", 
                              selectInput("genename", label = "Gene:", ## Gene 
