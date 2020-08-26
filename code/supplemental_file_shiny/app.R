@@ -16,16 +16,18 @@ suppressPackageStartupMessages(c(
 ))
 
 ## Load data
-umap_cancertype <- fread("/home/p3nguyen/TTmanu/data/umap_3d_coors.tsv")
-load("/home/p3nguyen/TTmanu/data/kelly.colours.rda")
-load("/home/p3nguyen/TTmanu/data/ditto.colours.rda")
-load("/home/p3nguyen/TTmanu/data/tumor_samples.Rda")
-load("/home/p3nguyen/TTmanu/data/supplemental_gene.Rda")
-load("/home/p3nguyen/TTmanu/data/gdc_reactome_path_analysis.Rda")
+umap_cancertype <- fread("../../data/umap_3d_coors.tsv")
+load("../../data/kelly.colours.rda")
+load("../../data/ditto.colours.rda")
+load("../../data/tumor_samples.Rda")
+load("../../data/supplemental_gene.Rda")
+load("../../data/gdc_reactome_path_analysis.Rda")
 
 cluster.colours <- c(kelly.colours[c(3:12)], "grey") ## Color scheme
 names(cluster.colours) <- c(1:11) ## Assign cluster to color
 
+sample.colours <- umap_cancertype %>% dplyr::select(sample_id, clust_knn) %>% column_to_rownames(var = "sample_id")
+ 
 ## Generating selection inputs
 cancer_type <- tumor_samples %>% .$project_code %>% unique %>% ## get cancer type info
     .[order(.)] ## Order alphabetically
@@ -43,30 +45,30 @@ ui <- (fluidPage(
     ## Interactive settings
     playwidgetOutput("player"),
     
-    ## Slider inputs
-    sidebarPanel(
-        selectInput("cancer_type", label = "Cancer type", ## Cancer type
-                    choices = cancer_type, selected = "BRCA"),
-        selectInput("genename", label = "Gene:", ## Gene 
-                    choices = genename, selected = "TP53"),
-        selectInput("pathwayname", label = "Pathway", ## Pathway
-                    choices = pathwayname, selected = "Cellular response to hypoxia")
-        ),
-    
     mainPanel(
         tabsetPanel(type = "tabs",
-                    tabPanel(title = "Interactive", rglwidgetOutput("interactive",  width = 500, height = 500)),
-                    tabPanel(title = "Cancer Type", plotOutput("cancertype")),
-                    tabPanel(title = "Gene", plotOutput("gene")),
-                    tabPanel(title = "Pathway", plotOutput("pathway")))
+                    tabPanel(title = "Pan-cancer", rglwidgetOutput("pancan",  width = 500, height = 500)),
+                    tabPanel(title = "Cancer Type",
+                             
+                             checkboxGroupInput("cancer_type", label = "Cancer type:", ## Cancer type
+                                         choices = cancer_type, selected = "BRCA", inline = TRUE),
+                             plotOutput("cancertype")),
+                    tabPanel(title = "Gene", 
+                             selectInput("genename", label = "Gene:", ## Gene 
+                                         choices = genename, selected = "TP53"),
+                             plotOutput("gene")),
+                    tabPanel(title = "Pathway", 
+                             selectInput("pathwayname", label = "Pathway:", ## Pathway
+                                         choices = pathwayname, selected = "Cellular response to hypoxia"),
+                             plotOutput("pathway")))
         )
     )
 )
 
 
-server <- (function(input, output) {
-    ## Interactive plot code
-    output$interactive <- renderRglwidget ({ 
+server <- (function(input, output, session) {
+    ## Pancancer plot code
+    output$pancan <- renderRglwidget ({ 
         open3d(useNULL=TRUE)
         plot3d(umap_cancertype[, c("plot_x", "plot_y", "plot_z"),],
                type = "s", size = 2.5,
@@ -79,6 +81,7 @@ server <- (function(input, output) {
     
     ## Cancer type plot code
         output$cancertype <- renderPlot({
+            
             # setup layout
             gl <- grid.layout(nrow=2, ncol=2) 
             ## Setup viewports - How figures will be laid out
@@ -93,7 +96,7 @@ server <- (function(input, output) {
             par(new=TRUE, fig=gridFIG())
             par(mar = c(0,2,0,0), mai=c(0.1,0.1,0.1,0.1)) ## setting plot parameters
             with(umap_cancertype %>% ## using umap_cancertype data
-                     filter(project_code == input$cancer_type), ## Only include selected cancer type
+                     filter(project_code %in% input$cancer_type), ## Only include selected cancer type
                  scatter3D(plot_y, -plot_z, plot_x, ## Plot cancer type using umap 3d coors
                            bg = cluster.colours[as.character(clust_knn)], pch = 21, cex = 0.8, lwd = 0.2,
                            theta = 0, phi = 65, scale = F,
@@ -128,6 +131,8 @@ server <- (function(input, output) {
                     las = 1) ## always horizontal axis
             popViewport()
             
+            if(length(input$cancer_type) == 1) { ## if only one cancer type is selected then do this
+                
             spec_cancer <- umap_cancertype %>% filter(project_code == input$cancer_type) %>% ## Filter for selected cancer type
                 dplyr::select(plot_x, plot_y, plot_z, Subtype_Selected) ## Select relevant column 
             spec_cancer[is.na(spec_cancer)] <- "NA" ## Convert NA to character "NA"
@@ -181,6 +186,7 @@ server <- (function(input, output) {
                     ylab = "Relative Proportion",
                     las = 1) ## always horizontal axis
             popViewport()
+            }
         })
         
     
@@ -188,13 +194,14 @@ server <- (function(input, output) {
     output$gene <- renderPlot({ 
         par(mfrow = c(1,2), mai = c(0.1, 0.1, 0.1, 0.1)) ## creating plot layout 1 x 2
         par(mar = c(2,2,0,0))
-        with(supplemental_gene %>% dplyr::select(input$genename) %>% ## filtering for gene
-                 "colnames<-" ("selectedgene") %>% ## rename column
-                 rownames_to_column(var = "sample_id") %>% ## move sample id to column
-                 left_join(umap_cancertype[,c("plot_x", "plot_y", "plot_z", "sample_id")], ., by = "sample_id") %>% ## left join data by sample_id
-                 filter(selectedgene == 1), ## only select tumor samples that have a mutation in the selected gene
+        gene.df <- supplemental_gene %>% dplyr::select(input$genename) %>% ## filtering for gene
+            "colnames<-" ("selectedgene") %>% ## rename column
+            rownames_to_column(var = "sample_id") %>% ## move sample id to column
+            left_join(umap_cancertype[,c("plot_x", "plot_y", "plot_z", "clust_knn", "sample_id")], ., by = "sample_id") %>% ## left join data by sample_id
+            filter(selectedgene == 1)
+        with(gene.df, ## only select tumor samples that have a mutation in the selected gene
              scatter3D(plot_y, -plot_z, plot_x,
-                       bg = "grey", pch = 21, cex = 0.8, lwd = 0.2,
+                       bg = cluster.colours[as.character(gene.df$clust_knn)], pch = 21, cex = 0.8, lwd = 0.2,
                        theta = 0, phi = 65, scale = F,
                        xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
                        xlab = "UMAP 2", ylab = "UMAP 3", zlab = "UMAP 1",
@@ -204,14 +211,15 @@ server <- (function(input, output) {
     output$pathway <- renderPlot({ 
         par(mfrow = c(1,2), mai = c(0.1, 0.1, 0.1, 0.1)) ## creating plot layout 1 x 2
         par(mar = c(2,2,0,0))
-        with(gdc_reactome_path_analysis %>% t() %>% as.data.frame() %>% ## transpose data for left_joining later
-                 dplyr::select(input$pathwayname) %>% ## filtering for pathway
-                 "colnames<-" ("selectedpath") %>% ## rename column
-                 rownames_to_column(var = "sample_id") %>% ## move sample id to column
-                 left_join(umap_cancertype[,c("plot_x", "plot_y", "plot_z", "sample_id")], ., by = "sample_id") %>% ## left join data by sample_id
-                 filter(selectedpath == 1), ## only select tumor samples that have a mutation in the selected gene
+       pathway.df <- gdc_reactome_path_analysis %>% t() %>% as.data.frame() %>% ## transpose data for left_joining later
+            dplyr::select(input$pathwayname) %>% ## filtering for pathway
+            "colnames<-" ("selectedpath") %>% ## rename column
+            rownames_to_column(var = "sample_id") %>% ## move sample id to column
+            left_join(umap_cancertype[,c("plot_x", "plot_y", "plot_z", "clust_knn", "sample_id")], ., by = "sample_id") %>% ## left join data by sample_id
+            filter(selectedpath == 1)
+        with(pathway.df, ## only select tumor samples that have a mutation in the selected gene
              scatter3D(plot_y, -plot_z, plot_x, 
-                       bg = "grey", pch = 21, cex = 0.8, lwd = 0.2,
+                       bg = cluster.colours[as.character(pathway.df$clust_knn)], pch = 21, cex = 0.8, lwd = 0.2,
                        theta = 0, phi = 65, scale = F,
                        xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
                        xlab = "UMAP 2", ylab = "UMAP 3", zlab = "UMAP 1",
