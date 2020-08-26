@@ -2,7 +2,7 @@
 
 One of the biggest hurdles in cancer research is the sparsity of data; ~20,000
 protein-coding genes is comparable with the number of tumor samples, even with
-multiple mutations per sample. And that is not accounting for the fact that
+multiple mutations per sample. This also does not account for the fact that
 ~30,000 non-coding genes and hundreds of thousands of non-coding regulatory
 elements exist with oncogenic or tumor suppressor activity [@deesMuSiC2012;
 @tamboreroOncodriveCLUST2013; @lawrenceDiscoverySaturationAnalysis2014;
@@ -13,13 +13,13 @@ simplify the problem by employing a "knowledge-base driven analysis"
 biochemical pathways, which we accomplished by translating gene-level mutations
 into pathway level disruptions. Our approach differs from previously described
 methods [@PATHNET] in that we chose to focus on the pathway (defined in the
-methods) as the unit of disruption instead of the gene, employing the conceit
-that individual mutations may be sufficient to disrupt or misdirect pathway
-activity (as is often the case with driver mutations). Rather than evaluating
-the burden of mutations on each pathway within or across tumors, which can be
-biased by the number of genes or the coverage of pathway-linked genes in the
-genome, we scored each pathway in binary fashion, allowing one mutation or
-multiple mutations to count equally for each sample.
+methods) as the unit of disruption instead of the gene, where individual
+mutations may be sufficient to disrupt or misdirect pathway activity (as is
+often the case with driver mutations). Rather than evaluating the burden of
+mutations on each pathway within or across tumors, which can be biased by the
+number of genes or the coverage of pathway-linked genes in the genome, we scored
+each pathway in binary fashion, allowing one mutation or multiple mutations to
+count equally for each sample.
 
 To our knowledge, this approach has not previously been attempted in spite of
 its relative simplicity. We limited our analysis to mutations with likely
@@ -35,11 +35,7 @@ potentially problematic [@pathways-Atul-Butte]. We chose this approach to limit
 redundancy and exclude biologically unrelated collections of genes. Our
 pathway-centric analysis allows us to circumvent the problem that some
 cancer-promoting mutations likely occur at such low frequencies as to be
-indistinguishable from background. Previous attempts to capture these
-associations using Bayesian networks have yielded important new insights into
-this problem and new genes [@hornNetSigNetworkbasedDiscovery2018] that would not
-have been possible with traditional analysis, supporting the case that
-pathway-centric approaches have the potential to increase statistical power.
+indistinguishable from background.
 
 The hypothesis that cancer is the result of dysfunction from a limited number of
 basic cellular processes common to all living human cells was introduced and
@@ -103,12 +99,12 @@ classes, since some treatment regimens have greater efficacy for patients of a
 given cancer or histological subtype [@breast-subtypes2]. Nonetheless, the basis
 for some tumors being treatment-refractory in spite of receiving the standard of
 clinical care for diagnostic markers remains elusive. Doubtless some of this is
-due to bad luck, as tumors can metastasize and remain dormant years before they
-are detected at distal sites, or resistant clones may have already arisen at
-undetectable levels [@hallmarks_II], but our analysis suggests the possibility
-of identifying more informative molecular, histological or cellular subtypes
-that could form a basis for future separation of patients into different
-precision treatment regimens.
+due to chance events, as tumors can metastasize and remain dormant years before
+they are detected at distal sites, or resistant clones may have already arisen
+at undetectable levels [@hallmarks_II], but our analysis suggests the
+possibility of identifying more informative molecular, histological or cellular
+subtypes that could form a basis for future stratification of patients into
+different precision treatment regimens.
 
 ### Tissue specific manifestation of pathway-centric disruptions
 

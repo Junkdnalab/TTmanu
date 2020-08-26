@@ -56,10 +56,11 @@ highlighting fundamental disease phenotypes at the pathway
 level across cancers with different origins at the cellular and tissue
 level.
 
-In this study, we attempt to address these questions by focusing on discrete
-molecular pathways as the unit of disruption in cancer. Our approach strips all
-cell-type-specific information from the mutation data and equates gene-level
-mutations to cell-biological pathway disruptions. We use this heuristic to
-evaluate all cancers and show that, surprisingly, tumors that exhibit
-tissue-specific gene mutation patterns nonetheless fall into common categories
-of pathway disruption having unique prognoses in each cancer type.
+In this study, we attempt to understand how tissue-specific gene disruptions
+create common cancer phenotypes by focusing on discrete molecular pathways as
+the unit of disruption. Our approach strips all cell-type-specific information
+from the mutation data and equates gene-level mutations to cell-biological
+pathway disruptions. We use this heuristic to evaluate all cancers and show
+that, surprisingly, tumors that exhibit tissue-specific gene mutation patterns
+nonetheless fall into common categories of pathway disruption having unique
+prognoses in each cancer type.
