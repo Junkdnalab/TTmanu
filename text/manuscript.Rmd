@@ -177,8 +177,7 @@ cat("\\newpage")
 **Figure 2: Clustering of tumor samples** Different rotational perspectives of
 the same MCA-based UMAP projection in three-dimensional space. Each dot
 corresponds to a tumor sample. The same colors indicate the tumor's cluster
-identity throughout this manuscript. 1=yellow, 2=lilac, 3=orange, 4=light blue,
-5=crimson, 6=beige, 7=grey, 8=dark green, 9=pink, 10=dark blue.
+identity throughout this manuscript.
 
 
 ```{r, results='asis'}
@@ -304,17 +303,16 @@ cat("\\newpage")
 ```
 
 Finally, as a measure of tumor advancement, metastasis is the condition in which
-certain phenotypic criteria are met. These phenotypes include (among others)
-loss of differentiation, cell-cell contacts, epithelial to mesenchyme
-transition, immune system evasion and tissue invasiveness [@hallmarks_II]. To
-determine whether any of our clusters correspond to an especially advanced stage
-of cancer across tissue types, we projected the metastasis data onto our UMAP,
-and surprisingly we observed an even distribution of metastases across classes
-(**figure 3E**). This final observation suggests that our pathway-disruption
-classification is dependent on particular combinations of gene mutations
-affecting different pathways that can each give rise to advanced stages of
-disease and metastasis, regardless and independent of overall mutational burden
-(see Discussion for further analysis).
+certain phenotypic criteria are met. These phenotypes include loss of
+differentiation, cell-cell contacts, epithelial to mesenchyme transition, immune
+system evasion and tissue invasiveness [@hallmarks_II]. To determine whether any
+of our clusters correspond to an especially advanced stage of cancer across
+tissue types, we projected the metastasis data onto our UMAP, and surprisingly
+we observed an even distribution of metastases across classes (**figure 3E**).
+This final observation suggests that our pathway-disruption classification is
+dependent on particular combinations of gene mutations affecting different
+pathways that can each give rise to advanced stages of disease and metastasis,
+regardless and independent of overall mutational burden.
 
 ### Tissue specific genes define cluster membership
 
