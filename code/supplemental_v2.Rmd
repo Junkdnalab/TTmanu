@@ -91,7 +91,7 @@ legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
 ```
 **Supplementary figure S1. Distribution of cancer type on UMAP clusters.** Each panel shows the identity of 
 individual tumors by one of 23 cancer types projected onto the cluster UMAP identified 
-in **Figure 2C of the main text**.
+in **Figure 2 of the main text**.
 
 \newpage
 
@@ -249,7 +249,7 @@ for(n in cancer_w_subtypes[16:19]) {
 #   facet_wrap(~ project_code, ncol = 5) ## facet by cancer type
 ```
 **Supplementary Figure S2. Histological subtypes.** Each panel shows the histological subtypes of one of the 23 
-cancers projected onto the tumors of the UMAP from **Figure 2C of the main text**.
+cancers projected onto the tumors of the UMAP from **Figure 2 of the main text**.
 
 \newpage
 
@@ -350,7 +350,7 @@ legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
 }
 ```
 **Supplementary Figure S3. Distribution of mismatch repair genes on UMAP clusters.** Each panel shows one of 15 
-genes involved in genome stability projected on the UMAP from **Figure 2C of the main text**.
+genes involved in genome stability projected on the UMAP from **Figure 2 of the main text**.
 
 \newpage
 
@@ -565,9 +565,11 @@ data <- startingpointlist[24,]
 s4plot(x = data)
 data <- startingpointlist[25,]
 s4plot(x = data)
+```
 
+```{r, fig.width = 6.7}
 par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1))
-par(mar = c(2,2,0,0))
+par(mar = c(2,2,0,0), cex.lab = 0.8)
 for(n in pathorder[376:377]) { 
   pathname <- as.data.frame(strsplit(n, " ")) ## split string into word
   pathname <- pathname[,1] ## get the character vectors
@@ -579,18 +581,19 @@ for(n in pathorder[376:377]) {
                xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
                                 xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
                                 colvar = NULL))
-title(xlab="UMAP 2", line=0)
+title(xlab="UMAP 2", line=-1.7)
 path1 <- paste0(pathname[1], " ", pathname[2], " ", pathname[3], " ", pathname[4], " ")
 path1 <- gsub("NA", "", path1)
 path2 <- paste0(pathname[5], " ", pathname[6], " ", pathname[7], " ", pathname[8], " ")
 path2 <- gsub("NA", "", path2)
-legend("top", inset = c(0.01), legend=path1, bty = "n", horiz = T, cex = 0.9)
-legend("top", inset = c(0.06), legend=path2, bty = "n", horiz = T, cex = 0.9)
+legend("top", inset = c(0.11), legend=path1, bty = "n", horiz = T, cex = 0.8)
+legend("top", inset = c(0.16), legend=path2, bty = "n", horiz = T, cex = 0.8)
 }
 ```
+
 **Supplementary Figure S4. Projection of pathway disruptions onto the UMAP.** Each panel shows one of 377 Reactome
 pathways projected on the UMAP from **Figure 1D of the main text** ordered by the hierarchical pathway order 
-(column) from **Figure 2C of the main text**.
+(column) from **Figure 2 of the main text**.
 
 \newpage
 
@@ -634,37 +637,6 @@ save(s5_data, file = "../data/s5_data.Rda")
 ```
 
 ```{r supplemental-s5-plot, fig.width=9}
-# umap_cancertype <- data.table::fread("../data/umap_3d_coors.tsv")
-# 
-# umap_cancertype$clust_knn <- as.character(umap_cancertype$clust_knn)
-# 
-# clusters178 <- umap_cancertype %>% 
-#        mutate(color = case_when(clust_knn %in% c("1", "7", "8") ~ clust_knn,
-#                                   TRUE ~ "Other"))
-# 
-# I_outlines <- c("black", "black", "black", "#00000000")
-# names(I_outlines) <- c("1", "7", "8", "Other")
-# 
-# I_colors <- c("gold2", "gray51", "springgreen4", "#00000011")
-# names(I_colors) <- c("1", "7", "8", "Other")
-# 
-# load("../data/s5_data.Rda")
-# genes <- as.character(unique(s5_data$variable))
-# 
-# par(mfrow = c(2,3), mai = c(0.1, 0.1, 0.1, 0.1))
-# par(mar = c(2,2,0,0))
-# plot.new()
-# with(clusters178, 
-#      scatter3D(plot_y, -plot_z, plot_x, 
-#                                 bg = I_colors[color], col = I_outlines[color],
-#                                 pch = 21, cex = 0.8, lwd = 0.2,
-#                                 theta = 0, phi = 65, scale = F,
-#                                 xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
-#                                 colvar = NULL))
-# legend("top", inset = c(0.05), legend=names(I_colors[c(1:3)]), col=I_colors[c(1:3)], pch = 20, bty = "n", horiz = T, cex = 1.2)
-# title(xlab="UMAP 2", line=0)
-# plot.new()
-
 load("../data/s5_data.Rda")
 genes <- c("AKT2","BCL2","CTNNB1","ERBB2","KRAS","PIK3CA","CDKN2C","PTEN","RB1","SMARCA4","TP53","VHL")
 
@@ -699,7 +671,7 @@ legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
 }
 
 ```
-**Supplementary Figure S5. Distribution of oncogenes/tumor suppressors on UMAP clusters.** Each panel shows shows one of the twelve oncogenes/tumor suppressors projected onto the tumors of the UMAP from **Figure 2C of the main text**.
+**Supplementary Figure S5. Distribution of oncogenes/tumor suppressors on UMAP clusters.** Each panel shows shows one of the twelve oncogenes/tumor suppressors projected onto the tumors of the UMAP from **Figure 2 of the main text**.
 
 \newpage 
 ```{r supplemental-table-st1-data-generation, eval = FALSE}
