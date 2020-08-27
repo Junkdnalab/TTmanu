@@ -461,10 +461,6 @@ cat("\\newpage")
 
 **Table 1: Cluster-specific enriched pathways (effect size ≥ 0.30) in metastasis.**
 
-```{r, results='asis'}
-cat("\\newpage")
-```
-
 ### Pathway disruption clusters vary in short-term prognosis of survival
 
 ```{r child='survival.Rmd'}
