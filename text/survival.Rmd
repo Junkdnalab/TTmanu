@@ -95,7 +95,7 @@ cat("\\newpage")
 
 #### Figure 8
 ```{r fig.width=3, message=FALSE, warning=FALSE}
-pcanc+mytheme
+#pcanc+mytheme
 ```
 
 **Figure 8 Tissue specific effects** Effects are compared between cancer type by

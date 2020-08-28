@@ -25,5 +25,5 @@ kclassplot = function(dfsamps,tisnames){
 pclass = kclassplot(dfsamps,levels(cancerdat$type))
 
 
-pclass+mytheme+scale_fill_manual(values = cluster.colours)
+pclass+mytheme + turn.off.legend +scale_fill_manual(values = cluster.colours)
 ```
