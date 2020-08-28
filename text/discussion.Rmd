@@ -2,83 +2,58 @@
 
 One of the biggest hurdles in cancer research is the sparsity of data; ~20,000
 protein-coding genes is comparable with the number of tumor samples, even with
-multiple mutations per sample. This also does not account for the fact that
-~30,000 non-coding genes and hundreds of thousands of non-coding regulatory
-elements exist with oncogenic or tumor suppressor activity [@deesMuSiC2012;
-@tamboreroOncodriveCLUST2013; @lawrenceDiscoverySaturationAnalysis2014;
-@kumarStatisticallyIdentifyingTumor2015; @jiangWITER2019;
-@zhaoModelingPositive2019; @noncoding-mutations-Zhang]. Hence, we sought to
+multiple mutations per sample. We sought to
 simplify the problem by employing a "knowledge-base driven analysis"
 [@pathways-Atul-Butte], investigating cancer as a disease of basic cellular and
 biochemical pathways, which we accomplished by translating gene-level mutations
 into pathway level disruptions. Our approach differs from previously described
 methods [@PATHNET] in that we chose to focus on the pathway (defined in the
 methods) as the unit of disruption instead of the gene, where individual
-mutations may be sufficient to disrupt or misdirect pathway activity. Rather
-than evaluating the burden of mutations on each pathway within or across tumors,
-which can be biased by the number of genes or the coverage of pathway-linked
-genes in the genome, we scored each pathway in binary fashion, allowing one
-mutation or multiple mutations to count equally for each sample.
+mutations may be sufficient to alter pathway activity.
 
-To our knowledge, this approach has not previously been attempted in spite of
+To our knowledge, this approach has not previously been attempted despite
 its relative simplicity. We limited our analysis to mutations with likely
 deleterious effects, including missense, nonsense, frame-shift, stop-loss,
 untranslated region and splice site mutations in genes that are actively
 expressed in each cancer type, thus avoiding bias from transcription coupled
 repair. Our method of filtration differs from the "rank-and-cut" method of
 [@PCAWG-MAIN] but represents a reasonable attempt to account for the same
-biases. We also filtered genes on the basis of pathway membership in biochemical
+biases. We also restricted our analysis to biochemical
 pathways, excluding curated gene sets related to diseases, syndromes, or classes
 of proteins with shared catalytic activity or conserved domains which are
 potentially problematic [@pathways-Atul-Butte]. We chose this approach to limit
-redundancy and exclude biologically unrelated collections of genes. Our
-pathway-centric analysis allows us to circumvent the problem that some
-cancer-promoting mutations likely occur at such low frequencies as to be
-indistinguishable from background.
+redundancy and exclude biologically unrelated collections of genes.
 
 The hypothesis that cancer is the result of dysfunction from a limited number of
-basic cellular processes common to all living human cells was introduced and
+basic cellular processes common to eukaryotic cells was introduced and
 later expanded on in a pair of essays by Hanahan and Weinberg [@weinberg2000;
-@hallmarks_II]. In this view, all tumors regardless of tissue of origin acquire
-six essential phenotypes; sustaining proliferative signaling, evading growth
-suppressors, replicative immortality, evading apoptosis, supportive
-angiogenesis, tissue invasion and metastasis [@weinberg2000]. Advancements in
-the field over the ensuing decade led to the inclusion of new tumor promoting
-processes, namely deregulation of cellular energy cycle, tumor promoting
-inflammation, evasion of the immune system, genome instability, and on top of
-these acquired traits a new appreciation for the concept of the tumor
-microenvironment and its contribution to the evolution and promotion of
-metastatic disease [@hallmarks_II].
-
-An alternative hypothesis is that every tumor belongs to one of a large number
+@hallmarks_II]. An alternative hypothesis is that every tumor belongs to one of a large number
 of syndromes which are unique to each tissue-of-origin, that share some
 mechanisms and treatment strategies. Recent publication of TCGA consortium
-papers present a view largely, and surprisingly, consistent with this hypothesis
+papers present a view largely, and surprisingly, consistent with this latter hypothesis
 [@hoadleyMultiplatformAnalysis2014; @hoadleyCellofOriginPatternsDominate2018].
 Perhaps owing to the intractable complexity of genomics, proteomics, and
 patient metadata in all its forms, the inescapable conclusion thus far is that
 tissue-of-origin remains the most important driver of tumor characteristics at
 every scale and by every measure. Our observations contrast with this view, and
 instead support an interpretation of publicly available data in which all tumors
-manifest one of a limited number of metastable phenotypes resulting from
-disruptions in basic pathways as represented by our clusters. 
+manifest one of a limited number of phenotypes resulting from
+disruptions of basic pathways. 
 
 We attempted to account for our clusters in terms of more trivial explanations.
-For example, it could be that the clusters we identified are consistent with a
-signature of overall disease progression, such that successive, adjacent
-clusters on the UMAP projection exhibit increasing specificity. We identified no
-such trend in the number of mutations, the relative staging or metastasis; and
-each cluster instead was associated with unique combinations of pathways.
+For example, it could be that the clusters we identified are consistent with
+disease progression. We were unable to identify any such trend in the number of
+mutations, the relative staging or metastasis; and each cluster instead was
+associated with unique combinations of pathways.
 
-We find that most tumors segregate into one of ten biologically distinct
-clusters, regardless of the cancer type. Some cancer types are unevenly
-distributed, though we could not identify any cancers that were exclusive to a
-single tumor cluster. Only cancer types with the fewest samples were found to be
+Some cancer types are unevenly
+distributed among the clusters, though we could not identify any cancers that were exclusive to a
+single cluster. Only cancer types with the fewest samples were found to be
 absent from one or more clusters at all. Somewhat surprisingly to us, this
 finding extends to histological subtypes of breast, head and neck cancers,
-leukemias, _etc._ This result implies that many, if not most, histological
+leukemias, _etc._ This result implies that histological
 subtypes could reflect differences in cell-of-origin, rather than fundamental
-differences in proximal cause. The four major subtypes of breast cancer
+differences in cancer phenotype. The four major subtypes of breast cancer
 correspond to histological and molecular expression profiles that define them
 and how they respond to experimental stimuli [@breast-subtypes2]. It has been
 hypothesized that differences in the molecular regulators of development in the
@@ -89,9 +64,9 @@ heavily biased toward membership in clusters 1 and 7, and basal tumor samples
 were biased toward cluster 6. However, both subtypes also contained samples in
 every other cluster (without exception), and Luminal B and Her2 positive samples
 are distributed across clusters. We interpret these data to mean that inherited
-cell-of-origin molecular profiles may predispose certain precursor cell types
+cell-of-origin signatures could predispose certain precursor cells
 within the breast epithelium to forming tumors of one cluster or another but are
-not determinative; this view is compatible with the previously stated hypothesis
+not determinative. This view is compatible with the previously stated hypothesis
 but opens the way for a more granular view of individual tumors. It would be
 surprising if we did not observe bias for some cancers and subtypes amongst our
 classes, since some treatment regimens have greater efficacy for patients of a
@@ -114,32 +89,26 @@ PIK3CA_ and _TP53_) are found in most of the clusters, in spite of the fact that
 they contribute to many cluster-specific pathways. This can only be explained as
 a result of other less common driver genes complementing the pathway disruption
 of the unique combination of driver genes that are disrupted in each tumor, and
-we speculate that many of these are relatively tissue-specific in terms of their
-sensitivity to mutation. Consistent with our observations, @moonlight showed how
-tissue- and cancer-specific driver genes and druggable targets of pathway moduli
-can be discovered by machine learning on integrated multi-omics datasets.
-Marrying these approaches in future work will greatly enhance our understanding
-of tumor biology.
+we speculate that many of these are sensitive to mutation in different tissues.
 
 ### Incompleteness of the pathway disruption data 
 
 Finally, we must remark on the limitations of our work exemplified in two of the
 clusters, 1 and 10, for which we did not find many distinctive associations with
-pathways. Cluster 1 had a relatively low proportion of mutated pathways across
-the board, although it is broadly enriched in many of the same tumor-promoting
-pathways common to the other groups. This likely does not reflect a true
-difference in stages of tumor evolution, as our data show clearly that this
-cluster is as likely to contain stage IV metastatic tumors as it is to contain
-those of stage I. This cluster likely represents a group of tumors with
-aberrations in methylation, key deletions, or other structural variants.
-Consistent with this, kidney chromophobe and thyroid cancers have high
-proportions of structural variations _vs._ other variant types [@PCAWG-MAIN] and
-are heavily skewed to cluster 1 membership. Likewise, cluster 10 represents a
-group of hyper-mutated tumors that harbor so many mutations that virtually no
-pathway is unaffected. It seems likely that a significant fraction of the
-“mutant” samples for each pathway are burdened with excess passenger mutations.
-This could be addressed with application of ever-increasingly sophisticated
-filtering of likely passenger mutations [_e.g._ @spliceAI;
+pathways. Cluster 1 had a relatively low proportion of mutated pathways,
+although it is broadly enriched in many of the same tumor-promoting pathways
+common to the other groups. In addition, our data show clearly that this cluster
+is as likely to contain stage IV metastatic tumors as it is to contain those of
+stage I. This cluster likely represents a group of tumors with aberrations in
+methylation, copy number, or other structural variants. Consistent with this,
+kidney chromophobe and thyroid cancers have high proportions of structural
+variations _vs._ other variant types [@PCAWG-MAIN] and are heavily skewed to
+cluster 1 membership. Likewise, cluster 10 represents a group of hyper-mutated
+tumors that harbor so many mutations that virtually no pathway is unaffected. It
+seems likely that a significant fraction of the “mutant” samples for each
+pathway are burdened with excess passenger mutations. This could be addressed
+with more sophisticated filtering of likely passenger mutations [_e.g._
+@spliceAI;
 @deep-learning-clinical-variants]. In the future, we hope to incorporate these
 other data into a comprehensive pathway-centric analysis as we have done here
 for point mutations and indels.
@@ -148,51 +117,43 @@ for point mutations and indels.
 
 By modeling CDC longevity data as a baseline risk function we showed that each
 of our pathway disruption clusters exhibit cancer-type specific effects on
-expected survival. Contrary to our initial expectation, we found that models
-assuming different survival based on cluster $\times$ cancer type fit better than
-models in which they are independent factors. However, considering that within
-each cancer type there are different clinical standards of care, and even within
-classes of drugs the preferred treatment can very between cancers, it makes
-sense that we observe tissue-specific cluster effects. Contrast the situation
-with ovarian _vs._ breast cancer, which are both hormonally driven cancers, for
-example. Ovarian cancer has but one main treatment axis, platinum, whereas
-breast cancer patients have a variety of treatment regimens based on molecular
-subtype and other factors. Standard of care for one cancer and cluster could
-produce different outcomes than the same cluster of a different cancer type.
-Unfortunately, given the diversity of drug classes and treatments (including
-non-chemical treatments such as surgery and palliative care), we lack sufficient
-power to explore these variables in the TCGA data. It is our hope that future
-studies will help to distinguish between treatment-specific effects on survival
-given different pathway disruption clusters.
+expected survival. However, considering that within each cancer type there are
+different clinical standards of care, and even within classes of drugs the
+preferred treatment can very between cancers, it makes sense that we observe
+tissue-specific cluster effects. Contrast the situation with ovarian _vs._
+breast cancer, which are both hormonally driven cancers, for example. Ovarian
+cancer has but one main treatment axis, platinum, whereas breast cancer patients
+have a variety of treatment regimens based on molecular subtype and other
+factors. Unfortunately, given the diversity of drug classes and treatments, we
+lack sufficient power to explore these variables in the TCGA data. It is our
+hope that future studies will help to distinguish between treatment-specific
+effects on survival given different pathway disruption clusters.
 
 ### Implications for the evolution of cancer 
 
 Our findings imply that there are separate processes in the etiology of cancer
 that can be broadly thought of as general cancer promoting, cluster-specific
-mutations and metastasis. General cancer promoting processes must include
-factors that relate to genome stability and immortality, as "enabling
-characteristics" of the cancer phenotype [@hallmarks_II]. Such pathways are
-disrupted in all or most of the defined clusters
-and are frequently the result of aberrations involving common driver genes such
-as BRCA1/2, MMR genes, mitotic checkpoints, cohesion complexes, _etc._
-Cluster-specific
+mutations and metastasis. General cancer promoting processes include genome
+stability and immortality, as "enabling characteristics" of the cancer phenotype
+[@hallmarks_II]. Such pathways are disrupted in most clusters and are frequently
+the result of aberrations involving common driver genes such as BRCA1/2, MMR
+genes, mitotic checkpoints, cohesion complexes, _etc._ Cluster-specific
 evolution must involve the acquisition of disruptions to pathways that may
-individually be harmful ( _e.g._ highly proliferative cells are more likely to
+individually be harmful (_e.g._ highly proliferative cells are more likely to
 senesce) but together produce more specialized cancer phenotype and increased
-fitness. Importantly, our
-observations do not imply the order in which these mutations should accumulate.
-This could be addressed in a future study by integrating our analysis with
-evolutionary analysis of clonality, drawing inferences from variant allele
+fitness. Importantly, our observations do not imply the order in which these
+mutations should accumulate. This could be addressed in a future study by
+evolutionary analysis of clonality, drawing inference from variant allele
 frequencies as in @PCAWG-EVO. However, since many of the genes in the
 non-cluster-specific pathways involve the known driver genes, it is reasonable
-to hypothesize that these mutations promote or enable the subsequent acquisition
-of cluster-specific defects via random mutation and natural selection, thus
+to surmise that these mutations promote or enable acquisition of
+cluster-specific defects via random mutation and natural selection, thus
 producing the clusters we observed. In support of this, the pan-cancer analysis
 of whole genomes consortium (PCAWG) found that oncogenic driver mutations are
 highly enriched in early arising clones, whereas later arising clones have much
 greater diversity in driver mutations [@PCAWG-EVO]. Moreover, driver genes that
 are known to be responsible for discrete mutation signatures such as APOBEC,
-BRCA1 and BRCA2 produce mutational hotspots reflecting the varying selective
+BRCA1 and BRCA2 produce mutational hotspots reflecting varying selective
 pressures in different tissues [@PCAWG-MAIN].
 
 One of the drawbacks of bulk tumor whole genome sequencing data is the problem
@@ -204,25 +165,23 @@ the context of single cell experiments.
 
 ### On metastasis as a convergence of phenotypes 
 
-We report that pathway enrichment in metastatic tumors across all clusters
-(pooled) yielded generally lower effect sizes and larger p-values than the
-cluster specific analysis, suggesting that signal is diluted when the samples
-are analyzed together, and supporting the view that metastasis has
-cluster-specific requirements. Since the number of metastatic samples is
-relatively low, this part of our analysis is likely underpowered and subject to
-expanded analysis with larger cohorts. The fact that most metastatic enrichment
-is cluster-specific and has a tendency to overlap with cluster-specific pathways
-from non-metastatic tumors of neighboring clusters suggests a mechanism of
-complementarity, in which newly acquired mutations result in similar clusters
-converging on one or more deadly phenotypes that capture most of the critical
-features of end-stage cancer. Thus, even at relatively low power, our analysis
-of metastasis further supports the pathway-centric approach as a fruitful way to
-uncover biologically meaningful differences between tumors against the noisy
-backdrop of tissue specific profiles. As a major caveat to this, we acknowledge
-that many therapies _do_ target highly-specific driver genes, markers, and
-signaling pathways ( _e.g._ TP53, EGFR or HER2), but understanding the broader
-context of the genetic background and pathway vulnerability of tumors containing
-such markers may aid in creating smarter combination therapies. We submit that
-when we discover the requirements of each cluster with respect to pathway
-disruptions and metastasis we may be able to target them therapeutically and
-prevent further adaptation.
+We report that enrichment in metastatic tumors across all clusters yielded
+generally lower effect sizes and larger p-values than the cluster specific
+analysis, suggesting that signal is diluted when clusters are pooled, and
+supporting the view that metastasis has cluster-specific requirements. Since the
+number of metastatic samples is relatively low, this part of our analysis is
+likely underpowered and subject to expanded analysis with larger cohorts. The
+fact that most metastatic enrichment is cluster-specific and has a tendency to
+overlap with cluster-specific pathways from non-metastatic tumors of neighboring
+clusters suggests that newly acquired mutations result in similar clusters
+converging on one or more deadly phenotypes with critical features of end-stage
+cancer. Thus, even at relatively low power, our analysis of metastasis uncovered
+differences between tumors against the noisy backdrop of tissue specific
+profiles. As a major caveat to our pan-cancer analysis, we acknowledge that many
+therapies _do_ target highly-specific driver genes, markers, and signaling
+pathways ( _e.g._ TP53, EGFR or HER2), but understanding the broader context of
+the genetic background and pathway vulnerability of tumors containing such
+markers may aid in creating smarter combination therapies. We submit that when
+we discover the requirements of each cluster with respect to pathway disruptions
+and metastasis we may be able to target them therapeutically and prevent further
+adaptation.

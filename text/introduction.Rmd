@@ -1,12 +1,11 @@
 Recent advances in technology have greatly expanded our view into the mechanisms
-of cancer at the systems biology level. Array and next-generation sequencing
-technologies have made it possible to assay germline and somatic mutations,
-expression profiles, DNA methylation, and copy number variations from the same
-tissue samples. To take advantage of these tools, several large consortia,
-including the cancer genome atlas (TCGA) and pan-cancer analysis of whole
-genomes (PCAWG) sequenced large numbers of tumors and collected data from
-multiple assays that could be analyzed together, with the goal of integration
-and increased understanding of the mechanisms of cancer.
+of cancer at the systems biology level. Next-generation sequencing technologies
+have made it possible to assay germline and somatic mutations, expression
+profiles, DNA methylation, and copy number variations from the same tissue. To
+take advantage of these tools, several large consortia, including the cancer
+genome atlas (TCGA) and pan-cancer analysis of whole genomes (PCAWG) sequenced
+large numbers of tumors multiple assays to analyze together, with the goal of
+integration and increased understanding of the mechanisms of cancer.
 
 Considerable progress has been made analyzing these data. Statistical analyses
 identify hundreds of global and tissue-specific cancer driver genes
@@ -14,47 +13,45 @@ identify hundreds of global and tissue-specific cancer driver genes
 @lawrenceDiscoverySaturationAnalysis2014;
 @kumarStatisticallyIdentifyingTumor2015; @tokheimEvaluatingEvaluationCancer2016;
 @jiangWITER2019; @zhaoModelingPositive2019] using approaches aimed at detecting
-when genes are mutated at a greater rate than expected due to chance. It has
-been estimated that fewer than five mutations in key oncogenes and/or tumor
+genes mutated at a greater rate than expected due to chance. It has been
+estimated that fewer than five mutations in key oncogenes and/or tumor
 suppressors would be sufficient to transform a normal cell to a cancerous state
-[@vogelsteinPathCancerThree2015; @Iranzo-Network]. Somewhat paradoxically,
-mutations in cancer driver genes are commonplace in healthy tissue and
-correlate with age and environmental exposures [@mutations-healthy-tissues].
+[@vogelsteinPathCancerThree2015; @Iranzo-Network]. Mutations in cancer driver
+genes are commonplace in healthy tissue and correlate with age and environmental
+exposures [@mutations-healthy-tissues].
 
 Other studies provide a comprehensive view of mutations, gene expression and
-genomic signatures, with the express goal of understanding the common themes of
-all cancer independent of tissue of origin. Understanding cancer as a disease of
-the cell has long been a goal of the field as characterized in essays by
-@weinberg2000; @hallmarks_II. The first of these studies in the genomic era
-identified 11 subtypes from 12 cancer types, using integrative analysis with
-co-equal weighting of gene expression, methylation, copy number and proteomics
-data [@hoadleyMultiplatformAnalysis2014]. The principal finding was that
-tissue-of-origin is the predominant driving factor, though a significant
-proportion of tumors (~10%) could be reclassified independent of
-tissue-of-origin. In a second study involving 33 cancer types and a much greater
-number of tumors, the authors identify
-28 clusters that could be further subdivided into organ specific groups,
-including pan-gastrointestinal, pan-gynecological, pan-squamous,
-pan-gynecological/squamous and pan-kidney [@hoadleyCellofOriginPatternsDominate2018].
+genomic signatures, with the goal of understanding common themes of all cancer
+independent of tissue of origin. Understanding cancer as a disease of the cell
+has long been a goal of the field as characterized in essays by
+@weinberg2000; @hallmarks_II. The first of these studies in genomics identified
+11 subtypes from 12 cancer types, using integrative analysis with co-equal
+weighting of gene expression, methylation, copy number and proteomics data
+[@hoadleyMultiplatformAnalysis2014]. The principal finding was that
+tissue-of-origin is the predominant driving factor, though ~10% could be
+reclassified independent of tissue-of-origin. In a second study involving 33
+cancer types and a much greater number of tumors, the authors identified 28
+clusters that could be further subdivided into organ specific groups, including
+pan-gastrointestinal, pan-gynecological, pan-squamous,
+pan-gynecological/squamous and pan-kidney
+[@hoadleyCellofOriginPatternsDominate2018].
 
-More recently, attempts have been made to consider pan-cancer mutations and
-other data as disruptions of normal pathway activity. @PCAWG-PATH carried out
-near-exhaustive analysis of pathway enrichment using whole genome data. Network
-approaches address the sparseness of mutations, allowing genes to be influenced
-by mutations in the nearest network neighbors
-[@hornNetSigNetworkbasedDiscovery2018; @Iranzo-Network]. These methods are
-powerful especially when applied to a small number (on the order of hundreds) of
-tumors. One of the challenges in the field remains that beyond a couple hundred
-common driver genes and mutations, there may be thousands of moderate effect
-genes that occur at such low frequency--given tissue diversity--and low sample
-numbers that they are impossible to detect using positive selection theory. Some
-groups have attempted to address this challenge by applying machine learning to
-cancer data sets to discover groups of functionally related genes as they
-interact with larger pathways and networks [@kimPancancerAnalysisSomatic2018;
+More recently, pan-cancer mutations and other data have been looked at as
+disruptions of normal pathway activity. @PCAWG-PATH carried out exhaustive
+analysis of pathway enrichment using whole genome data. Network approaches
+address the sparseness of mutations, allowing genes to be influenced by
+mutations in nearest network neighbors [@hornNetSigNetworkbasedDiscovery2018;
+@Iranzo-Network]. These methods are powerful especially when applied to smaller
+numbers of tumors. One of the challenges in the field remains that there may be
+thousands of moderate effect genes that occur at such low frequency--given
+tissue diversity and low sample number--that they are impossible to detect using
+positive selection theory. Some groups have attempted to address this challenge
+by applying machine learning to cancer data to discover groups of
+functionally related genes as they interact with larger pathways and networks
+[@kimPancancerAnalysisSomatic2018;
 @mourikis-ml-pathways; @moonlight]. These studies have proven very effective at
-highlighting fundamental disease phenotypes at the pathway
-level across cancers with different origins at the cellular and tissue
-level.
+highlighting fundamental disease phenotypes at the pathway level across cancers
+with different origins at the cellular and tissue level.
 
 In this study, we attempt to understand how tissue-specific gene disruptions
 create common cancer phenotypes by focusing on discrete molecular pathways as
