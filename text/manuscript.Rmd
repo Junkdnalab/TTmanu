@@ -160,7 +160,7 @@ cat("\\newpage")
 
 We investigated this dataset further using multiple correspondence analysis
 (MCA)  [@JSSv025i01], and visually summarized the analysis with UMAP (**figure
-2** and see interactive media from [**supplemental file 1**](https://junkdnalab.shinyapps.io/PANCAN_supplemental/)) [@McInnes2018]. 
+1B** and see interactive media from [**supplemental file 1**](https://junkdnalab.shinyapps.io/PANCAN_supplemental/)) [@McInnes2018]. 
 We used the resulting UMAP graph coordinates to perform
 density based clustering with HDBSCAN [@hdbscan], which resulted in
 identification of 10 well-defined clusters capturing about 80% of the tumor
@@ -173,12 +173,12 @@ Having defined tumors in terms of their pathway disruption profile, we sought to
 understand whether different cancer types segregate into one or more predominant
 clusters. To our surprise, most cancer types were not heavily biased in one
 cluster, and all well-represented cancer types had tumors in every cluster (see
-**figure 3A** and full tumor profiles in **supplementary figure S1**, see also
+**figure 2A** and full tumor profiles in **supplementary figure S1**, see also
 interactive media from **supplementary file 1**), suggesting that our
 pathway-disruptions identify clusters of molecular pathology largely independent
 of tissue-of-origin. As an example of one type of cancer that does have a biased
 pathway profile, pancreatic adenocarcinoma (PAAD) was predominantly found in
-cluster 8 (**figure 3A** and **supplementary figure S1** and **supplementary
+cluster 8 (**figure 2A** and **supplementary figure S1** and **supplementary
 file 1**). But even PAAD comprises tumors from the nine remaining classes,
 meaning that patients with these tumors have potentially different underlying
 molecular pathologies.
@@ -187,11 +187,11 @@ molecular pathologies.
 cat("\\newpage")
 ```
 
-#### Figure 3
+#### Figure 2
 ```{r child = '../code/figure3.Rmd'}
 ```
 
-**Figure 3: Pathway-based clustering independent of tissue-of-origin** 
+**Figure 2: Pathway-based clustering independent of tissue-of-origin** 
 A) Sankey plot showing correspondence between cancer type and cluster identity.
 B) Projection of breast cancer subtypes onto the UMAP. C) Projection of BRCA1/2
 somatic mutation onto the UMAP. D) Projection of tumor stage onto the UMAP,
@@ -241,7 +241,7 @@ confer elevated risk for breast, prostate and ovarian cancers. The mechanism of
 risk is thought to involve loss of heterozygosity resulting in loss of the
 wildtype, functional allele [@brca-loh], so we projected the somatic mutations
 for _BRCA1_ and _BRCA2_ genes onto the UMAP. We did not observe segregation of
-these mutations into specific clusters (**figure 3C** and see interactive media
+these mutations into specific clusters (**figure 2C** and see interactive media
 from [**supplemental file
 1**](https://junkdnalab.shinyapps.io/PANCAN_supplemental/)). We made similar
 projections for the mismatch repair (MMR) genes _MSH2_, _MSH6_, _MLH1_, _MLH3_,
@@ -259,16 +259,16 @@ diameter, which can vary greatly in importance between different tissues. Stage
 is used clinically as a proxy for advancement toward a more deadly state and
 metastasis. Given these criteria, it is possible that more advanced tumors have
 common pathway disruption profiles. The UMAP, which features a series of
-lobe-like structures on a common backbone of tumor samples (**figure 2**) could
+lobe-like structures on a common backbone of tumor samples (**figure 1B**) could
 in principle reflect progression through a series of stages. The backbone starts
 with a cluster of tumors (class 1) that has the fewest point mutations and
 culminates in a cluster (class 10) which has nearly every pathway disrupted
-(**figure 4**). However, outside of class 10 we don't observe a trend in the
+(**figure 2F**). However, outside of class 10 we don't observe a trend in the
 overall mutation burden across the backbone of the UMAP. Nonetheless, to test
 the hypothesis that the molecular-pathway disruption clusters represent
 advancement through stages, we projected staging data onto the UMAP. Similar to
 tissue of origin and other categories of tumor, we did not observe any bias
-among the stages to specific clusters (**figure 3D**), suggesting that stage is
+among the stages to specific clusters (**figure 2D**), suggesting that stage is
 not a contributing factor to cluster identity.
 
 Finally, as a measure of tumor advancement, metastasis is the condition in which
@@ -277,7 +277,7 @@ differentiation, cell-cell contacts, epithelial to mesenchyme transition, immune
 system evasion and tissue invasiveness [@hallmarks_II]. To determine whether any
 of our clusters correspond to an especially advanced stage of cancer across
 tissue types, we projected the metastases onto our UMAP, and surprisingly
-we observed even distribution of the samples across clusters (**figure 3E**).
+we observed even distribution of the samples across clusters (**figure 2E**).
 This final observation suggests that our pathway-disruption clustering is
 dependent on particular combinations of gene mutations affecting different
 pathways that can each give rise to advanced stages of disease and metastasis,
@@ -296,7 +296,7 @@ of samples), "G2/M Checkpoints" (62% of samples), _etc._
 To discover what pathways are most important for clustering, we calculated
 percent enrichment _within cluster_ relative to all other clusters (see methods)
 and ranked pathways from highest to lowest enrichment. We visualized the
-enrichment as a heatmap (**figure 5A**). Using this approach, we identified
+enrichment as a heatmap (**figure 3A**). Using this approach, we identified
 about fourteen pathways per cluster (enrichment score ≥ 0.3, 95% confidence; see
 methods) (**supplementary table ST2**). Clusters 7, 8, and 9 had several
 pathways in common. To explore the specific pathways marking each cluster, we
@@ -308,7 +308,7 @@ were distinguished by metabolic pathways including RNA and protein biosynthesis
 mutations affecting regulation of DNA and histone methylation ("DNA
 methylation", "PRC2 methylates histones and DNA", and "Nucleosome assembly").
 Clusters 7-9 have in common mutations in extracellular, intracellular, and
-immune-related signaling pathways (see **figure 5B** and **supplementary figure
+immune-related signaling pathways (see **figure 3B** and **supplementary figure
 S4**). Cluster 2 had the highest pathway enrichment levels of the three, having
 mutations in hedgehog signaling, "β-catenin degradation", "cellular response to
 hypoxia", "regulation of cell cycle" and "apoptosis" among others.
@@ -317,11 +317,11 @@ hypoxia", "regulation of cell cycle" and "apoptosis" among others.
 cat("\\newpage")
 ```
 
-#### Figure 5
+#### Figure 3
 ```{r child = '../code/figure5.Rmd'}
 ```
 
-**Figure 5: Pan-cancer enrichment of pathway disruptions.** 
+**Figure 3: Pan-cancer enrichment of pathway disruptions.** 
 A) Heatmap shows the relative enrichment of each pathway (rows) within each
 numbered cluster (columns). Effect size is displayed as colors representing
 percent enrichment. B) Proportion of mutated samples in the each significant
@@ -341,7 +341,7 @@ statistical significance thresholds), or a combination of both? To answer this
 question, we compared top pathway genes for each cluster relative to the TCGA
 background to find differentially mutated genes. We ranked odds ratios and
 selected the top ten enriched and depleted genes (pvalue < 0.01) for each
-cluster (**Figure 6**; odds ratios plot). Clusters 7 and 8, which shared
+cluster (**Figure 4**; odds ratios plot). Clusters 7 and 8, which shared
 multiple enrichment in signaling pathways, are largely driven by mutations in
 _PI3K_ and its orthologs and _Ras_ genes, respectively (compare _PIK3CA_ and
 _KRAS_ panels of **Supplementary figure S5** and see interactive media from
@@ -356,7 +356,7 @@ subunit genes involved in protein degradation. We also observed that genes that
 were enriched for one cluster are depleted from others (_i.e._ is enriched in
 cluster 6, but depleted in cluster 7; _PIK3CA_ is enriched in cluster 7, but
 depleted in clusters 3 and 8). Next, we investigated the proportion of samples
-per cancer type for the significant genes within a cluster (**Figure 6**;
+per cancer type for the significant genes within a cluster (**Figure 4**;
 heatmap). Surprisingly, cluster-specific tumors were not predominated by one or
 more highly mutated genes across all cancers. Instead, when observing the
 mutation rate for these genes within samples that belong to a cluster, the
@@ -372,11 +372,11 @@ clusters.
 cat("\\newpage")
 ```
 
-#### Figure 6
+#### Figure 4
 ```{r child = '../code/figure6.Rmd'}
 ```
 
-**Figure 6: Gene level analysis reveals tissue-specific class signatures.** 
+**Figure 4: Gene level analysis reveals tissue-specific class signatures.** 
 Odds ratio plot; Column uses a logarithmic axis to represent odds ratio with a
 95% confidence interval. Rows: significant genes from each cluster. Each cluster
 was compared against the background (all other clusters) to find differentially

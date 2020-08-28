@@ -25,20 +25,20 @@ potentially problematic [@pathways-Atul-Butte]. We chose this approach to limit
 redundancy and exclude biologically unrelated collections of genes.
 
 The hypothesis that cancer is the result of dysfunction from a limited number of
-basic cellular processes common to eukaryotic cells was introduced and
-later expanded on in a pair of essays by Hanahan and Weinberg [@weinberg2000;
-@hallmarks_II]. An alternative hypothesis is that every tumor belongs to one of a large number
-of syndromes which are unique to each tissue-of-origin, that share some
-mechanisms and treatment strategies. Recent publication of TCGA consortium
-papers present a view largely, and surprisingly, consistent with this latter hypothesis
-[@hoadleyMultiplatformAnalysis2014; @hoadleyCellofOriginPatternsDominate2018].
-Perhaps owing to the intractable complexity of genomics, proteomics, and
-patient metadata in all its forms, the inescapable conclusion thus far is that
-tissue-of-origin remains the most important driver of tumor characteristics at
-every scale and by every measure. Our observations contrast with this view, and
-instead support an interpretation of publicly available data in which all tumors
-manifest one of a limited number of phenotypes resulting from
-disruptions of basic pathways. 
+basic cellular processes common to eukaryotic cells was introduced and later
+expanded on in a pair of essays by Hanahan and Weinberg [@weinberg2000;
+@hallmarks_II]. An alternative hypothesis is that every tumor belongs to one of
+a large number of syndromes which are unique to each tissue-of-origin, that
+share some mechanisms and treatment strategies. Recent publication of TCGA
+consortium papers present a view largely, and surprisingly, consistent with this
+latter hypothesis [@hoadleyMultiplatformAnalysis2014;
+@hoadleyCellofOriginPatternsDominate2018]. Perhaps owing to the intractable
+complexity of genomics, proteomics, and patient metadata in all its forms, the
+inescapable conclusion thus far is that tissue-of-origin remains the most
+important driver of tumor characteristics at every scale and by every measure.
+Our observations contrast with this view, and instead support an interpretation
+of publicly available data in which all tumors manifest one of a limited number
+of phenotypes resulting from disruptions of basic pathways.
 
 We attempted to account for our clusters in terms of more trivial explanations.
 For example, it could be that the clusters we identified are consistent with
@@ -46,39 +46,39 @@ disease progression. We were unable to identify any such trend in the number of
 mutations, the relative staging or metastasis; and each cluster instead was
 associated with unique combinations of pathways.
 
-Some cancer types are unevenly
-distributed among the clusters, though we could not identify any cancers that were exclusive to a
-single cluster. Only cancer types with the fewest samples were found to be
-absent from one or more clusters at all. Somewhat surprisingly to us, this
-finding extends to histological subtypes of breast, head and neck cancers,
-leukemias, _etc._ This result implies that histological
-subtypes could reflect differences in cell-of-origin, rather than fundamental
-differences in cancer phenotype. The four major subtypes of breast cancer
-correspond to histological and molecular expression profiles that define them
-and how they respond to experimental stimuli [@breast-subtypes2]. It has been
-hypothesized that differences in the molecular regulators of development in the
-precursor cell types present in the breast epithelium drive the various
-histological phenotypes [@breast-subtypes; @breast-subtypes3]. Consistent with
-this view we found that breast tumor samples of the Luminal A subtype were
-heavily biased toward membership in clusters 1 and 7, and basal tumor samples
-were biased toward cluster 6. However, both subtypes also contained samples in
-every other cluster (without exception), and Luminal B and Her2 positive samples
-are distributed across clusters. We interpret these data to mean that inherited
-cell-of-origin signatures could predispose certain precursor cells
-within the breast epithelium to forming tumors of one cluster or another but are
-not determinative. This view is compatible with the previously stated hypothesis
-but opens the way for a more granular view of individual tumors. It would be
-surprising if we did not observe bias for some cancers and subtypes amongst our
-classes, since some treatment regimens have greater efficacy for patients of a
-given cancer or histological subtype [@breast-subtypes2]. Nonetheless, the basis
-for some tumors being treatment-refractory in spite of receiving the standard of
-clinical care for diagnostic markers remains elusive. Doubtless some of this is
-due to chance events, as tumors can metastasize and remain dormant years before
-they are detected at distal sites, or resistant clones may have already arisen
-at undetectable levels [@hallmarks_II], but our analysis suggests the
-possibility of identifying more informative molecular, histological or cellular
-subtypes that could form a basis for future stratification of patients into
-different precision treatment regimens.
+Some cancer types are unevenly distributed among the clusters, though we could
+not identify any cancers that were exclusive to a single cluster. Only cancer
+types with the fewest samples were found to be absent from one or more clusters
+at all. Somewhat surprisingly to us, this finding extends to histological
+subtypes of breast, head and neck cancers, leukemias, _etc._ This result implies
+that histological subtypes could reflect differences in cell-of-origin, rather
+than fundamental differences in cancer phenotype. The four major subtypes of
+breast cancer correspond to histological and molecular expression profiles that
+define them and how they respond to experimental stimuli [@breast-subtypes2]. It
+has been hypothesized that differences in the molecular regulators of
+development in the precursor cell types present in the breast epithelium drive
+the various histological phenotypes [@breast-subtypes; @breast-subtypes3].
+Consistent with this view we found that breast tumor samples of the Luminal A
+subtype were heavily biased toward membership in clusters 1 and 7, and basal
+tumor samples were biased toward cluster 6. However, both subtypes also
+contained samples in every other cluster (without exception), and Luminal B and
+Her2 positive samples are distributed across clusters. We interpret these data
+to mean that inherited cell-of-origin signatures could predispose certain
+precursor cells within the breast epithelium to forming tumors of one cluster or
+another but are not determinative. This view is compatible with the previously
+stated hypothesis but opens the way for a more granular view of individual
+tumors. It would be surprising if we did not observe bias for some cancers and
+subtypes amongst our classes, since some treatment regimens have greater
+efficacy for patients of a given cancer or histological subtype
+[@breast-subtypes2]. Nonetheless, the basis for some tumors being
+treatment-refractory in spite of receiving the standard of clinical care for
+diagnostic markers remains elusive. Doubtless some of this is due to chance
+events, as tumors can metastasize and remain dormant years before they are
+detected at distal sites, or resistant clones may have already arisen at
+undetectable levels [@hallmarks_II], but our analysis suggests the possibility
+of identifying more informative molecular, histological or cellular subtypes
+that could form a basis for future stratification of patients into different
+precision treatment regimens.
 
 ### Tissue specific manifestation of pathway-centric disruptions
 
@@ -108,10 +108,9 @@ tumors that harbor so many mutations that virtually no pathway is unaffected. It
 seems likely that a significant fraction of the “mutant” samples for each
 pathway are burdened with excess passenger mutations. This could be addressed
 with more sophisticated filtering of likely passenger mutations [_e.g._
-@spliceAI;
-@deep-learning-clinical-variants]. In the future, we hope to incorporate these
-other data into a comprehensive pathway-centric analysis as we have done here
-for point mutations and indels.
+@spliceAI; @deep-learning-clinical-variants]. In the future, we hope to
+incorporate these other data into a comprehensive pathway-centric analysis as we
+have done here for point mutations and indels.
 
 ### Estimates of survival reveal pathway-dependent differences 
 
