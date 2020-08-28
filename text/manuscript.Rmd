@@ -136,13 +136,13 @@ predisposition to different classes of cancer however, and therefore chose not
 to exclude these genes from our analysis. After selecting our pathways and
 genes, we then compiled a matrix of the pathways, assigning a Boolean value of 1
 to each pathway with one or more genes mutated and 0 for all others (**figure
-1**).
+1A**).
 
 ```{r, results='asis'}
 cat("\\newpage")
 ```
 #### Figure 1
-```{r child='../code/figure1v2.Rmd'}
+```{r child='../code/figure1.Rmd'}
 ```
 
 **Figure 1: Clustering the molecular pathway profiles of tumor samples with one or more
@@ -188,7 +188,7 @@ cat("\\newpage")
 ```
 
 #### Figure 2
-```{r child = '../code/figure3.Rmd'}
+```{r child = '../code/figure2.Rmd'}
 ```
 
 **Figure 2: Pathway-based clustering independent of tissue-of-origin** 
@@ -220,8 +220,8 @@ this, we projected annotations for each of the breast cancer subtypes, composed
 of Triple-negative/Basal-like, Her2 positive, normal-like, and luminal A and B
 subtypes onto the UMAP. These are among the most heavily studied molecular
 subtypes in cancer, each with different prognoses and standards of care. We did
-not observe any exclusive segregation by pathway for these subtypes (**Figure
-3B**). We also projected histological subtype data for the remaining cancers
+not observe any exclusive segregation by pathway for these subtypes (**figure
+2B**). We also projected histological subtype data for the remaining cancers
 (see **supplementary figure S2** and online [**supplemental file
 1**](https://junkdnalab.shinyapps.io/PANCAN_supplemental/)); we find that the
 subtypes, though often biased to one or more clusters, are almost never
@@ -318,7 +318,7 @@ cat("\\newpage")
 ```
 
 #### Figure 3
-```{r child = '../code/figure5.Rmd'}
+```{r child = '../code/figure3.Rmd'}
 ```
 
 **Figure 3: Pan-cancer enrichment of pathway disruptions.** 
@@ -341,7 +341,7 @@ statistical significance thresholds), or a combination of both? To answer this
 question, we compared top pathway genes for each cluster relative to the TCGA
 background to find differentially mutated genes. We ranked odds ratios and
 selected the top ten enriched and depleted genes (pvalue < 0.01) for each
-cluster (**Figure 4**; odds ratios plot). Clusters 7 and 8, which shared
+cluster (**figure 4**; odds ratios plot). Clusters 7 and 8, which shared
 multiple enrichment in signaling pathways, are largely driven by mutations in
 _PI3K_ and its orthologs and _Ras_ genes, respectively (compare _PIK3CA_ and
 _KRAS_ panels of **Supplementary figure S5** and see interactive media from
@@ -356,7 +356,7 @@ subunit genes involved in protein degradation. We also observed that genes that
 were enriched for one cluster are depleted from others (_i.e._ is enriched in
 cluster 6, but depleted in cluster 7; _PIK3CA_ is enriched in cluster 7, but
 depleted in clusters 3 and 8). Next, we investigated the proportion of samples
-per cancer type for the significant genes within a cluster (**Figure 4**;
+per cancer type for the significant genes within a cluster (**figure 4**;
 heatmap). Surprisingly, cluster-specific tumors were not predominated by one or
 more highly mutated genes across all cancers. Instead, when observing the
 mutation rate for these genes within samples that belong to a cluster, the
@@ -373,7 +373,7 @@ cat("\\newpage")
 ```
 
 #### Figure 4
-```{r child = '../code/figure6.Rmd'}
+```{r child = '../code/figure4.Rmd'}
 ```
 
 **Figure 4: Gene level analysis reveals tissue-specific class signatures.** 

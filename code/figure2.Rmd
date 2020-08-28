@@ -1,38 +1,280 @@
-```{r figure-2-plot, fig.width = 9, echo = FALSE}
-umap_cancertype <- data.table::fread("../data/umap_3d_coors.tsv") ## load data
+```{r sankey-plot}
+umap_cancertype <- fread("../data/umap_3d_coors.tsv") ## load data
 load("../data/kelly.colours.rda")
-cluster.colours <- c("grey", kelly.colours[c(3:12)]) ## Color scheme for cluster
-names(cluster.colours) <- c(0:10) ## assigning cluster to the colors
+load("../data/ditto.colours.rda")
 
-theta <- c(0, 90, 270)
-phi <- c(65, 15, 15)
+sankey.data <- umap_cancertype %>% dplyr::select(sample_id, project_code, clust_knn) %>% ## select relevant columns
+  gather(., key = "type", value = "value", -sample_id) ## wide to long format
 
-opar <- par(mfrow = c(1,3), mai = c(0.1, 0.1, 0.1, 0.1)) ## plot layout 2x3
-par(mar = c(0,2,0,0), bg = NA) ## setting plot margins for the following plots
+## Cancer names in alphabetical order
+cancerorder <- unique(umap_cancertype$project_code)
+cancerorder <- cancerorder[order(cancerorder)]
+## Cluster in numerical order
+clustorder <- unique(umap_cancertype$clust_knn)
+clustorder <- as.character(clustorder[order(clustorder)])
 
-for(n in 1) {
-  with(umap_cancertype, scatter3D(plot_y, -plot_z, plot_x, 
-                                  bg = cluster.colours[as.character(clust_knn)], pch = 21, cex = 0.8, lwd = 0.2, # clust_knn is knn result
-                                  theta = theta[n], phi = phi[n], scale = T,
-                                  xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
-                                  colvar = NULL))
-  title(xlab="UMAP 2", line=-5.2)
-  for(p in 2:length(phi)) {
-    with(umap_cancertype, scatter3D(plot_y, -plot_z, plot_x, 
-                                bg = cluster.colours[as.character(clust_knn)], pch = 21, cex = 0.8, lwd = 0.2, 
-                                theta = theta[p], phi = phi[p], scale = T,
-                                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
-                                colvar = NULL))
-        if(p == 2) {
-      mtext("Cluster", side=3, line=-3.5, cex=1.2, adj=0.5)
-      legend("top", inset = c(0.10), legend=names(cluster.colours[2:6]), col=cluster.colours[2:6], pch = 20, bty = "n", horiz = T, cex = 1.2)
-      legend("top", inset = c(0.15), legend=names(cluster.colours[7:11]), col=cluster.colours[7:11], pch = 20, bty = "n", horiz = T, cex = 1.2)
-    }
-  }
-}
+## Factor to force ordering
+sankey.data$type <- factor(sankey.data$type, levels = c( "clust_knn", "project_code"))
+sankey.data$value <- factor(sankey.data$value, levels= c(cancerorder, clustorder))
 
+## Color scheme for sankey plot
+sankey.colours <- c(ditto_colours[2:24],kelly.colours[3:12])
+names(sankey.colours) <- c(cancerorder, clustorder)
 
-
-
+## Sankey plot
+sankey.plot <- ggplot(sankey.data,
+       aes(x = type, stratum = value, alluvium = sample_id,
+           fill = value, label = value)) +
+  scale_fill_manual(values = sankey.colours) +
+  geom_flow(stat = "alluvium", lode.guidance = "frontback") +
+  geom_stratum(alpha = 0.5) +
+  geom_text(stat = "stratum", size = 3) +
+  theme_classic() +
+  xlab(label = "") +
+  theme(legend.position = "none",
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        axis.line.x = element_blank(),
+        axis.line.y = element_blank(),
+        plot.margin = unit(c(-0.4, -3, -1, -2.5), "cm"),
+        panel.background = element_rect(fill = "transparent"))
 ```
 
+```{r, message = FALSE}
+
+## Arranging mutation freq for each cluster
+mut_order <- list() ## store data in list 
+for(n in 1:max(as.numeric(as.character(umap_cancertype$clust_knn)))) { ## loop through all the clusters
+  mut_order[[n]] <- umap_cancertype %>% filter(clust_knn == n) %>%  ## filter for specific class
+    dplyr::select(sample_id, plot_x, plot_y, clust_knn, mut_count) %>% ## select relevant columns
+    arrange(mut_count) ## arrange mutation in increasing order
+}
+mut_order <- mut_order %>% do.call(rbind, .) %>% as.data.frame() ## rbind list
+
+## Convert sample_id and clust_knn into factor
+mut_order$sample_id <- factor(mut_order$sample_id, levels = mut_order$sample_id)
+mut_order$clust_knn <- factor(mut_order$clust_knn, levels = c(1:10))
+
+## Determining the breaks positions for the x-axis
+previous_class <- 0 ## starting position 1
+position_of_previous_class <- 0 ## starting position 2
+xaxis_breaks <- list() ## list for the for loop
+for(n in 1) { ## loop through 1 to 10 clusters
+  class_spec <- round(mut_order %>% filter(clust_knn == n) %>% nrow(.) / 2, digits = 0) ## calculate halfway mark of class 
+  xaxis_breaks[[n]] <- class_spec + previous_class + position_of_previous_class ## adding up all variables
+  previous_class <- class_spec ## storing class halfway mark
+  for(n in 2:max(as.numeric(as.character(mut_order$clust_knn)))) {
+    position_of_previous_class <- xaxis_breaks[[n-1]] ## getting the previous class position
+    class_spec <- round(mut_order %>% filter(clust_knn == n) %>% nrow(.) / 2, digits = 0) ## calculate halfway mark of new class
+    xaxis_breaks[[n]] <- class_spec + previous_class + position_of_previous_class ## adding up all variables
+    previous_class <- class_spec ## storing class halfway mark
+  }
+}
+xaxis_breaks <- as.data.frame(do.call(rbind, xaxis_breaks)) ## rbind list
+xaxis_breaks <- mut_order[rownames(mut_order) %in% xaxis_breaks$V1,] ## find the tumor samples in these positions
+
+total_n <- as.data.frame(table(mut_order$clust_knn)) ## getting total n in cluster
+
+mut_order$log10mut <- log10(mut_order$mut_count + 1) ## mutation count log transformation + pseudo count
+
+## Calculate median for each class
+mut_median <- mut_order %>% 
+  group_by(clust_knn) %>% 
+  dplyr::summarize(mut_med = median(log10mut)) 
+
+## Need to add 100 pseudo samples front and end of data so they don't touch the y-axis
+mut_order <- mut_order[,c("sample_id", "clust_knn", "log10mut")] ## selecting relevant column
+
+begin_NA <- data.frame(sample_id = paste0("sample", 1:100), 
+                       clust_knn = min(as.numeric(mut_order$clust_knn)), ## put lowest cluster to prevent a new facet
+                       log10mut = NA) ## put NA values so they don't get plotted
+end_NA <- data.frame(sample_id = paste0("sample", 101:200), ## repeat the step for the ends
+                       clust_knn = max(as.numeric(mut_order$clust_knn)),
+                       log10mut = NA)
+mut_order <- rbind(begin_NA, mut_order, end_NA) ## rbind the data in a specfic order
+
+mut_order$sample_id <- factor(mut_order$sample_id, levels = mut_order$sample_id) ## factor samples
+mut_order$clust_knn <- factor(mut_order$clust_knn, levels = c(1:10)) ## factor clusters
+
+fig1G <- ggplot(mut_order, aes(x = sample_id, y = log10mut, color = clust_knn)) + 
+  geom_point(size = 0.25) + 
+  ylab("Log10(Mutation Count)") + 
+  xlab("") +
+  theme_classic() +
+  facet_wrap(~ factor(clust_knn, levels = c(1:10)), ncol = 10, scales = "free_x") + ## facet by cluster
+  geom_hline(data= mut_median, aes(yintercept=mut_med)) + ## add median line
+  scale_y_continuous(sec.axis = sec_axis(~.)) + ## dup y-axis
+  scale_x_discrete(breaks = c(as.character(mut_order$sample_id[1]), as.character(xaxis_breaks$sample_id)), labels = c("n =" ,total_n$Freq)) +
+  theme(axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10),
+        axis.ticks.x = element_blank(),
+        axis.line.x = element_line(colour = "black", size = 0.5),
+        axis.line.x.top = element_line(colour = "black", size = 0.5),
+        panel.spacing = unit(0.25, "lines"),
+        strip.background = element_rect(size = 0.5),
+        strip.placement = "outside",
+        strip.text.x = element_text(size = 10),
+        legend.position = "none") +
+  scale_color_manual(values = kelly.colours[-c(1:2)])
+
+## code to keep only the bottom border line of the facet
+fig1G <- ggplotGrob(fig1G)
+
+lg <- linesGrob(x=unit(c(0,1),"npc"), y=unit(c(0,0),"npc"), ## All lines off expect bottom line of facet
+                   gp=gpar(col="black", lwd=4))
+
+for (k in grep("strip-t",fig1G$layout$name)) { ## turn off 3 lines from the facet border text
+  fig1G$grobs[[k]]$grobs[[1]]$children[[1]] <- lg
+}
+
+fig1G <- as.ggplot(fig1G)
+```
+
+
+```{r, fig.width= 6, fig.height = 8}
+# start new page
+plot.new()
+
+# setup layout
+gl <- grid.layout(nrow=11, ncol=3)
+
+## Setup viewports - How figures will be laid out
+vp.1 <- viewport(layout.pos.col=1:2, layout.pos.row=1:8)
+vp.2 <- viewport(layout.pos.col=3, layout.pos.row=1:2) 
+vp.3 <- viewport(layout.pos.col=3, layout.pos.row=3:4) 
+vp.4 <- viewport(layout.pos.col=3, layout.pos.row=5:6) 
+vp.5 <- viewport(layout.pos.col=3, layout.pos.row=7:8)
+vp.6 <- viewport(layout.pos.col=1:3, layout.pos.row=9:11)
+
+# init layout
+pushViewport(viewport(layout=gl))
+
+## vp.1 - Figure A - sankey plot
+pushViewport(vp.1) ## Enter vp.1 viewpoint
+print(sankey.plot, newpage = FALSE) ## Plot ggplot
+mtext("A", side=3, line=2.6, cex=1, adj=-0.17)
+popViewport() ## Exit vp.1 viewpoint
+
+## vp.2 - Figure B - BRCA subtype
+pushViewport(vp.2)
+par(new=TRUE, fig=gridFIG())
+par(mar = c(0,0,0,0), mai=c(0.1,0.1,0.1,0.1), cex.lab = 0.8, cex = 0.8) ## setting plot parameters
+
+brca_subtype <- umap_cancertype %>% filter(project_code == "BRCA") %>% ## Filter for selected cancer type
+  dplyr::select(plot_x, plot_y, plot_z, Subtype_Selected) ## Select relevant column 
+brca_subtype[is.na(brca_subtype)] <- "NA" ## Convert NA to character "NA"
+  
+## Color scheme for subtype
+B_name <- unique(brca_subtype$Subtype_Selected) ## What are the subtype names
+B_name <- B_name[order(B_name,na.last=T)] ## Order the names ABC and have NA last
+B_color <- ditto_colours[c(2:(length(B_name) + 1))] ## Selecting enough colors from ditto
+names(B_color) <- B_name ## Assigning subtypes to color
+
+with(brca_subtype,
+     scatter3D(plot_y, -plot_z, plot_x, 
+               bg = B_color, pch = 21, cex = 0.8, lwd = 0.2, 
+               theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+               xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+               colvar = NULL))
+## Axis labels
+legend("top", inset = c(0), legend=names(B_color[1:2]), col=B_color[1:2], pch = 20, bty = "n", horiz = T, cex = 0.8)
+legend("top", inset = c(0.07), legend=names(B_color[3:4]), col=B_color[3:4], pch = 20, bty = "n", horiz = T, cex = 0.8)
+legend("top", inset = c(0.14), legend=names(B_color[5:6]), col=B_color[5:6], pch = 20, bty = "n", horiz = T, cex = 0.8)
+title(xlab="UMAP 2", line=-0.25)
+mtext("B", side=3, line=-1.2, cex=1, adj=0)
+
+popViewport() ## exit
+
+## vp.3 - Figure C - BRCA somatic mutations
+pushViewport(vp.3)
+par(new=TRUE, fig=gridFIG())
+par(mar = c(0,0,0,0), mai=c(0.1,0.1,0.1,0.1), cex.lab = 0.8, cex = 0.8) ## setting plot parameters
+
+load("../data/gdc_gene_exp_adj.Rda") ## load data
+load("../data/gene_data.Rda")
+
+brca <- gene_data %>% .[.$external_gene_name %in% c("BRCA1", "BRCA2"),] %>% dplyr::select(ensembl_gene_id, external_gene_name) ## Getting BRCA gene information
+brca <- gdc_gene_exp_adj %>% .[rownames(.) %in% brca$ensembl_gene_id, ] %>% ## Include BRCA gene
+  rownames_to_column(var = "ensembl_gene_id") %>% ## Move ensembl id to column
+  left_join(., brca, by = "ensembl_gene_id") %>% ## left join with brca df 
+  remove_rownames()  %>% column_to_rownames(var = "external_gene_name") %>% ## replace row with gene symbol
+  dplyr::select(-ensembl_gene_id) %>% ## get rid of ensembl_id col
+  t() %>% as.data.frame() %>% ## correct orientation for umap_cancertype df
+  rownames_to_column(var = "sample_id") %>% ## getting data ready for leftjoin 
+  mutate(BRCA1 = case_when(BRCA1 == "1" ~ "BRCA1", ## Convert booleans to categorical variables
+                           BRCA1 == "0" ~ "NA"),
+         BRCA2 = case_when(BRCA2 == "1" ~ "BRCA2",
+                           BRCA2 == "0" ~ "NA")) %>%
+  mutate(mut_type = gsub('NA,|,NA', '', paste(.$BRCA1, .$BRCA2, sep = ","))) %>% ## combine mutation cause some patients can have both
+  dplyr::select(-BRCA1, -BRCA2) %>% ## remove col we don't need
+  left_join(., umap_cancertype[,c("sample_id", "plot_x", "plot_y", "plot_z", "project_code")], by = "sample_id") ## leftjoin by sample id
+
+C_colors <- c('#33a02c', '#e31a1c', '#ff7f00') ## Color scheme 
+names(C_colors) <- c("BRCA1", "BRCA2", "BRCA1,BRCA2") ## Assigning mutation type to color
+with(brca %>% filter(mut_type != "NA"), ## Filter samples that do not have a mutation in BRCA1 or BRCA2
+     scatter3D(plot_y, -plot_z, plot_x, 
+               bg = C_colors, pch = 21, cex = 0.8, lwd = 0.2,
+               theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+               xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+               colvar = NULL))
+## Axis labels
+legend("top", inset = c(0), legend=names(C_colors[c(1:2)]), col=C_colors[c(1:2)], pch = 20, bty = "n", horiz = T, cex = 0.8)
+legend("top", inset = c(0.07), legend=names(C_colors[c(3)]), col=C_colors[3], pch = 20, bty = "n", horiz = T, cex = 0.8)
+title(xlab="UMAP 2", line=-0.25)
+mtext("C", side=3, line=-1.2, cex=1, adj=0)
+
+popViewport()
+
+## vp.4 - Figure D - Stage
+pushViewport(vp.4)
+par(new=TRUE, fig=gridFIG())
+par(mar = c(0,0,0,0), mai=c(0.1,0.1,0.1,0.1), cex.lab = 0.8, cex = 0.8) ## setting plot parameters
+
+D_colors <- c('darkgoldenrod3','dodgerblue3','yellow3','tomato2') ## Color scheme
+names(D_colors) <- c("Stage I", "Stage II", "Stage III", "Stage IV") ## Assign stage to color
+with(umap_cancertype %>% filter(ajcc_pathologic_tumor_stage != "Not Available"), ## Filter samples that do not have stage info
+     scatter3D(plot_y, -plot_z, plot_x, 
+               bg = D_colors, pch = 21, cex = 0.8, lwd = 0.2,
+               theta = 0, phi = 65, scale = F,
+               xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
+               xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+               colvar = NULL))
+## Axis labels
+legend("top", inset = c(0), legend=names(D_colors[1:2]), col=D_colors[1:2], pch = 20, bty = "n", horiz = T, cex = 0.8)
+legend("top", inset = c(0.07), legend=names(D_colors[3:4]), col=D_colors[3:4], pch = 20, bty = "n", horiz = T, cex = 0.8)
+title(xlab="UMAP 2", line=-0.25)
+mtext("D", side=3, line=-1.2, cex=1, adj=0)
+
+popViewport()
+
+## vp.5 - Figure E - Metastasis
+pushViewport(vp.5)
+par(new=TRUE, fig=gridFIG())
+par(mar = c(0,0,0,0), mai=c(0.1,0.1,0.1,0.1), cex.lab = 0.8, cex = 0.8) ## setting plot parameters
+
+E_colors <- c('#a6cee3','#1f78b4') ## Color scheme
+names(E_colors) <- c("M0", "M1") ## Assign metastasis to color
+with(umap_cancertype %>% filter(ajcc_metastasis_pathologic_pm %in% c("M0", "M1")), ## Only M0 and M1 tumor samples
+     scatter3D(plot_y, -plot_z, plot_x, 
+               bg = E_colors, pch = 21, cex = 0.8, lwd = 0.2,
+               theta = 0, phi = 65, scale = F,
+               xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
+               colvar = NULL))
+## Axis labels
+legend("top", inset = c(0), legend=names(E_colors), col=E_colors, pch = 20, bty = "n", horiz = T, cex = 0.8)
+title(xlab="UMAP 2", line=-0.25)
+mtext("E", side=3, line=-1.2, cex=1, adj=0)
+
+popViewport()
+
+## vp.1 - Figure A - sankey plot
+pushViewport(vp.6) ## Enter vp.1 viewpoint
+print(fig1G, newpage = FALSE) ## Plot ggplot
+mtext("F", side=3, line=-9.8, cex=1, adj=-2.4)
+popViewport() ## Exit vp.1 viewpoint
+```

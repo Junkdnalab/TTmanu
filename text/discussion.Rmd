@@ -151,8 +151,8 @@ producing the clusters we observed. In support of this, the pan-cancer analysis
 of whole genomes consortium (PCAWG) found that oncogenic driver mutations are
 highly enriched in early arising clones, whereas later arising clones have much
 greater diversity in driver mutations [@PCAWG-EVO]. Moreover, driver genes that
-are known to be responsible for discrete mutation signatures such as APOBEC,
-BRCA1 and BRCA2 produce mutational hotspots reflecting varying selective
+are known to be responsible for discrete mutation signatures such as _APOBEC_,
+_BRCA1_ and _BRCA2_ produce mutational hotspots reflecting varying selective
 pressures in different tissues [@PCAWG-MAIN].
 
 One of the drawbacks of bulk tumor whole genome sequencing data is the problem
@@ -178,7 +178,7 @@ cancer. Thus, even at relatively low power, our analysis of metastasis uncovered
 differences between tumors against the noisy backdrop of tissue specific
 profiles. As a major caveat to our pan-cancer analysis, we acknowledge that many
 therapies _do_ target highly-specific driver genes, markers, and signaling
-pathways ( _e.g._ TP53, EGFR or HER2), but understanding the broader context of
+pathways ( _e.g. TP53_, _EGFR_ or _HER2_), but understanding the broader context of
 the genetic background and pathway vulnerability of tumors containing such
 markers may aid in creating smarter combination therapies. We submit that when
 we discover the requirements of each cluster with respect to pathway disruptions

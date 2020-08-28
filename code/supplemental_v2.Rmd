@@ -91,7 +91,7 @@ legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
 ```
 **Supplementary figure S1. Distribution of cancer type on UMAP clusters.** Each panel shows the identity of 
 individual tumors by one of 23 cancer types projected onto the cluster UMAP identified 
-in **Figure 2 of the main text**.
+in **Figure 1B of the main text**.
 
 \newpage
 
@@ -249,7 +249,7 @@ for(n in cancer_w_subtypes[16:19]) {
 #   facet_wrap(~ project_code, ncol = 5) ## facet by cancer type
 ```
 **Supplementary Figure S2. Histological subtypes.** Each panel shows the histological subtypes of one of the 23 
-cancers projected onto the tumors of the UMAP from **Figure 2 of the main text**.
+cancers projected onto the tumors of the UMAP from **Figure 1B of the main text**.
 
 \newpage
 
@@ -350,7 +350,7 @@ legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
 }
 ```
 **Supplementary Figure S3. Distribution of mismatch repair genes on UMAP clusters.** Each panel shows one of 15 
-genes involved in genome stability projected on the UMAP from **Figure 2 of the main text**.
+genes involved in genome stability projected on the UMAP from **Figure 1B of the main text**.
 
 \newpage
 
@@ -593,7 +593,7 @@ legend("top", inset = c(0.16), legend=path2, bty = "n", horiz = T, cex = 0.8)
 
 **Supplementary Figure S4. Projection of pathway disruptions onto the UMAP.** Each panel shows one of 377 Reactome
 pathways projected on the UMAP from **Figure 1D of the main text** ordered by the hierarchical pathway order 
-(column) from **Figure 2 of the main text**.
+(column) from **Figure 1B of the main text**.
 
 \newpage
 
@@ -671,7 +671,7 @@ legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
 }
 
 ```
-**Supplementary Figure S5. Distribution of oncogenes/tumor suppressors on UMAP clusters.** Each panel shows shows one of the twelve oncogenes/tumor suppressors projected onto the tumors of the UMAP from **Figure 2 of the main text**.
+**Supplementary Figure S5. Distribution of oncogenes/tumor suppressors on UMAP clusters.** Each panel shows shows one of the twelve oncogenes/tumor suppressors projected onto the tumors of the UMAP from **Figure 1B of the main text**.
 
 \newpage 
 ```{r supplemental-table-st1-data-generation, eval = FALSE}
