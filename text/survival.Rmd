@@ -1,8 +1,3 @@
----
-output:
-  word_document: default
-  html_document: default
----
 If our clusters represent biological states
 distinct from tissue of origin, they may have different prognoses within cancer
 types or across all cancers. These analyses are limited by confounding factors
@@ -47,7 +42,10 @@ correct age distribution for the given cancer (turqoise) to the model predicted
 survival for the given average k (blue) and the actual survival for the patients
 in our dataset (orange). Differences with actual data are likely due to a
 mixture of cluster identities which we exclude from these simulations for
-simplicity.
+simplicity. F) Effects are compared between cancer type by
+showing the probability density for the posterior value of the $k_{tis}$
+multiplier. Larger values correspond to decreased age-independent life
+expectancy.
 
 ```{r, results='asis'}
 cat("\\newpage")
@@ -82,20 +80,6 @@ deadliest cancers outside of GBM were stomach (STAD), melanoma (SKCM) and
 pancreatic (PAAD) cancers. Apart from these top 4 cancers which ranged from 6-22
 in relative risk of age-adjusted death, the remaining cancer types ranged from
 about 1 to 5 in magnitude.
-
-```{r, results='asis'}
-cat("\\newpage")
-```
-
-#### Figure 8
-```{r fig.width=3, message=FALSE, warning=FALSE}
-#pcanc+mytheme
-```
-
-**Figure 8 Tissue specific effects** Effects are compared between cancer type by
-showing the probability density for the posterior value of the $k_{tis}$
-multiplier. Larger values correspond to decreased age-independent life
-expectancy.
 
 ```{r, results='asis'}
 cat("\\newpage")

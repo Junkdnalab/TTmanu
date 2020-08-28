@@ -143,14 +143,16 @@ cat("\\newpage")
 ```
 #### Figure 1
 ```{r child='../code/figure1v2.Rmd'}
-#
 ```
 
-**Figure 1: Molecular pathway profiles of tumor samples with one or more
-mutations.** Each of 377 selected Reactome pathways (rows) is classified as
+**Figure 1: Clustering the molecular pathway profiles of tumor samples with one or more
+mutations.** A) Each of 377 selected Reactome pathways (rows) is classified as
 disrupted if one or more genes is mutated in the tumor sample (columns). Red
 cells denote pathway disruption. Tumors types reflect standardized abbreviations
-from the TCGA project.
+from the TCGA project. B) Different rotational perspectives of
+the same MCA-based UMAP projection in three-dimensional space. Each dot
+corresponds to a tumor sample. The same colors indicate the tumor's cluster
+identity throughout this manuscript.
 
 ```{r, results='asis'}
 cat("\\newpage")
@@ -164,25 +166,6 @@ density based clustering with HDBSCAN [@hdbscan], which resulted in
 identification of 10 well-defined clusters capturing about 80% of the tumor
 samples. To capture the remaining samples into one of these 10 clusters we used
 kNN (see **Supplementary Methods** for details on clustering methods).
-
-```{r, results='asis'}
-cat("\\newpage")
-```
-
-#### Figure 2
-```{r}
-#child='../code/figure2.Rmd'
-```
-
-**Figure 2: Clustering of tumor samples** Different rotational perspectives of
-the same MCA-based UMAP projection in three-dimensional space. Each dot
-corresponds to a tumor sample. The same colors indicate the tumor's cluster
-identity throughout this manuscript.
-
-
-```{r, results='asis'}
-cat("\\newpage")
-```
 
 #### Independence from tissue-of-origin.
 
@@ -206,7 +189,6 @@ cat("\\newpage")
 
 #### Figure 3
 ```{r child = '../code/figure3.Rmd'}
-#
 ```
 
 **Figure 3: Pathway-based clustering independent of tissue-of-origin** 
@@ -214,7 +196,11 @@ A) Sankey plot showing correspondence between cancer type and cluster identity.
 B) Projection of breast cancer subtypes onto the UMAP. C) Projection of BRCA1/2
 somatic mutation onto the UMAP. D) Projection of tumor stage onto the UMAP,
 regardless of cancer type. E) Projection of metastatic status onto the UMAP.
-Abbrevs: M0 = non-metastatic tumors, M1 = metastatic tumors.
+Abbrevs: M0 = non-metastatic tumors, M1 = metastatic tumors. F) Somatic mutation 
+frequencies for each cluster. Vertical axis shows log mutation count, horizontal 
+axis is cluster identity. Each dot represents an individual tumor sample, ranked 
+lowest to highest by mutation count. The median mutation count in each cluster is 
+indicated by the horizontal line.
 
 ```{r, results='asis'}
 cat("\\newpage")
@@ -285,25 +271,6 @@ tissue of origin and other categories of tumor, we did not observe any bias
 among the stages to specific clusters (**figure 3D**), suggesting that stage is
 not a contributing factor to cluster identity.
 
-```{r, results='asis'}
-cat("\\newpage")
-```
-
-#### Figure 4
-```{r }
-#child = '../code/figure4.Rmd'
-```
-
-**Figure 4: Somatic mutation frequencies for each cluster** 
-Vertical axis shows log mutation count, horizontal axis is cluster identity.
-Each dot represents an individual tumor sample, ranked lowest to highest by
-mutation count. The median mutation count in each cluster is indicated by the
-horizontal line.
-
-```{r, results='asis'}
-cat("\\newpage")
-```
-
 Finally, as a measure of tumor advancement, metastasis is the condition in which
 certain phenotypic criteria are met: loss of
 differentiation, cell-cell contacts, epithelial to mesenchyme transition, immune
@@ -352,7 +319,6 @@ cat("\\newpage")
 
 #### Figure 5
 ```{r child = '../code/figure5.Rmd'}
-#
 ```
 
 **Figure 5: Pan-cancer enrichment of pathway disruptions.** 
@@ -408,7 +374,6 @@ cat("\\newpage")
 
 #### Figure 6
 ```{r child = '../code/figure6.Rmd'}
-#
 ```
 
 **Figure 6: Gene level analysis reveals tissue-specific class signatures.** 
@@ -456,7 +421,6 @@ cat("\\newpage")
 
 #### Table 1
 ```{r child = '../code/table1.Rmd'}
-#
 ```
 
 **Table 1: Cluster-specific enriched pathways (effect size ≥ 0.30) in metastasis.**
@@ -464,7 +428,6 @@ cat("\\newpage")
 ### Pathway disruption clusters vary in short-term prognosis of survival
 
 ```{r child='survival.Rmd'}
-#
 ```
 
 ## Discussion

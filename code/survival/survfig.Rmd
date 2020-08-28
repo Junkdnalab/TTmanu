@@ -1,4 +1,4 @@
-```{r, survfig, echo=FALSE, warning=FALSE, error=TRUE,message=FALSE,fig.height=12, fig.width=9}
+```{r, survfig, echo=FALSE, warning=FALSE, error=TRUE,message=FALSE,fig.height=11, fig.width=9}
 
 
 library(ggridges)
