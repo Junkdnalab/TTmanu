@@ -3,18 +3,18 @@ output:
   word_document: default
   html_document: default
 ---
-If our molecular pathway disruption clusters represent biological states
+If our clusters represent biological states
 distinct from tissue of origin, they may have different prognoses within cancer
 types or across all cancers. These analyses are limited by confounding factors
 of age and stage at diagnosis, sex, ethnicity, and tissue-specific disease
 progression. To explore these ideas, we used Bayesian inference to test models
-(see Methods and **Supplemental Methods** for greater detail) of survival using
-public longevity data from the CDC, accounting for age, gender and ethnicity.
+of survival using
+public longevity data from the CDC.
 Our model estimates the effect of cancer type and cluster-specific cancer
 effects independently, resulting in a cancer and cluster-specific estimate of
 the aging rate multiplier, $k$.
 
-To understand the model, we show in **Figure 7A** simulated survival time curves
+To illustrate the model, in **Figure 7A** we simulate survival time curves
 for four related groups. We start with a cohort of women aged 30 and show their
 expected survival (light blue). By setting their cancer rate multiplier to $k=2$
 we can simulate the effect of a moderately deadly cancer (yellow). Compare this
@@ -37,45 +37,39 @@ cat("\\newpage")
 
 **Figure 7: Comparison of different cancers, simulated and actual results
 results.** To illustrate the risk model, we compare survival of four simulated
-cohorts. A) A group consisting of randomly selected 30 year old
-women (light blue) vs. an equal sized group of 30 year old women with cancer, k =
-2 (light orange). To illustrate how the mix of ages alters the survival curve,
-we compare a randomly selected group of people with ages uniformly distributed
-from 30 to 70 (dark blue) and a randomly selected group with uniformly
-distributed ages and cancer k = 2 (dark orange). B,C,D,E) We compare a randomly
-selected group with correct age distribution for the given cancer (turqoise) to
-the model predicted survival for the given average k (blue) and the actual
-survival for the patients in our dataset (orange). As can be seen, Stomach
-Cancer (STAD), Glioblastoma (GBM), and Pancreatic Cancer (PAAD) are all very
-deadly. The modeled results fit the general trend for the actual patients.
-Thyroid Cancer (THCA) on the other hand has very little if any effect on our
-estimates of life expectancy, in fact there may be a slight benefit which may be
-associated with a bias in diagnosis towards patients who are more health
-conscious, or higher socioeconomic status, with more access to care compared to
-random population members.
+cohorts. A) A group consisting of randomly selected 30 year old women (light
+blue) vs. an equal sized group of 30 year old women with cancer, k = 2 (light
+orange). To illustrate how the mix of ages alters the survival curve, we compare
+a randomly selected group of people with ages uniformly distributed from 30 to
+70 (dark blue) and a randomly selected group with uniformly distributed ages and
+cancer k = 2 (dark orange). B,C,D,E) We compare a randomly selected group with
+correct age distribution for the given cancer (turqoise) to the model predicted
+survival for the given average k (blue) and the actual survival for the patients
+in our dataset (orange). Differences with actual data are likely due to a
+mixture of cluster identities which we exclude from these simulations for
+simplicity.
 
 ```{r, results='asis'}
 cat("\\newpage")
 ```
 
 We found that cancer types, as expected, have a range of prognoses relative to
-the general population. For example in **Figure 7B-E** we see three particularly
-deadly cancers (Stomach:STAD, Glioblastoma:GBM, and Pancreatic:PAAD), and one
-cancer where diagnosis apparently decreases risk relative to background
-(Thyroid: THCA). Cancers with posterior probability for relative risk of less
-than 1 such as THCA should be interpreted carefully. This Bayesian model is a
-model for a state of information. The information that a person is diagnosed
-with cancer may lead us to expect that they will live a shorter time than the
-general population of matched age (k > 1), or a longer time than the general
-population of matched age (k < 1). One mechanism for a shorter result is that
-the cancer is aggressive and we can expect it to rapidly injure the body,
-causing death. One explanation for longer results may be that the cancer is
-relatively mild, and therefore diagnosis is potentially an informational signal
-that the patient is health conscious, with the comparison group having more
-people whose cancers go undiagnosed. It's important to note that the diagnosis
-can increase our expectation of life relative to the comparison group, even if
-it decreases the expectation of life of the individual relative to the
-counterfactual where they did not have cancer.
+the general population. In **Figure 7B-E** we see three particularly deadly
+cancers (Stomach:STAD, Glioblastoma:GBM, and Pancreatic:PAAD), and one cancer
+where diagnosis apparently decreases risk relative to background (Thyroid:
+THCA). Cancers with posterior probability for relative risk of less than 1 such
+as THCA should be interpreted carefully. This Bayesian model is a model for a
+state of information. The information that a person is diagnosed with cancer may
+lead us to expect that they will live a shorter time than the general population
+of matched age (k > 1), or a longer time than the general population of matched
+age (k < 1). A shorter prognosis could result from the cancer being aggressive,
+injuring the body and causing death. By contrast, a longer prognosis may result
+from the cancer being relatively mild, and therefore diagnosis could be an
+informational signal that the patient is health conscious, with the comparison
+group having more people whose cancers go undiagnosed. It is important to note
+therefore that the diagnosis can increase our expectation of life relative to
+the comparison group, even if it decreases the expectation of life of the
+individual relative to the counterfactual where they did not have cancer.
 
 The degree to which a given cancer accelerates aging can be determined by
 the $k_{tis}$ multiplier (**Figure 8**) multiplied by the cluster modifier $k_{cl}$
