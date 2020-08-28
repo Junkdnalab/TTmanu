@@ -1,13 +1,36 @@
 ```{r, message = FALSE, fig.width = 9, fig.height= 9}
-kelly.colours <- c("gray95", "gray13", "gold2", "plum4", "darkorange1",
-                   "lightskyblue2", "firebrick", "burlywood3", "gray51", "springgreen4",
-                   "lightpink2", "deepskyblue4", "lightsalmon2", "mediumpurple4",
-                   "orange", "maroon", "yellow3", "brown4", "yellow4", "sienna4", "chocolate", "gray19")
-
+load("../data/kelly.colours.rda")
 cluster.colours <- c("grey", kelly.colours[c(3:12)])
 names(cluster.colours) <- c(0:10)
 
-kclassplot = function(dfsamps,tisnames){
+## Getting n_race for white and black
+cancerdat <- read_csv("../data/survival/clinical_plus_cluster.csv")
+cancer.clusttype <- cancerdat %>% dplyr::select(type, race, clust_knn) %>% ## select relevant columns
+  filter(race %in% c("WHITE", "BLACK OR AFRICAN AMERICAN")) ## filter black and white only
+cancer.race <- as.data.frame(table(cancer.clusttype$type)) ## table cancer type
+cancer.race$facetname <- paste0(cancer.race$Var1, " (N = ", cancer.race$Freq, (")")) ## Create a new col with type and freq together
+cancer.race$Freq <- NULL ## Remove Freq Column
+names(cancer.race) <- c("tiss", "facetname") ## rename cols for left join in kclassplot below
+
+
+## Getting n_cluster within cancer.type
+cancer.nclustintype <- as.data.frame(table(cancer.clusttype$type, cancer.clusttype$clust_knn))
+cancer.nclustintype <- cancer.nclustintype %>% mutate(alpha = case_when(Freq < 10 ~ "0.05",
+                                                                        Freq >= 10 & Freq < 25 ~ "0.5",
+                                                                        Freq >= 25 ~ "1.0"))
+textlist <- list()
+cancertype <- "BRCA"
+for(n in cancertype) {
+  df <- cancer.nclustintype %>% filter(Var1 == n)
+  cancer.race$lab <- as.character(paste(df[1, "alpha"], "\n",df[2, "alpha"], "\n", df[3, "alpha"], "\n",df[4, "alpha"], "\n",df[5, "alpha"], "\n",df[6, "alpha"], "\n",df[7, "alpha"], "\n",df[8, "alpha"], "\n",df[9, "alpha"], "\n",df[10, "alpha"]))
+}
+
+textlist <- as.data.frame(do.call(rbind, textlist))
+
+tisnames <- levels(cancerdat$type)
+
+
+  ## Processing data
 	kclnames = grep("k\\[",names(dfsamps), value=TRUE)
 	dfclas = dfsamps[,kclnames]
 	dfclas = stack(dfclas)
@@ -15,15 +38,15 @@ kclassplot = function(dfsamps,tisnames){
 	dfclas$class = as.factor(as.numeric(gsub("k\\[(.*),(.*)\\]","\\2",dfclas$coefname)))
 	dfclas$tiss = tisnames[as.numeric(gsub("k\\[(.*),(.*)\\]","\\1",dfclas$coefname))]
 	dfclas$class <- fct_rev(dfclas$class)
-	ggplot(dfclas,aes_(quote(value),quote(class), fill = quote(class))) + geom_density_ridges() +
-		facet_wrap(. ~ tiss,nrow=3) + theme_minimal() + scale_fill_brewer(palette = "Paired") +
+	
+	## 
+	dfclas <- left_join(dfclas, cancer.race, by = "tiss")
+	
+	## Plotting
+	ggplot(dfclas,aes_(x = quote(value),y = quote(class), fill = quote(class))) + geom_density_ridges() +
+		facet_wrap(. ~ facetname,nrow=3) + theme_minimal() + scale_fill_brewer(palette = "Paired") +
 		xlim(0,3) + theme(legend.position = "none") + ggtitle("Class Specific Coefficients") +
-	  labs(x = expression(paste("k"["cl"])), y = "Cluster Identity")
-}
-
-
-pclass = kclassplot(dfsamps,levels(cancerdat$type))
-
-
-pclass+mytheme + turn.off.legend +scale_fill_manual(values = cluster.colours)
+	  labs(x = expression(paste("k"["cl"])), y = "Cluster Identity") +
+	  geom_text(data = dfclas, aes(label = lab), x = 2.5, y = 6) +
+	  mytheme + turn.off.legend +scale_fill_manual(values = cluster.colours)
 ```

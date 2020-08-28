@@ -266,6 +266,30 @@ males and females of European descent.
 cat("\\newpage")
 ```
 
+#### Figure SM3
+
+```{r sm3, fig.height=3}
+pritis = ggplot(data.frame(x=0:30),aes(x)) + stat_function(fun=function(x) dgamma(x,1.2,.2),geom="area",fill="#666699")+
+  labs(title=expression(paste("Prior for k"["tis"])),x=expression(paste("k"["tis"])), y = "Probability Density") +
+  theme_classic() + scale_x_continuous(limits = c(0, 20), breaks = c(seq(0,20, by =5))) +
+  scale_y_continuous(limits = c(0,0.75), breaks = c(seq(0,0.75, by = 0.25))) + theme(title = element_text(size = 10))
+
+pricl = ggplot(data.frame(x=0:30),aes(x)) + stat_function(fun=function(x) dgamma(x,3.5,2.5),geom="area",fill="#666699")+
+  labs(title=expression(paste("Prior for k"["class"])),x=expression(paste("k"["cl"])), y = "Probability Density") +
+  theme_classic() + scale_x_continuous(limits = c(0, 20), breaks = c(seq(0,20, by =5))) +
+  scale_y_continuous(limits = c(0,0.75), breaks = c(seq(0,0.75, by = 0.25))) + theme(title = element_text(size = 10))
+print(pritis+pricl)
+```
+
+**Supplementary Figure SM3: Priors for the tissue and class coefficients** The tissue coefficient
+is chosen to admit parameter values across a range from near 0 to 20+
+in the high density region, reflecting the wide variety of severities
+across tissue type. Within a given tissue, the class k parameter
+multiplies the tissue k and is given a peak density at 1, and a
+credible range from near 0 to 5, reflecting our expectation of a
+moderate amount of variation across the classes.
+
+
 As an aside, we did not explicitly account for stage at diagnosis in our model
 for the following reasons. In the tumor sample data, stage at diagnosis is
 confounded with cancer type because some cancers are screened aggressively (_e.g._ colorectal and prostate cancers) while others are diagnosed typically
