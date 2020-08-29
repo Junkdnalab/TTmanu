@@ -281,7 +281,7 @@ pricl = ggplot(data.frame(x=0:30),aes(x)) + stat_function(fun=function(x) dgamma
 print(pritis+pricl)
 ```
 
-**Supplementary Figure SM3: Priors for the tissue and class coefficients** The tissue coefficient
+**Supplementary Figure SM3: Priors for the tissue and class coefficients.** The tissue coefficient
 is chosen to admit parameter values across a range from near 0 to 20+
 in the high density region, reflecting the wide variety of severities
 across tissue type. Within a given tissue, the class k parameter

@@ -4,8 +4,8 @@ cluster.colours <- c("grey", kelly.colours[c(3:12)])
 names(cluster.colours) <- c(0:10)
 
 ## Getting n_race for white and black
-cancerdat <- read_csv("../data/survival/clinical_plus_cluster.csv")
-cancer.clusttype <- cancerdat %>% dplyr::select(type, race, clust_knn) %>% ## select relevant columns
+cancerinfo <- read_csv("../data/survival/clinical_plus_cluster.csv")
+cancer.clusttype <- cancerinfo %>% dplyr::select(type, race, clust_knn) %>% ## select relevant columns
   filter(race %in% c("WHITE", "BLACK OR AFRICAN AMERICAN")) ## filter black and white only
 cancer.race <- as.data.frame(table(cancer.clusttype$type)) ## table cancer type
 cancer.race$facetname <- paste0(cancer.race$Var1, " (N = ", cancer.race$Freq, (")")) ## Create a new col with type and freq together
@@ -13,40 +13,67 @@ cancer.race$Freq <- NULL ## Remove Freq Column
 names(cancer.race) <- c("tiss", "facetname") ## rename cols for left join in kclassplot below
 
 
-## Getting n_cluster within cancer.type
-cancer.nclustintype <- as.data.frame(table(cancer.clusttype$type, cancer.clusttype$clust_knn))
-cancer.nclustintype <- cancer.nclustintype %>% mutate(alpha = case_when(Freq < 10 ~ "0.05",
+## Getting n_cluster within cancer.type to calculate alpha
+cancer.nclustintype <- as.data.frame(table(cancer.clusttype$type, cancer.clusttype$clust_knn)) ## Determine n_cancer in each cluster
+cancer.nclustintype <- cancer.nclustintype %>% mutate(alpha = case_when(Freq < 10 ~ 0.1, ## Create alpha column for geom_ridges
+                                                                        Freq >= 10 & Freq < 25 ~ 0.5,
+                                                                        Freq >= 25 ~ 1.0),
+                                                      alphatext = case_when(Freq < 10 ~ "0.1", ## Create alpha text for labeling
                                                                         Freq >= 10 & Freq < 25 ~ "0.5",
                                                                         Freq >= 25 ~ "1.0"))
-textlist <- list()
-cancertype <- "BRCA"
-for(n in cancertype) {
-  df <- cancer.nclustintype %>% filter(Var1 == n)
-  cancer.race$lab <- as.character(paste(df[1, "alpha"], "\n",df[2, "alpha"], "\n", df[3, "alpha"], "\n",df[4, "alpha"], "\n",df[5, "alpha"], "\n",df[6, "alpha"], "\n",df[7, "alpha"], "\n",df[8, "alpha"], "\n",df[9, "alpha"], "\n",df[10, "alpha"]))
-}
 
-textlist <- as.data.frame(do.call(rbind, textlist))
+cancer.alpha <- cancer.nclustintype %>% dplyr::select(Var1, Var2, alphatext) %>%
+  'colnames<-' (c("tiss", "class","alphatext"))
 
-tisnames <- levels(cancerdat$type)
+tisnames <- levels(cancerdat$type) ## getting cancer type names
+
+# Code to generate the text label for each alpha
+# textlist <- list() ## create list for for loop
+# for(n in tisnames) {
+#   df <- cancer.nclustintype %>% filter(Var1 == n) ## Filter for specific cancer type
+#   textlist[[n]] <- as.character(paste(df[1, "alphatext"], "\n",df[2, "alphatext"], "\n", df[3, "alphatext"], "\n",df[4, "alphatext"], "\n",df[5, "alphatext"], "\n",df[6, "alphatext"], "\n",df[7, "alphatext"], "\n",df[8, "alphatext"], "\n",df[9, "alphatext"], "\n",df[10, "alphatext"])) ## collect all the alpha values and insert new line after each alpha
+# }
+# textlist <- as.data.frame(do.call(rbind, textlist)) ## rbind list
+# textlist <- textlist %>% 'colnames<-' ("lab") %>% ## rename col to lab
+#   rownames_to_column(var = "tiss") ## cancer type to column for left join
 
 
-  ## Processing data
-	kclnames = grep("k\\[",names(dfsamps), value=TRUE)
-	dfclas = dfsamps[,kclnames]
-	dfclas = stack(dfclas)
-	names(dfclas) = c("value","coefname")
-	dfclas$class = as.factor(as.numeric(gsub("k\\[(.*),(.*)\\]","\\2",dfclas$coefname)))
-	dfclas$tiss = tisnames[as.numeric(gsub("k\\[(.*),(.*)\\]","\\1",dfclas$coefname))]
-	dfclas$class <- fct_rev(dfclas$class)
+
+
+## Processing data
+kclnames = grep("k\\[",names(dfsamps), value=TRUE)
+dfclas = dfsamps[,kclnames]
+dfclas = stack(dfclas)
+names(dfclas) = c("value","coefname")
+dfclas$class = as.factor(as.numeric(gsub("k\\[(.*),(.*)\\]","\\2",dfclas$coefname)))
+dfclas$tiss = tisnames[as.numeric(gsub("k\\[(.*),(.*)\\]","\\1",dfclas$coefname))]
+dfclas$class <- fct_rev(dfclas$class)
 	
-	## 
-	dfclas <- left_join(dfclas, cancer.race, by = "tiss")
+## Left joining data created above
+dfclas <- left_join(dfclas, cancer.race, by = "tiss") ## add facet names
+	
+# ## Code for adding alpha level text
+# 	dfclas <- left_join(dfclas, textlist, by = "tiss")
+# 	for(n in tisnames) {
+# 	  dfclas[which(dfclas$tiss == n)[-1], "lab"] <- NA ## Remove the extra 29999 labels that will be generated on the ggplot
+# 	}
+	
+## Code for setting alpha in geom_density ridges
+alpha.setup <- c() ## create empty vector for loop
+	for(n in tisnames) { ##loop through the cancer type in alphabetical order
+	  df <- cancer.nclustintype %>% filter(Var1 == n) %>% ## Filter for specific cancer type	
+	    arrange(desc(Var2)) ## Arrange in desc order cause thats how the alpha are set from 10 <- 1
+	  for(p in 1:nrow(df)) { ## loop through the clusters starting from 10 --> 1
+	    alpha.setup <- c(alpha.setup, rep(df[p, "alpha"], 512)) ## Get the alpha value for each cluster in each cancer type and rep 512 (necessary for geom ridges)
+	  }
+	}
 	
 	## Plotting
-	ggplot(dfclas,aes_(x = quote(value),y = quote(class), fill = quote(class))) + geom_density_ridges() +
+	ggplot(dfclas,aes_(x = quote(value),y = quote(class), fill = quote(class))) + geom_density_ridges(alpha = alpha.setup) +
 		facet_wrap(. ~ facetname,nrow=3) + theme_minimal() + scale_fill_brewer(palette = "Paired") +
 		xlim(0,3) + theme(legend.position = "none") + ggtitle("Class Specific Coefficients") +
 	  labs(x = expression(paste("k"["cl"])), y = "Cluster Identity") +
-	  geom_text(data = dfclas, aes(label = lab), x = 2.5, y = 6) +
-	  mytheme + turn.off.legend +scale_fill_manual(values = cluster.colours)
+	  #geom_text(data = dfclas, aes(label = lab), x = 2.5, y = 6) +
+	  mytheme + theme(plot.title= element_text(hjust = 0.5))+ turn.off.legend +
+	  scale_fill_manual(values = cluster.colours)
 ```
