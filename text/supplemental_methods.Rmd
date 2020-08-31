@@ -196,9 +196,6 @@ to the age at diagnosis. Risk of death assumes a new rate $ka$ thereafter.
 Though the model extends to earlier ages, relatively few patients were under age
 20 (**supplementary figure SM2**).
 
-```{r, results='asis'}
-cat("\\newpage")
-```
 
 #### Figure SM2
 
@@ -245,6 +242,10 @@ tissue specific multiplicative modifying factor. This allows the overall
 magnitude of $k$ to be primarily determined by the $k_{tis}$ value whose prior
 is significantly less constrained so that there is a wider range of risk across
 tissue types (**supplementary figure SM3**).
+
+```{r, results='asis'}
+cat("\\newpage")
+```
 
 #### Figure SM3
 

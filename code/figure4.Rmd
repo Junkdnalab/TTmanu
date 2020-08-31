@@ -1,3 +1,4 @@
+
 ```{r forest-heatmap-data-generation, eval = FALSE}
 load("../data/kelly.colours.rda")
 
@@ -95,7 +96,7 @@ for( cluster_c in levels(clinical_plus_cluster$clust_knn_char) ) {
 save(all_compare, all_muts, clinical_plus_cluster, cluster_colors, file = "../data/forest.heatmap.data.rda")
 ```
 
-```{r forest-heatmap-data-plot, fig.align='center', fig.width= 9, fig.height= 8, message=FALSE}
+```{r forest-heatmap-data-plot, fig.align='center', fig.width= 8, fig.height= 10.25, message=FALSE}
 load("../data/forest.heatmap.data.rda")
 
 down_compare_plot <- all_compare %>%
@@ -127,40 +128,11 @@ Hugo_rownames <- all_compare_plot$Hugo_Symbol
 names(Hugo_rownames) <- as.character(all_compare_plot$Row_Index)
 all_p <- ggplot(all_compare_plot, 
                aes(x = or,
-                   y = Row_Index,down_compare_plot <- all_compare %>%
-  group_by(cluster) %>%
-  filter(or < 0) %>%
-  filter(adjPval < 0.01) %>%
-  arrange(-or) %>%
-  filter(is.finite(or)) %>%
-  slice_max(order_by = or, n = 10) %>%
-  arrange(cluster, or, .by.group = TRUE)))
-down_compare_plot$Hugo_Symbol <- with(down_compare_plot,
-                                      factor(as.character(Hugo_Symbol),
-                                             levels = unique(as.character(Hugo_Symbol))))
-
-up_compare_plot <- all_compare %>%
-  group_by(cluster) %>%
-  filter(or > 0) %>%
-  arrange(-or) %>%
-  filter(is.finite(or)) %>%
-  slice_max(order_by = or, n = 10) %>%
-  arrange(cluster, or, .by.group = TRUE)
-up_compare_plot$Hugo_Symbol <- with(up_compare_plot,
-                                    factor(as.character(Hugo_Symbol),
-                                           levels = unique(as.character(Hugo_Symbol))))
-
-all_compare_plot <- bind_rows(down_compare_plot, up_compare_plot)
-all_compare_plot %<>% arrange(or, .by_group = TRUE) %>% mutate(Hugo_Symbol = as.character(Hugo_Symbol)) %>% ungroup() %>% mutate(Row_Index = sprintf("%3i", row_number()))
-Hugo_rownames <- all_compare_plot$Hugo_Symbol
-names(Hugo_rownames) <- as.character(all_compare_plot$Row_Index)
-all_p <- ggplot(all_compare_plot, 
-               aes(x = or,
                    y = Row_Index,
                    color = cluster,
                    group = cluster)) +
   geom_vline(xintercept = 0, linetype = 2) +
-  geom_pointrange(aes(xmin = ci.low, xmax = ci.up)) +
+  geom_pointrange(aes(xmin = ci.low, xmax = ci.up, fatten = 1)) +
   scale_y_discrete(labels = Hugo_rownames) +
   scale_color_manual(values = cluster_colors) +
   theme_classic() +
@@ -169,7 +141,10 @@ all_p <- ggplot(all_compare_plot,
   facet_grid(cluster ~ ., scales = "free_y", drop = TRUE, space = "free_y", switch = "y") +
   theme(
     panel.grid.major.y = element_line(colour = "#f0f0f0"),
-    axis.title.y = element_blank()
+    axis.text.y = element_text(size = 8),
+    axis.title.y = element_blank(),
+    legend.text = element_text(size = 8),
+    legend.title = element_text(size = 8)
   )
 
 tdat_all <- all_muts %>%
@@ -200,9 +175,11 @@ tdat_all_p <- tdat_all %>% ggplot(aes(type, Row_Index, fill = c_prop)) +
   theme_classic() +
   theme(
     strip.text = element_blank(),
-    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 8),
     axis.text.y = element_blank(),
     axis.title.y = element_blank(),
+    legend.text = element_text(size = 8),
+    legend.title = element_text(size = 8),
     panel.grid.major.y = element_line(colour = "#f0f0f0")
   )
 
