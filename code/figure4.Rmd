@@ -96,7 +96,6 @@ save(all_compare, all_muts, clinical_plus_cluster, cluster_colors, file = "../da
 ```
 
 ```{r forest-heatmap-data-plot, fig.align='center', fig.width= 9, fig.height= 8, message=FALSE}
-#fig.width= 16, fig.height= 20,
 load("../data/forest.heatmap.data.rda")
 
 down_compare_plot <- all_compare %>%
@@ -135,7 +134,7 @@ all_p <- ggplot(all_compare_plot,
   arrange(-or) %>%
   filter(is.finite(or)) %>%
   slice_max(order_by = or, n = 10) %>%
-  arrange(cluster, or, .by.group = TRUE)
+  arrange(cluster, or, .by.group = TRUE)))
 down_compare_plot$Hugo_Symbol <- with(down_compare_plot,
                                       factor(as.character(Hugo_Symbol),
                                              levels = unique(as.character(Hugo_Symbol))))
@@ -158,57 +157,6 @@ names(Hugo_rownames) <- as.character(all_compare_plot$Row_Index)
 all_p <- ggplot(all_compare_plot, 
                aes(x = or,
                    y = Row_Index,
-                   color = cluster,
-                   group = cluster)) +
-  geom_vline(xintercept = 0, linetype = 2) +
-  geom_pointrange(aes(xmin = ci.low, xmax = ci.up)) +
-  scale_y_discrete(labels = Hugo_rownames) +
-  scale_color_manual(values = cluster_colors) +
-  theme_classic() +
-  xlab("log odds ratio") +
-  ylab("Gene") +
-  facet_grid(cluster ~ ., scales = "free_y", drop = TRUE, space = "free_y", switch = "y") +
-  theme(
-    panel.grid.major.y = element_line(colour = "#f0f0f0"),
-    axis.title.y = element_blank()
-  )
-
-tdat_all <- all_muts %>%
-  filter(Hugo_Symbol %in% all_compare_plot$Hugo_Symbol) %>%
-  distinct(Tumor_Sample_Barcode, Hugo_Symbol, clust_knn_char, type) %>%
-  select(type, clust_knn_char, Hugo_Symbol) %>%
-  table()
-tdat_all <- left_join(
-  as.data.frame(tdat_all),
-  clinical_plus_cluster %>%
-    select(Tumor_Sample_Barcode, type, clust_knn_char) %>%
-    distinct() %>%
-    group_by(type, clust_knn_char) %>%
-    summarise(ntumors = n())) %>%
-  group_by(type, clust_knn_char) %>%
-  mutate(c_prop = Freq / ntumors) %>%
-  mutate(c_prop = ifelse(is.na(c_prop), 0, c_prop)) %>%
-  select(type, clust_knn_char, Hugo_Symbol, c_prop) %>%
-  rename(cluster = clust_knn_char)
-tdat_all <- all_compare_plot %>% left_join(tdat_all)
-tdat_all_p <- tdat_all %>% ggplot(aes(type, Row_Index, fill = c_prop)) +
-  geom_tile() +
-  scale_fill_viridis_c(option = "E", "Proportion of \nTumor Type \nMutated Within Cluster", limits = c(0, 1)) +
-  xlab("Tumor Type") +
-  ylab("Gene Symbol") +
-  scale_y_discrete(labels = Hugo_rownames) +
-  facet_grid(cluster ~ ., scales = "free_y", drop = TRUE, space = "free_y") +
-  theme_classic() +
-  theme(
-    strip.text = element_blank(),
-    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
-    axis.text.y = element_blank(),
-    axis.title.y = element_blank(),
-    panel.grid.major.y = element_line(colour = "#f0f0f0")
-  )
-
-layout <- "ABB"
-all_p + tdat_all_p + plot_layout(guides = 'collect', design = layout) & theme(legend.position = "bottom")
                    color = cluster,
                    group = cluster)) +
   geom_vline(xintercept = 0, linetype = 2) +
