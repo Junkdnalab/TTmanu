@@ -8,7 +8,7 @@ cancer effects independently, resulting in a cancer and cluster-specific
 estimate of the aging rate multiplier, $k$.
 
 To illustrate the model, we simulate survival time curves
-for four related groups (**figure 5A**. We start with a cohort of women aged 30 and show their
+for four related groups (**figure 5A**). We start with a cohort of women aged 30 and show their
 expected survival (light blue). By setting their cancer rate multiplier to $k=2$
 we can simulate the effect of a moderately deadly cancer (yellow). Compare this
 to a randomly selected group of women ranging in age from 30 to 70 years old
@@ -28,14 +28,13 @@ cat("\\newpage")
 ```{r child='../code/survival/figure5.Rmd'}
 ```
 
-**Figure 5: Comparison of different cancers, simulated and actual results
-results.** To illustrate the risk model, we compare survival of four simulated
-cohorts. A) A group consisting of randomly selected 30 year old women (light
-blue) vs. an equal sized group of 30 year old women with cancer, k = 2 (light
-orange). To illustrate how the mix of ages alters the survival curve, we compare
-a randomly selected group of people with ages uniformly distributed from 30 to
-70 (dark blue) and a randomly selected group with uniformly distributed ages and
-cancer k = 2 (dark orange). B,C,D,E) We compare a randomly selected group with
+**Figure 5: Comparison of different cancers, simulated and actual results.** To
+illustrate the risk model, we compare survival of four simulated cohorts. A) A
+group consisting of randomly selected 30 year old women (light blue) vs. an
+equal sized group of 30 year old women with cancer, $k = 2$ (light orange).
+Compare a randomly selected group of people with ages uniformly distributed from
+30 to 70 (dark blue) and a randomly selected group with uniformly distributed
+ages and cancer $k = 2$ (dark orange). B,C,D,E) Compare random group with
 correct age distribution for the given cancer (turqoise) to the model predicted
 survival for the given average k (blue) and the actual survival for the patients
 in our dataset (orange). Differences with actual data are likely due to a
@@ -90,11 +89,9 @@ cat("\\newpage")
 **Figure 6 Cluster specific $k_{cl}$ values for each cancer type.** The overall
 $k$ value is the product of $k_{tis} \times k_{cl}$. The cluster-specific value
 represents the relative aggressiveness of each cluster within the cancer type.
-For example clusters 1, 2, and 6 Glioblastoma (GBM) are apparently much less
-deadly than other types of GBM. A similar situation can be seen with Pancreatic
-Cancer (PAAD) where 1, 6, and 8 are less deadly compared to clusters 7, 9, 10.
-For some cancer types there are few data points and little ability to estimate
-values with precision (DLBC and KICH for example).
+Alpha transparency (α) is set to reflect varying confidence in the posterior
+distribution when the number of observations is N<10, α = 0.1; N<25, α = 0.5; N
+≥ 25 α = 1.0.
 
 
 ```{r, results='asis'}
