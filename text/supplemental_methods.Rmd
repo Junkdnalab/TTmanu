@@ -194,7 +194,24 @@ $D(t) = 0$, after $D(t) = 1$). The model assumes that the risk of death is
 $R_{20}$ at age 20 years and increases exponentially with a constant rate $a$ up
 to the age at diagnosis. Risk of death assumes a new rate $ka$ thereafter.
 Though the model extends to earlier ages, relatively few patients were under age
-20.
+20 (**supplementary figure SM2**).
+
+```{r, results='asis'}
+cat("\\newpage")
+```
+
+#### Figure SM2
+
+```{r child='../code/figureSM2.Rmd'}
+```
+
+**Supplementary Figure SM2** Comparison between CDC data and ODE model fit for
+males and females of European descent. This comparison does not distinguish on
+ethnicity for simplicity in visualization.
+
+```{r, results='asis'}
+cat("\\newpage")
+```
 
 Given this risk per unit time, the probability of death at time $T+dT$ is the
 probability to survive to time $T$ which is $(1-P(T))$ and then die in the
@@ -227,44 +244,7 @@ probability at 1 and a relatively narrow width, due to the fact that it is a
 tissue specific multiplicative modifying factor. This allows the overall
 magnitude of $k$ to be primarily determined by the $k_{tis}$ value whose prior
 is significantly less constrained so that there is a wider range of risk across
-tissue types.
-
-The $k$ in our model can be taken as, roughly, the aging rate relative to the
-baseline rates. Thus, a value of $k=2$ means that a given cancer causes you to
-experience the same risk in time $dt$ as a non-cancer patient would experience
-at the same age, in time $2dt$.
-
-Using this model, we split the data by Male/Female sex, and by White _vs._
-Black race as these were the main well-identified categories available to us in
-the dataset. Sex is known to be a risk factor for death, with males dying at
-slightly higher rates for all ages of interest in our dataset. Black _vs._ White
-race is an important category due to differences in access to care and other
-socioeconomic and education related factors. However, due to the low number of
-Black patient tumors, we use ethnicity only to identify the baseline risk
-function, while the tissue- and cluster-specific multipliers are not ethnicity
-specific. There were too few tumors from other races to obtain good inference so
-we excluded them from our analysis.
-
-**Supplementary figure SM2** gives a comparison between the post-fit
-survival curves for men and women vs the CDC data it is based on. This
-comparison does not distinguish on ethnicity for simplicity in
-visualization.
-
-```{r, results='asis'}
-cat("\\newpage")
-```
-
-#### Figure SM2
-
-```{r child='../code/figureSM2.Rmd'}
-```
-
-**Supplementary Figure SM2** Comparison between CDC data and ODE model fit for
-males and females of European descent.
-
-```{r, results='asis'}
-cat("\\newpage")
-```
+tissue types (**supplementary figure SM3**).
 
 #### Figure SM3
 
@@ -300,6 +280,22 @@ moderate amount of variation across the classes.
 ```{r, results='asis'}
 cat("\\newpage")
 ```
+
+The $k$ in our model can be taken as, roughly, the aging rate relative to the
+baseline rates. Thus, a value of $k=2$ means that a given cancer causes you to
+experience the same risk in time $dt$ as a non-cancer patient would experience
+at the same age, in time $2dt$.
+
+Using this model, we split the data by Male/Female sex, and by White _vs._
+Black race as these were the main well-identified categories available to us in
+the dataset. Sex is known to be a risk factor for death, with males dying at
+slightly higher rates for all ages of interest in our dataset. Black _vs._ White
+race is an important category due to differences in access to care and other
+socioeconomic and education related factors. However, due to the low number of
+Black patient tumors, we use ethnicity only to identify the baseline risk
+function, while the tissue- and cluster-specific multipliers are not ethnicity
+specific. There were too few tumors from other races to obtain good inference so
+we excluded them from our analysis.
 
 As an aside, we did not explicitly account for stage at diagnosis in our model
 for the following reasons. In the tumor sample data, stage at diagnosis is
