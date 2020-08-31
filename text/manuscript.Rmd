@@ -437,7 +437,8 @@ methods.
 ## Acknowledgements
 
 We wish to thank David Van Valen, Kate Lawrenson, Simon Knott, and Megan
-Hitchens for critical reading of this manuscript, and Ivetth Corona for early
+Hitchens, for critical comments on this manuscript, and Tim Triche Jr for
+suggested improvements to the preprint. We also thank Ivetth Corona for early
 discussions and feedback.
 
 ## Declarations
