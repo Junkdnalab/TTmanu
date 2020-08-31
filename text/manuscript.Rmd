@@ -111,7 +111,7 @@ supplemental table ST1) of interest corresponding to basic cellular processes
 and biochemical pathways, excluding gene sets that correspond to miscellaneous
 categories (_e.g._ “transcription factors”) or disease associations (_e.g._
 “mutated in colon cancer”) and filtered our gene list on membership in these
-pathways (total of 8,940 genes; see methods for details).
+pathways (total of 8,940 genes).
 
 To avoid bias toward larger pathways with more genes, we counted them as
 disrupted if one or more member genes were mutated. We do not attempt to
@@ -128,8 +128,8 @@ accumulate mutations at a higher rate due to transcription coupled repair
 @kimPancancerAnalysisSomatic2018;
 @Pervasive_lesion_segregation; @expression-aware-annotation]. To address this
 issue, we identified low expressed genes in each type of cancer and eliminated
-them for that cancer type only (see methods for details). Highly expressed genes
-could also have high mutation rates owing to transcription induced mutagenesis
+them for that cancer type only. Highly expressed genes could also have high
+mutation rates owing to transcription induced mutagenesis
 [@parkGenomicEvidenceElevated2012]. This phenomenon would likely result in
 cell-type-specific biases that might be biologically meaningful for
 predisposition to different classes of cancer however, and therefore chose not
@@ -225,9 +225,8 @@ not observe any exclusive segregation by pathway for these subtypes (**figure
 (see **supplementary figure S2** and online [**supplemental file
 1**](https://junkdnalab.shinyapps.io/PANCAN_supplemental/)); we find that the
 subtypes, though often biased to one or more clusters, are almost never
-exclusive. We interpret these data in aggregate to mean that the clusters do not
-correspond to previously identified molecular subtypes within the parent cancer
-types.
+exclusive. We interpret these data to mean that the clusters do not correspond
+to previously identified molecular subtypes within the parent cancer types.
 
 #### Independence from drivers of genome instability.
 
@@ -294,14 +293,14 @@ samples), "Mitotic G2-G2/M phases" (67% of samples), "Cellular senescence" (64%
 of samples), "G2/M Checkpoints" (62% of samples), _etc._
 
 To discover what pathways are most important for clustering, we calculated
-percent enrichment _within cluster_ relative to all other clusters (see methods)
-and ranked pathways from highest to lowest enrichment. We visualized the
-enrichment as a heatmap (**figure 3A**). Using this approach, we identified
-about fourteen pathways per cluster (enrichment score ≥ 0.3, 95% confidence; see
-methods) (**supplementary table ST2**). Clusters 7, 8, and 9 had several
-pathways in common. To explore the specific pathways marking each cluster, we
-projected disruptions for each of the 377 pathways onto the UMAP
-(**supplementary figure S4** and see interactive media from [**supplemental file
+percent enrichment _within cluster_ relative to all other clusters and ranked
+pathways from highest to lowest enrichment. We visualized the enrichment as a
+heatmap (**figure 3A**). Using this approach, we identified about fourteen
+pathways per cluster (enrichment score ≥ 0.3, 95% confidence; see methods)
+(**supplementary table ST2**). Clusters 7, 8, and 9 had several pathways in
+common. To explore the specific pathways marking each cluster, we projected
+disruptions for each of the 377 pathways onto the UMAP (**supplementary figure
+S4** and see interactive media from [**supplemental file
 1**](https://junkdnalab.shinyapps.io/PANCAN_supplemental/)). Clusters 3 and 5
 were distinguished by metabolic pathways including RNA and protein biosynthesis
 (**supplementary figure S4**). Similarly, cluster 4 was distinguished by

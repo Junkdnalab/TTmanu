@@ -119,14 +119,14 @@ of our pathway disruption clusters exhibit cancer-type specific effects on
 expected survival. However, considering that within each cancer type there are
 different clinical standards of care, and even within classes of drugs the
 preferred treatment can very between cancers, it makes sense that we observe
-tissue-specific cluster effects. Contrast the situation with ovarian _vs._
-breast cancer, which are both hormonally driven cancers, for example. Ovarian
-cancer has but one main treatment axis, platinum, whereas breast cancer patients
-have a variety of treatment regimens based on molecular subtype and other
-factors. Unfortunately, given the diversity of drug classes and treatments, we
-lack sufficient power to explore these variables in the TCGA data. It is our
-hope that future studies will help to distinguish between treatment-specific
-effects on survival given different pathway disruption clusters.
+tissue-specific cluster effects. Contrast ovarian _vs._ breast cancer, which are
+both hormonally driven cancers, for example. Ovarian cancer has but one main
+treatment axis, platinum, whereas breast cancer patients have a variety of
+treatment regimens based on molecular subtype and other factors. Unfortunately,
+given the diversity of drug classes and treatments, we lack sufficient power to
+explore these variables in the TCGA data. It is our hope that future studies
+will help to distinguish between treatment-specific effects on survival given
+different pathway disruption clusters.
 
 ### Implications for the evolution of cancer 
 
