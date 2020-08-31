@@ -1,10 +1,3 @@
----
-output:
-  word_document: default
-  html_document: default
-editor_options: 
-  chunk_output_type: console
----
 ```{r, fig.width = 9, fig.height= 4}
 load("../data/cancer_disrupt_heatmap.Rda") ## Load  in data processed in figure1.Rmd
 
@@ -82,6 +75,8 @@ with(umap_cancertype, scatter3D(plot_y, -plot_z, plot_x,
                                   xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
                                   colvar = NULL))
 title(xlab="UMAP 2", line=-1.5)
+legend("top", inset = c(0.1), legend=names(cluster.colours[2:6]), col=cluster.colours[2:6], pch = 20, bty = "n", horiz = T, cex = 0.8)
+legend("top", inset = c(0.15), legend=names(cluster.colours[7:11]), col=cluster.colours[7:11], pch = 20, bty = "n", horiz = T, cex = 0.8)
 mtext("B", side=3, line=-1.2, cex=1.2, adj=0)
 popViewport()
 ## View 2
@@ -94,6 +89,7 @@ with(umap_cancertype, scatter3D(plot_y, -plot_z, plot_x,
                                   theta = theta[n], phi = phi[n], scale = T,
                                   xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
                                   colvar = NULL))
+
 popViewport()
 ## View 3
 pushViewport(vp.4)
