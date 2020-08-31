@@ -1,14 +1,15 @@
-Cancer affects cellular metabolism, biochemical processes, and the
-microenvironment. However, despite some unifying principles, molecular
-signatures remain largely indistinguishable from tissue-of-origin, presenting a
-major barrier for precision health and individualized medicine. To address this,
-we assign tumors into ten clusters based on pathways largely free of bias from
-tissue-of-origin, mutational burden or stage. Germline risk genes are equally
-distributed among clusters, contrary to the expectation that they determine
-molecular subtype. We show that clusters vary in prognosis, modeling risk of
-death by cancer type and cluster. We investigate metastasis, and show that most
-differences are cluster-specific and complement other clusters, suggesting
-convergence. Our observations suggest that driver genes combine with uncommon
-genes in tumor-promoting pathways to produce distinct molecular phenotypes.
-Thus, we present a coherent view of global tumor biology, and explain how common
-cellular dysfunction might arise from tissue-specific mutations.
+Cancer is an organism-level disease, impacting processes from cellular
+metabolism and the microenvironment to systemic immune response. Nevertheless,
+efforts to distinguish overarching mutational processes from interactions with
+the cell of origin for a tumor have seen limited success, presenting a barrier
+to individualized medicine. Here we present a novel, pathway-centric approach,
+extracting somatic mutational profiles within and between tissues, largely
+orthogonal to cell of origin, mutational burden, or stage. Known predisposition
+variants are equally distributed among clusters, and largely independent of
+molecular subtype. Prognosis and risk of death vary jointly by cancer type and
+cluster. Analysis of metastatic tumors reveals that differences are largely
+cluster-specific and complementary, implicating convergent mechanisms that
+combine familiar driver genes with diverse low-frequency lesions in
+tumor-promoting pathways, ultimately producing distinct molecular phenotypes.
+The results shed new light on the interplay between organism-level dysfunction
+and tissue-specific lesions.
