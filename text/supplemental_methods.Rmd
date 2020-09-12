@@ -1,7 +1,6 @@
 ---
 title: "Supplementary methods"
 author: "Peter T. Nguyen, Simon G. Coetzee, Daniel L. Lakeland, and Dennis J. Hazelett"
-date: "8/24/2020"
 bibliography: references.bib
 output:
   word_document:
