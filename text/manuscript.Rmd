@@ -99,13 +99,13 @@ suppressPackageStartupMessages(c(
 ### A taxonomy of tumors based on disrupted molecular pathways
 
 To study cancer pathways we obtained a set of 7,607 solid tumors from The Cancer
-Genome Atlas (TCGA) through the [Genomic Data Commons (GDC)](gdc.cancer.gov)
+Genome Atlas (TCGA) through the Genomic Data Commons (GDC)(gdc.cancer.gov)
 portal. TCGA data are most appropriate given the relative completeness of the
 patient metadata for survival and staging. We chose to analyze exome sequencing
 data because the affected target gene is known unambiguously. Therefore, we
 selected all missense, nonsense, frameshift, stop-loss, untranslated region, and
 splicing mutations. To minimize bias from well-studied diseases and processes,
-we selected 377 [Reactome pathways](https://reactome.org/) (see supplemental
+we selected 377 Reactome pathways (reactome.org) (see supplemental
 table ST1) of interest corresponding to basic cellular processes and biochemical
 pathways, excluding those corresponding to catalytic categories (_e.g._
 “transcription factors”) or disease associations (_e.g._ “mutated in colon
@@ -156,8 +156,8 @@ cat("\\newpage")
 
 We investigated this dataset using multiple correspondence analysis (MCA)
 [@JSSv025i01], and visually summarized the analysis with UMAP (**figure 1B** and
-see interactive media from [**supplemental file
-1**](https://junkdnalab.shinyapps.io/PANCAN_supplemental/)) [@McInnes2018]. We
+see interactive media from **supplemental file
+1** (junkdnalab.shinyapps.io/PANCAN_supplemental/)) [@McInnes2018]. We
 used the resulting graph coordinates to perform density based clustering
 with HDBSCAN [@hdbscan], which resulted in identification of 10 well-defined
 clusters capturing about 80% of the tumor samples. To capture the remaining
@@ -217,8 +217,8 @@ and luminal A and B subtypes onto the UMAP. These are among the most heavily
 studied molecular subtypes in cancer, each with different prognoses and
 standards of care. We did not observe exclusive segregation by cluster for these
 subtypes (**figure 2B**). We also projected histological subtype data for the
-remaining cancers (see **supplementary figure S2** and online [**supplemental
-file1**](https://junkdnalab.shinyapps.io/PANCAN_supplemental/)); we find that
+remaining cancers (see **supplementary figure S2** and see interactive media from 
+**supplemental file 1**); we find that
 the subtypes, though often biased to one or more clusters, are almost never
 exclusive. We interpret these data to mean that the clusters do not correspond
 to previously identified molecular subtypes within the parent cancer types.
@@ -235,8 +235,7 @@ mechanism of risk is thought to involve loss of heterozygosity, resulting in
 loss of the wildtype, functional allele [@brca-loh], so we projected somatic
 mutations for _BRCA1_ and _BRCA2_ genes onto the UMAP. We did not observe
 segregation of these mutations into specific clusters (**figure 2C** and see
-interactive media from [**supplemental file
-1**](https://junkdnalab.shinyapps.io/PANCAN_supplemental/)). We also projected
+interactive media from **supplemental file 1**). We also projected
 mismatch repair (MMR) genes _MSH2_, _MSH6_, _MLH1_, _MLH3_, _PMS1_ and _PMS2_;
 _BRIP1_, _RAD51_, _CHEK2_ and _APC_. None of these genes except for _APC_
 exhibited remarkable specificity with respect to cluster assignment
@@ -293,8 +292,8 @@ pathways per cluster (enrichment score ≥ 0.3, 95% confidence; see methods)
 (**supplementary table ST2**). Clusters 7, 8, and 9 had several pathways in
 common. To explore the specific pathways marking each cluster, we projected
 disruptions for each of the 377 pathways onto the UMAP (**supplementary table
-ST2** and see interactive media from [**supplemental file
-1**](https://junkdnalab.shinyapps.io/PANCAN_supplemental/)). Clusters 3 and 5
+ST2** and see interactive media from **supplemental file
+1**). Clusters 3 and 5
 were distinguished by metabolic pathways including RNA and protein biosynthesis
 (**supplementary table ST2**). Similarly, cluster 4 was distinguished by
 mutations affecting regulation of DNA and histone methylation ("DNA
@@ -335,8 +334,7 @@ enriched and depleted genes (pvalue < 0.01) for each cluster (**figure 4**; odds
 ratios plot). Clusters 7 and 8, which shared multiple enrichment in signaling
 pathways, are largely driven by mutations in _PI3K_ and its orthologs and _Ras_
 genes, respectively (compare _PIK3CA_ and _KRAS_ panels of **Supplementary
-figure S4** and see interactive media from [**supplemental file
-1**](https://junkdnalab.shinyapps.io/PANCAN_supplemental/)). Interestingly,
+figure S4** and see interactive media from **supplemental file 1**. Interestingly,
 cluster 9, which also shared multiple enrichment in signaling pathways with
 clusters 7 and 8, is enriched for both _PIK3CA_ and _KRAS_. Clusters 3 and 5,
 defined by enrichment in metabolic pathways, had mutations in ribosomal proteins
@@ -428,11 +426,11 @@ cat("\\newpage")
 
 All code and data for producing the analyses and figures herein are included in
 this fully reproducible manuscript in R markdown format. R markdown files and
-all other models are available from [our
-repositories](https://github.com/dennishazelett/TTmanu) on the distributed
+all other models are available from our
+repositories (https://github.com/dennishazelett/TTmanu) on the distributed
 version control site, GitHub. Extended descriptions of clustering, models,
 formulae, pathway selection, and gene filtering are provided in supplementary
-methods.
+methods. An interactive media of the results is available on junkdnalab.shinyapps.io/PANCAN_supplemental/.
 
 ## Acknowledgements
 

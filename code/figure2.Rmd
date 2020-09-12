@@ -175,7 +175,7 @@ names(B_color) <- B_name ## Assigning subtypes to color
 
 with(brca_subtype,
      scatter3D(plot_y, -plot_z, plot_x, 
-               bg = B_color, pch = 21, cex = 0.8, lwd = 0.2, 
+               bg = B_color[as.character(Subtype_Selected)], pch = 21, cex = 0.8, lwd = 0.2, 
                theta = 0, phi = 65, scale = F,
                xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
@@ -217,7 +217,7 @@ C_colors <- c('#33a02c', '#e31a1c', '#ff7f00') ## Color scheme
 names(C_colors) <- c("BRCA1", "BRCA2", "BRCA1,BRCA2") ## Assigning mutation type to color
 with(brca %>% filter(mut_type != "NA"), ## Filter samples that do not have a mutation in BRCA1 or BRCA2
      scatter3D(plot_y, -plot_z, plot_x, 
-               bg = C_colors, pch = 21, cex = 0.8, lwd = 0.2,
+               bg = C_colors[as.character(mut_type)], pch = 21, cex = 0.8, lwd = 0.2,
                theta = 0, phi = 65, scale = F,
                xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
@@ -239,7 +239,7 @@ D_colors <- c('darkgoldenrod3','dodgerblue3','yellow3','tomato2') ## Color schem
 names(D_colors) <- c("Stage I", "Stage II", "Stage III", "Stage IV") ## Assign stage to color
 with(umap_cancertype %>% filter(ajcc_pathologic_tumor_stage != "Not Available"), ## Filter samples that do not have stage info
      scatter3D(plot_y, -plot_z, plot_x, 
-               bg = D_colors, pch = 21, cex = 0.8, lwd = 0.2,
+               bg = D_colors[as.character(ajcc_pathologic_tumor_stage)], pch = 21, cex = 0.8, lwd = 0.2,
                theta = 0, phi = 65, scale = F,
                xlim = c(-6, 4.5), zlim = c(-4.5, 4), ylim = c(-4, 5),
                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
@@ -261,7 +261,7 @@ E_colors <- c('#a6cee3','#1f78b4') ## Color scheme
 names(E_colors) <- c("M0", "M1") ## Assign metastasis to color
 with(umap_cancertype %>% filter(ajcc_metastasis_pathologic_pm %in% c("M0", "M1")), ## Only M0 and M1 tumor samples
      scatter3D(plot_y, -plot_z, plot_x, 
-               bg = E_colors, pch = 21, cex = 0.8, lwd = 0.2,
+               bg = E_colors[as.character(ajcc_metastasis_pathologic_pm)], pch = 21, cex = 0.8, lwd = 0.2,
                theta = 0, phi = 65, scale = F,
                xlab = "", ylab = "UMAP 3", zlab = "UMAP 1",
                colvar = NULL))

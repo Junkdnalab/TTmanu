@@ -87,7 +87,8 @@ analysis, which computes a similarity metric to every tumor in the set and then
 lets the _k_ most similar tumors "vote" as to the identity of the query tumor
 sample based on their cluster labels. We set _k_ to be the square root of the
 number of tumor samples (87). Using this method, we assigned cluster membership
-to the remaining tumors (**figure SM1F**).
+to the remaining tumors (**figure SM1F** and see interactive media from **supplemental file
+1** (junkdnalab.shinyapps.io/PANCAN_supplemental/)).
 
 ```{r, results='asis'}
 cat("\\newpage")
