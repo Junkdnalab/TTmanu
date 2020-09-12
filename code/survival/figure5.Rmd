@@ -1,4 +1,4 @@
-```{r, survfig, echo=FALSE, warning=FALSE, error=TRUE,message=FALSE,fig.height=9, fig.width=9}
+```{r, survfig, echo=FALSE, warning=FALSE, error=TRUE,message=FALSE,fig.height=11, fig.width=9}
 
 
 library(ggridges)
@@ -92,6 +92,7 @@ mytheme = theme(
     strip.background = element_blank(),
     legend.key.height = unit(0.4, "lines"),
     legend.title = element_blank(),
+    legend.position = c(0.7, 0.8),
     #legend.position = "none",
     title = element_text(size=10)
   )
@@ -99,20 +100,48 @@ mytheme = theme(
 
 
 kmlayout = "
-AB
-AB
-AB
-CD
-CD
-CD
-EE
+AAFF
+AAFF
+AAFF
+BBFF
+BBFF
+BBFF
+CCFF
+CCFF
+CCFF
+DDFF
+DDFF
+DDFF
+EE##
 "
+
+BE_legend <- get_legend(thca[[1]] + theme(legend.direction = "horizontal"))
 kmlegend <- theme(legend.direction = "horizontal")
 
-print(
-  ((p1+mytheme)/((pstad[[1]]+mytheme + kmlegend)+(pgbm[[1]]+mytheme + kmlegend) +
-                   (ppaad[[1]]+mytheme + kmlegend) + (thca[[1]] + mytheme + kmlegend) + guide_area() + plot_layout(design = kmlayout, guides = "collect"))) + plot_annotation(tag_levels = "A")
-)
+
+  # ((p1+mytheme)/((pstad[[1]]+mytheme + kmlegend)+(pgbm[[1]]+mytheme + kmlegend) +
+  #                  (ppaad[[1]]+mytheme + kmlegend) + (thca[[1]] + mytheme) + (kmlegend) + (pcanc+mytheme) + guide_area() + plot_layout(design = kmlayout, guides = "collect"))) + plot_annotation(tag_levels = "A")
+layout = "
+AAAA
+AAAA
+AAAA
+AAAA
+AAAA
+AAAA
+BBFF
+BBFF
+CCFF
+CCFF
+DDFF
+DDFF
+EEFF
+EEFF
+"
+
+turn.off.legend <- theme(legend.position = "none")
+
+(p1+mytheme) + (pstad[[1]]+mytheme) + (pgbm[[1]]+mytheme + turn.off.legend) + (ppaad[[1]]+mytheme + turn.off.legend) + (thca[[1]] + mytheme + turn.off.legend) + (pcanc+mytheme) + plot_annotation(tag_levels = "A") + plot_layout(design = layout) 
+
 ```
 
 

@@ -130,7 +130,7 @@ rm(list = ls(all.names = T))
 gc()
 ```
 
-```{r table-1}
+```{r table-1, eval = FALSE}
 load("../data/cluster_spec_enrich_table.Rda")
 tumor_clusters <- fread("../data/umap_3d_coors.tsv") ## load in data
 

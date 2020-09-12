@@ -86,7 +86,8 @@ analysis, which computes a similarity metric to every tumor in the set and then
 lets the _k_ most similar tumors "vote" as to the identity of the query tumor
 sample based on their cluster labels. We set _k_ to be the square root of the
 number of tumor samples (87). Using this method, we assigned cluster membership
-to the remaining tumors (**figure SM1F**).
+to the remaining tumors (**figure SM1F** and see interactive media from **supplemental file
+1** (junkdnalab.shinyapps.io/PANCAN_supplemental/)).
 
 ```{r, results='asis'}
 cat("\\newpage")
@@ -113,13 +114,75 @@ assign membership to the remaining tumors.
 cat("\\newpage")
 ```
 
+### Selection of pathways
+
+To understand the molecular mechanism of cancer at a pathway level, we used
+Reactome (https://reactome.org/), a knowledge-based pathway database. The
+mapping files of ENSEMBL genes to pathways, pathway hierarchy relationships, and
+complexes to top pathways were downloaded from
+https://reactome.org/download-data. Using these data, we imposed pathway
+criteria to define basic cellular processes and biochemical pathways: (1)
+human-derived pathways (\it{“HSA”}) (2) limited to grandchild node for each
+parent pathway (_e.g._ ‘Beta-catenin independent WNT signaling’ in ‘Signal
+Transduction’) (3) exclusion of pathways in the parent pathway: "Disease",
+"Muscle contraction", and "Reproduction" or pathway names that include any of
+the following keywords: "disease", "defect", "cancer", "oncogenic", "disorder",
+"mutant", "loss", "infection", "bacteria", or "listeria". While some of the
+excluded pathways have been shown to play an important role in cancer, they are
+highly specialized (_e.g._ "PI3K/AKT Signaling in Cancer"). Additionally, for
+most of the excluded pathways, a neutral version pathway of the pathway exists
+(_e.g._ "PIP3 activates Akt signaling"). Finally, we mapped the 18,577
+Ensembl IDs from the TCGA dataset to the highly selected Reactome pathways. This
+operation produced a lookup table that consisted of 377 pathways mapped to 8,940
+genes.
+
+### Filtering genes
+
+We filtered likely erroneous mutations due to transcription coupled repair. Our
+approach was to determine the status of each gene (_i.e._ expressed or not
+expressed) in each tissue type in order to exclude gene mutations low expressed
+enes. To do this, we obtained the TCGA RNA sequencing data adjusted for batch
+effect dataset (https://pancanatlas.xenahubs.net). Using the data, we removed
+the genes and tumor samples that were not included in our analysis, grouped the
+tumor samples by tissue type and computed the mean expression value for each
+gene. A minimum threshold of 10 transcripts per million was set for expressed
+genes based on an inflection point observed when plotting the mean expression
+values of genes ranked by expression in each tissue type. Genes that did not
+meet this threshold were considered not expressed. This operation produced a
+lookup table for gene expression status in each tumor sample for 18,127 genes.
+
+### Class and stage-specific Enrichment Calculations
+
+We calculated the enrichment of pathways in one set of tumors as the relative
+fraction of tumors (with estimated uncertainty) with a mutated gene in the
+pathway to all tumors, inclusive of the category of interest. To do this
+operation, we use the beta distribution to permute a posterior distribution on
+the fraction of tumors with a pathway mutated for each category based on the
+observed set, and compared this to the posterior obtained from the full set of
+tumors (all tumors) as the distribution of differences between all permuted
+samples. We considered a pathway enriched if the 95% range of credible
+differences thus obtained excludes 0 and the mean credible difference was
+greater than or equal to 30% enrichment, which excludes a large number of small
+differences that are not likely to be biologically relevant.
+
+
 ### Survival
 
-In order to understand how the diagnosis of cancer changes the expectation for
-longevity of patients, we first modeled the longevity of the overall population
-of the U.S. based on CDC life tables. Most TCGA cases are diagnosed late in
-life, so we fit a model that emphasizes accuracy in the right tail of the
-distribution. We modeled baseline longevity using a risk rate function:
+We used Bayesian inference to explore the relative impact of cancer diagnosis on
+survival at the time of diagnosis. Our model assumes that at birth each person
+has a small initial probability per unit time to die, and that this probability
+grows exponentially in time at some baseline rate that matches the observed CDC
+data. The rate of growth in risk is assumed to jump to a higher level at
+diagnosis, which we take as a proxy for onset. This represents an accelerated
+aging type model. To fit the model, we constrain the baseline risks using the
+available CDC life tables (ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Publications/NVSR/68_07/). We also constrain the cancer specific multiplier
+using the longevity data within the cancer tumor dataset. Our model estimates
+the effect of cancer type and class-specific cancer effects independently,
+resulting in a cancer and class specific estimate of the aging rate multiplier.
+
+Most TCGA cases are diagnosed late in life, so we fit a model that emphasizes
+accuracy in the right tail of the distribution. We modeled baseline longevity
+using a risk rate function:
 
 $$R(t) = R_{20}\exp(a(A-20) + D(t) k a (\frac{t}{365}))$$ 
 
@@ -131,7 +194,21 @@ $D(t) = 0$, after $D(t) = 1$). The model assumes that the risk of death is
 $R_{20}$ at age 20 years and increases exponentially with a constant rate $a$ up
 to the age at diagnosis. Risk of death assumes a new rate $ka$ thereafter.
 Though the model extends to earlier ages, relatively few patients were under age
-20.
+20 (**supplementary figure SM2**).
+
+
+#### Figure SM2
+
+```{r child='../code/figureSM2.Rmd'}
+```
+
+**Supplementary Figure SM2** Comparison between CDC data and ODE model fit for
+males and females of European descent. This comparison does not distinguish on
+ethnicity for simplicity in visualization.
+
+```{r, results='asis'}
+cat("\\newpage")
+```
 
 Given this risk per unit time, the probability of death at time $T+dT$ is the
 probability to survive to time $T$ which is $(1-P(T))$ and then die in the
@@ -164,7 +241,46 @@ probability at 1 and a relatively narrow width, due to the fact that it is a
 tissue specific multiplicative modifying factor. This allows the overall
 magnitude of $k$ to be primarily determined by the $k_{tis}$ value whose prior
 is significantly less constrained so that there is a wider range of risk across
-tissue types.
+tissue types (**supplementary figure SM3**).
+
+```{r, results='asis'}
+cat("\\newpage")
+```
+
+#### Figure SM3
+
+```{r sm3, fig.height=3, fig.width=3}
+ggplot(data.frame(x=0:30),aes(x)) + 
+  stat_function(fun=function(x) dgamma(x,1.2,.2),geom="area", aes(fill = "ktis"))+ 
+  stat_function(fun=function(x) dgamma(x,3.5,2.5),geom="area", aes(fill = "kcl"))+ 
+  labs(title=expression(paste("Prior for k"["tis"], "and k"["cl"])),x= "k value", y = "Probability Density") +
+  theme_classic() + scale_x_continuous(limits = c(0, 20), breaks = c(seq(0,20, by =5))) +
+  scale_y_continuous(limits = c(0,0.75), breaks = c(seq(0,0.75, by = 0.25))) +
+  scale_fill_manual(values = c(alpha("#E69F00", 0.5),alpha("#0072B2", 0.5)),
+                    labels = c(expression(paste("k"["cl"])), expression(paste("k"["tis"])))) +
+  theme(plot.title = element_text(size = 12, hjust = 0.5),
+        panel.grid.major = element_line(size = 0.75),
+        panel.grid.minor = element_line(),
+        legend.position = c(0.8, 0.8),
+        legend.spacing.y = unit(0, "mm"),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 8),
+        legend.key.size = unit(0.75,"line"),
+        legend.background = element_blank(),
+        legend.box.background = element_rect(colour = "black"))
+```
+
+**Supplementary Figure SM3: Priors for the tissue and class coefficients.** The tissue coefficient
+is chosen to admit parameter values across a range from near 0 to 20+
+in the high density region, reflecting the wide variety of severities
+across tissue type. Within a given tissue, the class k parameter
+multiplies the tissue k and is given a peak density at 1, and a
+credible range from near 0 to 5, reflecting our expectation of a
+moderate amount of variation across the classes.
+
+```{r, results='asis'}
+cat("\\newpage")
+```
 
 The $k$ in our model can be taken as, roughly, the aging rate relative to the
 baseline rates. Thus, a value of $k=2$ means that a given cancer causes you to
@@ -181,49 +297,6 @@ Black patient tumors, we use ethnicity only to identify the baseline risk
 function, while the tissue- and cluster-specific multipliers are not ethnicity
 specific. There were too few tumors from other races to obtain good inference so
 we excluded them from our analysis.
-
-**Supplementary figure SM2** gives a comparison between the post-fit
-survival curves for men and women vs the CDC data it is based on. This
-comparison does not distinguish on ethnicity for simplicity in
-visualization.
-
-```{r, results='asis'}
-cat("\\newpage")
-```
-
-#### Figure SM2
-
-```{r child='../code/figureSM2.Rmd'}
-```
-
-**Supplementary Figure SM2** Comparison between CDC data and ODE model fit for
-males and females of European descent.
-
-```{r, results='asis'}
-cat("\\newpage")
-```
-
-### Figure SM3
-```{r}
-
-
-pritis = ggplot(data.frame(x=0:30),aes(x)) + stat_function(fun=function(x) dgamma(x,1.2,.2),geom="area",fill="#666699")+
-coord_cartesian(xlim=c(0,20),ylim=c(0,1))+labs(title="Prior for ktis",x="ktis")
-pricl = ggplot(data.frame(x=0:30),aes(x)) + stat_function(fun=function(x) dgamma(x,3.5,2.5),geom="area",fill="#666699")+
-coord_cartesian(xlim=c(0,20),ylim=c(0,1))+labs(title="Prior for kclass",x="kclass")
-print(pritis+pricl)
-
-```
-
-Priors for the tissue and class coefficients. The tissue coefficient
-is chosen to admit parameter values across a range from near 0 to 20+
-in the high density region, reflecting the wide variety of severities
-across tissue type. Within a given tissue, the class k parameter
-multiplies the tissue k and is given a peak density at 1, and a
-credible range from near 0 to 5, reflecting our expectation of a
-moderate amount of variation across the classes.
-
-
 
 As an aside, we did not explicitly account for stage at diagnosis in our model
 for the following reasons. In the tumor sample data, stage at diagnosis is
