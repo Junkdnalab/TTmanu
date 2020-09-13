@@ -141,7 +141,7 @@ all_p <- ggplot(all_compare_plot,
   facet_grid(cluster ~ ., scales = "free_y", drop = TRUE, space = "free_y", switch = "y") +
   theme(
     panel.grid.major.y = element_line(colour = "#f0f0f0"),
-    axis.text.y = element_text(size = 8),
+    axis.text.y = element_text(size = 6.5),
     axis.title.y = element_blank(),
     legend.text = element_text(size = 8),
     legend.title = element_text(size = 8)
