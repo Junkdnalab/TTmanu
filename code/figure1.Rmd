@@ -21,7 +21,8 @@ fig1 <- ggplot(data = cancer_disrupt_heatmap, aes(x=sample_id, y=path_name, fill
         legend.margin=margin(0,0,0,0),
         legend.box.margin=margin(-10,-10,0,-10),
         plot.margin = unit(c(0.6, 0, 0, 0), "cm"),
-        panel.background = element_rect(fill = "transparent")) 
+        panel.background = element_rect(fill = "transparent"),
+        panel.spacing = unit(0.15, "lines")) 
 
 ## fixing the text cutoff in heatmap
  fig1 <- ggplotGrob(fig1)
