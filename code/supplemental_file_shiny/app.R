@@ -79,7 +79,7 @@ ui <- (fluidPage(
                                          choices = tisnames, selected = "BRCA", #multiple = TRUE,
                                          options = list(`actions-box` = TRUE)),
                              pickerInput("sim.cluster", label = "Cluster:", ## Cluster
-                                         choices = 1:10, selected = "1", #multiple = TRUE,
+                                         choices = c(as.character(1:10), "All"), selected = "All", #multiple = TRUE,
                                          options = list(`actions-box` = TRUE)),
                              pickerInput("sim.sex", label = "Sex:", ## Sex
                                          choices = c("MALE", "FEMALE"), selected = "FEMALE"),
@@ -323,7 +323,7 @@ server <- (function(input, output, session) {
         ## Reactive options
         sim.cancertype.selection <- as.character(input$sim.cancertype)
         #sim.cancertype.selection <- c("BRCA")
-        #sim.cluster.selection <- input$sim.cancertype
+        sim.cluster.selection <- input$sim.cluster
         sim.sex.selection <- input$sim.sex
         #sim.sex.selection <- "FEMALE"
         sim.ethnic.selection <- input$sim.ethnic
@@ -367,8 +367,14 @@ server <- (function(input, output, session) {
         load("dfclas.rmd")
         load("~/TTmanu/code/supplemental_file_shiny/dfclas.rmd")
         ## Getting the kclass mean for specified cluster
+        if(sim.cluster.selection == "All") {
         kcl <- dfclas[which(dfclas$tissnames %in% sim.cancertype.selection),]
         kmean.cl <- mean(kcl$value)
+        } else{
+            kcl <- dfclas[which(dfclas$tissnames %in% sim.cancertype.selection &
+                                dfclas$class %in% sim.cluster.selection),]
+            kmean.cl <- mean(kcl$value)
+        }
         
         ## Getting kmean value ##
         kmean <- kmean.tis * kmean.cl
