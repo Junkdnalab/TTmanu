@@ -15,7 +15,8 @@ suppressPackageStartupMessages(c(
     library(htmltools),
     library(car),
     library(grid),
-    library(gridBase)
+    library(gridBase),
+    library(ggkm)
 ))
 
 ## Load data
@@ -72,7 +73,26 @@ ui <- (fluidPage(
                              pickerInput("cancer_type_pathway", label = "Cancer type:", ## Cancer type
                                          choices = cancer_type, selected = cancer_type, multiple = TRUE,
                                          options = list(`actions-box` = TRUE)),
-                             plotOutput("pathway")))
+                             plotOutput("pathway")),
+                    tabPanel(title = "Survival",
+                             pickerInput("sim.cancertype", label = "Cancer type:", ## Cancer type
+                                         choices = tisnames, selected = "BRCA", #multiple = TRUE,
+                                         options = list(`actions-box` = TRUE)),
+                             pickerInput("sim.cluster", label = "Cluster:", ## Cluster
+                                         choices = 1:10, selected = "1", #multiple = TRUE,
+                                         options = list(`actions-box` = TRUE)),
+                             pickerInput("sim.sex", label = "Sex:", ## Sex
+                                         choices = c("MALE", "FEMALE"), selected = "FEMALE"),
+                             pickerInput("sim.ethnic", label = "Ethnicity:", ## Ethnicity
+                                         choices = c("WHITE", "BLACK OR AFRICAN AMERICAN"), selected = "WHITE"),
+                             sliderInput("sim.range", "Age range:", ## Age range
+                                         min = 1, max = 100,
+                                         value = c(30,70)),
+                             sliderInput("sim.population", label = "Population Size:", ## Population size
+                                         min = 5, max = 500,
+                                         value = 100),
+                             plotOutput("survival"))
+                    )
         )
     )
 )
@@ -243,6 +263,194 @@ server <- (function(input, output, session) {
                        xlab = "UMAP 2", ylab = "UMAP 3", zlab = "UMAP 1",
                        colvar = NULL))
     })
+    
+    ## Survival plot code
+    output$survival <- renderPlot({
+        
+        ## Survival plot code
+        set.seed(20200805) #a date based seed for reproducibility
+        ## these are scaled in the stan file, so we need to scale here as well
+        r20scale <- 1e-5
+        ageratescale <- .05
+
+        r20 <- c(0.365209, 0.367732, 0.093299, 0.098039) * r20scale
+        names(r20) <- c("WF", "WM", "BF", "BM")
+
+        agerate <- c(1.197896, 1.291932, 1.649803, 1.734934) * ageratescale
+        names(agerate) <- c("WF", "WM", "BF", "BM")
+
+        ## Model ##
+        lccdf = function(r20,agerate,age,k,t){
+            return(-r20*((365*exp((agerate*k*t)/365+age*agerate-20*agerate))/(agerate*k)
+                         -(365*exp(age*agerate-20*agerate))/(agerate*k)));
+        }
+
+
+        simdeath = function(r20,agerate,age,k){
+            r = runif(1)
+            lr = log(r)
+            tdays = uniroot(function(t) return(lccdf(r20,agerate,age,k,t)-lr),c(0,365*400))
+            return(tdays$root) ## years since diagnosis at "age"
+        }
+
+        cancerdat <- read_csv("clinical_plus_cluster.csv")
+        #cancerdat <- read_csv("~/TTmanu/code/supplemental_file_shiny/clinical_plus_cluster.csv")
+        cancerdat$type <- as.factor(cancerdat$type) ## the tissue
+        tisnames <- levels(cancerdat$type)
+        ## Getting vital status and final time after diagnosis
+        endpoints <- sqldf("select case when death_days_to is NULL then last_contact_days_to else death_days_to end as finaltime, case when death_days_to is NULL then 0 else 1 end as finalstatus from cancerdat;")
+
+        cancerdat <- cbind(cancerdat,endpoints)
+        ## Are there any NA's in finaltime column?
+        sum(is.na(cancerdat$finaltime))
+        ## Remove data with NA's in finaltime column
+        cancerdat <- cancerdat[!is.na(cancerdat$finaltime),]
+
+        #load("../code/survival/survmodel-ethbkd.stansave") ## loads a variable called "sampseth" which is a stanfit
+        load("survmodel-ethbkd.stansave")
+        asampseth <- as.array(sampseth)
+        dfsamps = as.data.frame(sampseth)
+        
+        ## Data for kmeans tissue
+        tissue.kvalues <- dfsamps[,235:257] ## 
+        names(tissue.kvalues) <- tisnames
+        #names(tissue.kvalues) <- gsub(pattern = ".*\\[", replacement = "", x = names(tissue.kvalues)) ## removing brackets from colnames because shiny doesn't like
+        #names(tissue.kvalues) <- gsub(pattern = "\\].*", replacement = "", x = names(tissue.kvalues))
+        
+
+        ## Reactive options
+        sim.cancertype.selection <- as.character(input$sim.cancertype)
+        #sim.cancertype.selection <- c("BRCA")
+        #sim.cluster.selection <- input$sim.cancertype
+        sim.sex.selection <- input$sim.sex
+        #sim.sex.selection <- "FEMALE"
+        sim.ethnic.selection <- input$sim.ethnic
+        #sim.ethnic.selection <- "WHITE"
+
+        agemodel <- paste0(substring(text = sim.ethnic.selection, first = 1, last = 1),
+                           substring(text = sim.sex.selection, first = 1, last = 1))
+        #################
+        ## Actual data ##
+        #################
+        ## Which level is the specific cancer type
+        cancerdat.filtered <- cancerdat[cancerdat$type == sim.cancertype.selection & ## filter by cancer type
+                                        cancerdat$gender == sim.sex.selection,] ## filter by sex
+        ages <- cancerdat.filtered$age_at_initial_pathologic_diagnosis
+        
+        ####################
+        ## Simulated data ##
+        ####################
+        ## Getting the ktissue mean for specified cancer
+        kmean.tis <- tissue.kvalues[, names(tissue.kvalues) == sim.cancertype.selection]
+        kmean.tis <- mean(kmean.tis)
+        # ## Getting the kclass means for specified cancer
+        # kclnames <- grep("k\\[",names(dfsamps), value=TRUE)
+        # dfclas <- dfsamps[,kclnames]
+        # dfclas <- stack(dfclas)
+        # names(dfclas) <- c("value","coefname")
+        # ## Separate coefname to only include class
+        # dfclas$class <- gsub(pattern = ".*,", replacement = "", x = dfclas$coefname) 
+        # dfclas$class <- gsub(pattern = "\\].*", replacement = "", x = dfclas$class)
+        # ## Separate coefname to only include tissue
+        # dfclas$tiss <- gsub(pattern = ",.*", replacement = "", x = dfclas$coefname) 
+        # dfclas$tiss <- gsub(pattern = ".*\\[", replacement = "", x = dfclas$tiss) 
+        # 
+        # convert.tiss2names <- data.frame(tiss = as.character(1:23),
+        #                                  tissnames = tisnames)
+        # 
+        # dfclas <- dfclas %>% left_join(., convert.tiss2names, by = "tiss") %>% ## leftjoin data
+        #     dplyr::select(-tiss) ## Remove tissue number system
+        # rm(convert.tiss2names)
+        # save(dfclas, file = "~/TTmanu/code/supplemental_file_shiny/dfclas.rmd")
+        load("dfclas.rmd")
+        load("~/TTmanu/code/supplemental_file_shiny/dfclas.rmd")
+        ## Getting the kclass mean for specified cluster
+        kcl <- dfclas[which(dfclas$tissnames %in% sim.cancertype.selection),]
+        kmean.cl <- mean(kcl$value)
+        
+        ## Getting kmean value ##
+        kmean <- kmean.tis * kmean.cl
+        
+        ## Getting age info
+        mixedages = runif(input$sim.population,input$sim.range[1],input$sim.range[2])
+        
+        survyrs.cancer <- sapply(mixedages,function(a) tryCatch(simdeath(r20[agemodel],agerate[agemodel],a,kmean)/365,error= function(e) {0}))
+        survyrs.ref <-  sapply(mixedages,function(a) tryCatch(simdeath(r20[agemodel],agerate[agemodel],a,1)/365,error= function(e) {0}))
+        
+        # df <- data.frame(stime = survyrs.cancer,
+        #            rtime = survyrs.ref,
+        #            acttime = cancerdat.filtered$finaltime / 365,
+        #            status = rep(1, length(cancerdat.filtered$finaltime / 365)),
+        #            actstatus = cancerdat.filtered$finalstatus)
+        
+        ##Simulated data
+        df <- data.frame(stime = survyrs.cancer,
+                         rtime = survyrs.ref,
+                         status = rep(1, length(survyrs.cancer)))
+        
+        df <- df %>% pivot_longer(-c(status),
+                                  values_to = "time",
+                                  names_to = "condition"
+        )
+        
+        # df <- df %>% mutate(status = case_when(condition != "acttime" ~ as.integer(status),
+        #                                        condition == "acttime" ~ as.integer(actstatus)))
+        
+        ggplot(df, aes(time = time, color = condition, status = status)) +
+            geom_km() +
+            theme_classic() +
+            theme(legend.position = c(.8, .75))
+        
+        # plotkmcomp = function(sim,ref,act,actstatus){
+        #     data.frame(
+        #         stime = sim,
+        #         rtime = ref,
+        #         acttime = act,
+        #         status = rep(1, length(ref)),
+        #         actstatus = actstatus
+        #     ) %>%
+        #         pivot_longer(-c(status, actstatus),
+        #                      values_to = "time",
+        #                      names_to = "condition"
+        #         ) %>%
+        #         mutate(status = case_when(condition != "acttime" ~ as.integer(status),
+        #                                   condition == "acttime" ~ as.integer(actstatus))) %>%
+        #         ggplot(aes(time = time, color = condition, status = status)) +
+        #         geom_km() +
+        #         theme_classic() +
+        #         theme(legend.position = c(.8, .75))
+        # }
+        # 
+        # 
+        # tryCatch(plotkmcomp(survyrs.cancer, survyrs.ref, cancerdat.filtered$finaltime / 365, cancerdat.filtered$finalstatus) +
+        #                    coord_cartesian(xlim = c(0, 80)) +
+        #                    labs(
+        #                        x = "Survival Time (years past diagnosis)",
+        #                        y = "Probability",
+        #                        title = sprintf("Survival for %s simulated white female patients", sim.cancertype.selection),
+        #                        subtitle = sprintf("Simulated Patient Population; k = %.1f", kmean)
+        #                    ) +
+        #                    scale_color_manual(
+        #                        values = c(
+        #                            rtime = "#66c2a5",
+        #                            stime = "#8da0cb",
+        #                            acttime = "#fc8d62"
+        #                        ),
+        #                        breaks = c("rtime", "stime", "acttime"),
+        #                        labels = c(
+        #                            "Simulated General Population; k = 1",
+        #                            "Simulated Patient Population",
+        #                            "Actual Patient Population"
+        #                        )
+        #                    ),
+        #                error = function(e) {
+        #                    print(e)
+        #                    ggplot()
+        #                }
+        # )
+
+    })
+    
     
 })   
 shinyApp(ui = ui, server = server)
