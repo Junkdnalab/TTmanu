@@ -91,6 +91,8 @@ ui <- (fluidPage(
                              sliderInput("sim.population", label = "Population Size:", ## Population size
                                          min = 5, max = 500,
                                          value = 100),
+                             checkboxInput("show.sim.k.eq.1", label = "Show Control",
+                                           value = FALSE),
                              plotOutput("survival"))
                     )
         )
@@ -393,13 +395,43 @@ server <- (function(input, output, session) {
                                   names_to = "condition"
         )
         
+        if(input$show.sim.k.eq.1 == FALSE) {
+            df1 <- df[!df$condition %in% "rtime",]
+        } else {
+            df1 <- df
+        }
         # df <- df %>% mutate(status = case_when(condition != "acttime" ~ as.integer(status),
         #                                        condition == "acttime" ~ as.integer(actstatus)))
         
-        ggplot(df, aes(time = time, color = condition, status = status)) +
+        load("ditto.colours.rda")
+        
+        rtime.colour <- ditto_colours[2]
+        stime.colour <- ditto_colours[3]
+        
+        km.colours <- c(rtime.colour, stime.colour)
+        names(km.colours) <- c("rtime", "stime")
+        
+        ggplot(df1, aes(time = time, color = condition, status = status)) +
             geom_km() +
             theme_classic() +
-            theme(legend.position = c(.8, .75))
+            theme(legend.position = c(.8, .75)) +
+            coord_cartesian(xlim = c(0,80)) +
+            scale_color_manual(values = km.colours) +
+            labs(x = "Survival Time (years past diagnosis)",
+                 y = "Probabilty",
+                 colour = "",
+                 title = sprintf("Survival for %s simulated %s %s patients", sim.cancertype.selection, tolower(sim.ethnic.selection), tolower(sim.sex.selection)),
+                 subtitle = sprintf("Simulated Patient Population; k = %.1f", kmean)) +
+            theme(axis.text = element_text(size = 12),
+                  axis.title = element_text(size = 14))
+        
+        
+  #      labs(
+            #                        x = "Survival Time (years past diagnosis)",
+            #                        y = "Probability",
+            #                        title = sprintf("Survival for %s simulated white female patients", sim.cancertype.selection),
+            #                        subtitle = sprintf("Simulated Patient Population; k = %.1f", kmean)
+            #                    )
         
         # plotkmcomp = function(sim,ref,act,actstatus){
         #     data.frame(
