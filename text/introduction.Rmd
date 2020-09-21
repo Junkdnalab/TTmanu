@@ -40,7 +40,7 @@ More recently, pan-cancer mutations and other data have been looked at as
 disruptions of normal pathway activity. @PCAWG-PATH carried out exhaustive
 analysis of pathway enrichment using whole genome data. Network approaches
 address the sparseness of mutations, allowing genes to be influenced by
-mutations in nearest network neighbors [@hornNetSigNetworkbasedDiscovery2018;
+mutations in nearest network neighbors [@hotnet2;@hornNetSigNetworkbasedDiscovery2018;
 @Iranzo-Network]. These methods are powerful especially when applied to smaller
 numbers of tumors. One of the challenges in the field remains that there may be
 thousands of moderate effect genes that occur at such low frequency--given
