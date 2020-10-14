@@ -1,6 +1,6 @@
-Recent advances in technology have greatly expanded our view into the mechanisms
+Advances in technology have greatly expanded our view into the mechanisms
 of cancer at the systems biology level. Next-generation sequencing technologies
-have made it possible to assay germline and somatic mutations, expression
+have made it possible to study germline and somatic mutations, expression
 profiles, DNA methylation, and copy number variations from the same tissue. To
 take advantage of these tools, several large consortia, including the cancer
 genome atlas (TCGA) and pan-cancer analysis of whole genomes (PCAWG) sequenced
@@ -43,12 +43,11 @@ address the sparseness of mutations, allowing genes to be influenced by
 mutations in nearest network neighbors [@hotnet2;@hornNetSigNetworkbasedDiscovery2018;
 @Iranzo-Network]. These methods are powerful especially when applied to smaller
 numbers of tumors. One of the challenges in the field remains that there may be
-thousands of moderate effect genes that occur at such low frequency--given
-tissue diversity and low sample number--that they are impossible to detect using
-positive selection theory. Some groups have attempted to address this challenge
-by applying machine learning to cancer data to discover groups of
-functionally related genes as they interact with larger pathways and networks
-[@kimPancancerAnalysisSomatic2018;
+thousands of moderate effect genes that occur at such low frequency that they
+are impossible to detect using positive selection theory. Some researchers have
+attempted to address this challenge by applying machine learning to cancer data
+to discover groups of functionally related genes as they interact with larger
+pathways and networks [@kimPancancerAnalysisSomatic2018;
 @mourikis-ml-pathways; @moonlight]. These studies have proven very effective at
 highlighting fundamental disease phenotypes at the pathway level across cancers
 with different origins at the cellular and tissue level.
