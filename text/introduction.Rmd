@@ -4,7 +4,7 @@ have made it possible to study germline and somatic mutations, expression
 profiles, DNA methylation, and copy number variations from the same tissue. To
 take advantage of these tools, several large consortia, including the cancer
 genome atlas (TCGA) and pan-cancer analysis of whole genomes (PCAWG) sequenced
-large numbers of tumors multiple assays to analyze together, with the goal of
+large numbers of tumors and collected data from multiple assays to analyze together, with the goal of
 integration and increased understanding of the mechanisms of cancer.
 
 Considerable progress has been made analyzing these data. Statistical analyses
@@ -24,7 +24,7 @@ Other studies provide a comprehensive view of mutations, gene expression and
 genomic signatures, with the goal of understanding common themes of all cancer
 independent of tissue of origin. Understanding cancer as a disease of the cell
 has long been a goal of the field as characterized in essays by
-@weinberg2000; @hallmarks_II. The first of these studies in genomics identified
+[@weinberg2000; @hallmarks_II]. The first of these studies in genomics identified
 11 subtypes from 12 cancer types, using integrative analysis with co-equal
 weighting of gene expression, methylation, copy number and proteomics data
 [@hoadleyMultiplatformAnalysis2014]. The principal finding was that
@@ -37,7 +37,7 @@ pan-gynecological/squamous and pan-kidney
 [@hoadleyCellofOriginPatternsDominate2018].
 
 More recently, pan-cancer mutations and other data have been looked at as
-disruptions of normal pathway activity. @PCAWG-PATH carried out exhaustive
+disruptions of normal pathway activity. Sanchez-Vega et al. [@PCAWG-PATH] carried out exhaustive
 analysis of pathway enrichment using whole genome data. Network approaches
 address the sparseness of mutations, allowing genes to be influenced by
 mutations in nearest network neighbors [@hotnet2;@hornNetSigNetworkbasedDiscovery2018;

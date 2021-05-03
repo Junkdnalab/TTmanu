@@ -1,10 +1,10 @@
 ---
 title: "Supplementary methods"
-author: "Peter T. Nguyen, Simon G. Coetzee, Daniel L. Lakeland, and Dennis J. Hazelett"
 bibliography: references.bib
+csl: plos-computational-biology.csl
 output:
   word_document:
-    reference_docx: "../text/word-style-reference-ttmanu.docx"
+    reference_docx: "../text/word-style-reference-ttmanu-iscb-iscience-v2.docx"
 always_allow_html: TRUE
 editor_options:
   chunk_output_type: console
@@ -53,21 +53,19 @@ library(ggalluvial)
 ```
 
 
-## Supplementary Methods
-
 ### Clustering
 
 In order to classify tumors using this dataset, we used multiple correspondence
 analysis (MCA) [@JSSv025i01]. First, we determined the number of dimensions
 containing useful information by selecting the eigenvalue with the most
 explanatory power, using the average of 100 permutations of the data as baseline
-(**figure SM1A**). We then chose the maximum eigenvalue for which the p-value
-remained ≤ 0.05 (see cutoff in **figure SM1B**). Then we performed a UMAP
+(**SM1A Fig**). We then chose the maximum eigenvalue for which the p-value
+remained ≤ 0.05 (see cutoff in **SM1B Fig**). Then we performed a UMAP
 analysis [@McInnes2018], both in order to summarize the MCA graphically, and as
 a preprocessing step to boost the performance of density based clustering. The
 resulting map was notable for its lobed structure, with several reproducible
 projections regardless of random seed setting. A representative version of this
-3D UMAP is shown in **figure SM1C**, rotated to enhance the visibility of the
+3D UMAP is shown in **SM1C Fig**, rotated to enhance the visibility of the
 major features. Following this spatial mapping we attempted to define groupings
 of similar tumors within the spatial map using HDBSCAN, which performs
 hierarchical clustering and provides metrics of cluster stability and
@@ -77,8 +75,8 @@ of tumor samples in a cluster that capture the maximum number of tumor samples,
 measured by probability of membership of ≥ 5% in at least one cluster. Thus, we
 created a score metric as the fraction of classified tumors with max probability
 < 5% in one cluster and chose a cluster size of 92 to minimize the score
-function (**figure SM1D**). HDBSCAN with these settings resulted in ten distinct
-high-density clusters which we then projected onto the UMAP (**figure SM1E**).
+function (**SM1D Fig**). HDBSCAN with these settings resulted in ten distinct
+high-density clusters which we then projected onto the UMAP (**SM1E Fig**).
 This classified 6,038 out of 7,607 tumors but still resulted in a significant
 fraction of unclassified tumor samples. Since we ultimately wish to be able to
 classify any tumor using this scheme, we performed k Nearest Neighbors (kNN)
@@ -86,33 +84,7 @@ analysis, which computes a similarity metric to every tumor in the set and then
 lets the _k_ most similar tumors "vote" as to the identity of the query tumor
 sample based on their cluster labels. We set _k_ to be the square root of the
 number of tumor samples (87). Using this method, we assigned cluster membership
-to the remaining tumors (**figure SM1F** and see interactive media from **supplemental file
-1** (junkdnalab.shinyapps.io/PANCAN_supplemental/)).
-
-```{r, results='asis'}
-cat("\\newpage")
-```
-
-#### Figure SM1
-```{r child='../code/figureSM1.Rmd'}
-```
-
-**Figure SM1: Method for tumor classification using pathway aberration data** 
-A) MCA analysis was performed to determine the eigenvalue with the most
-explanatory power from the categorical data. Average of 100 permutations of the
-data was used as a baseline. B) The p-value of each eigenvalue was plotted and
-the max eigenvalue with a pvalue < 0.05 was selected. C) The resulting MCA was
-projected down to 3 dimensions for the purpose of density based clustering (only
-the first 2 dimensions are shown). Each dot represents a tumor D) HDBSCAN was
-used to perform hierarchical density based clustering tuned to minimize the
-fraction of unassigned tumors. E) HDBSCAN clustered tumors were visualized on
-the UMAP projection; tumors are colored by cluster membership (see legend). This
-results in some tumors remaining unclassified (grey points). F) kNN was used to
-assign membership to the remaining tumors.
-
-```{r, results='asis'}
-cat("\\newpage")
-```
+to the remaining tumors (**SM1F Fig** and see interactive media from **S1 File** (junkdnalab.shinyapps.io/PANCAN_supplemental/)).
 
 ### Selection of pathways
 
@@ -122,7 +94,7 @@ mapping files of ENSEMBL genes to pathways, pathway hierarchy relationships, and
 complexes to top pathways were downloaded from
 https://reactome.org/download-data. Using these data, we imposed pathway
 criteria to define basic cellular processes and biochemical pathways: (1)
-human-derived pathways (\it{“HSA”}) (2) limited to grandchild node for each
+human-derived pathways ( _“HSA"_ ) (2) limited to grandchild node for each
 parent pathway (_e.g._ ‘Beta-catenin independent WNT signaling’ in ‘Signal
 Transduction’) (3) exclusion of pathways in the parent pathway: "Disease",
 "Muscle contraction", and "Reproduction" or pathway names that include any of
@@ -140,8 +112,8 @@ genes.
 
 We filtered likely erroneous mutations due to transcription coupled repair. Our
 approach was to determine the status of each gene (_i.e._ expressed or not
-expressed) in each tissue type in order to exclude gene mutations low expressed
-enes. To do this, we obtained the TCGA RNA sequencing data adjusted for batch
+expressed) in each tissue type in order to exclude lowly expressed
+genes. To do this, we obtained the TCGA RNA sequencing data adjusted for batch
 effect dataset (https://pancanatlas.xenahubs.net). Using the data, we removed
 the genes and tumor samples that were not included in our analysis, grouped the
 tumor samples by tissue type and computed the mean expression value for each
@@ -194,21 +166,7 @@ $D(t) = 0$, after $D(t) = 1$). The model assumes that the risk of death is
 $R_{20}$ at age 20 years and increases exponentially with a constant rate $a$ up
 to the age at diagnosis. Risk of death assumes a new rate $ka$ thereafter.
 Though the model extends to earlier ages, relatively few patients were under age
-20 (**supplementary figure SM2**).
-
-
-#### Figure SM2
-
-```{r child='../code/figureSM2.Rmd'}
-```
-
-**Supplementary Figure SM2** Comparison between CDC data and ODE model fit for
-males and females of European descent. This comparison does not distinguish on
-ethnicity for simplicity in visualization.
-
-```{r, results='asis'}
-cat("\\newpage")
-```
+20 (**SM2 Fig**).
 
 Given this risk per unit time, the probability of death at time $T+dT$ is the
 probability to survive to time $T$ which is $(1-P(T))$ and then die in the
@@ -241,46 +199,7 @@ probability at 1 and a relatively narrow width, due to the fact that it is a
 tissue specific multiplicative modifying factor. This allows the overall
 magnitude of $k$ to be primarily determined by the $k_{tis}$ value whose prior
 is significantly less constrained so that there is a wider range of risk across
-tissue types (**supplementary figure SM3**).
-
-```{r, results='asis'}
-cat("\\newpage")
-```
-
-#### Figure SM3
-
-```{r sm3, fig.height=3, fig.width=3}
-ggplot(data.frame(x=0:30),aes(x)) + 
-  stat_function(fun=function(x) dgamma(x,1.2,.2),geom="area", aes(fill = "ktis"))+ 
-  stat_function(fun=function(x) dgamma(x,3.5,2.5),geom="area", aes(fill = "kcl"))+ 
-  labs(title=expression(paste("Prior for k"["tis"], "and k"["cl"])),x= "k value", y = "Probability Density") +
-  theme_classic() + scale_x_continuous(limits = c(0, 20), breaks = c(seq(0,20, by =5))) +
-  scale_y_continuous(limits = c(0,0.75), breaks = c(seq(0,0.75, by = 0.25))) +
-  scale_fill_manual(values = c(alpha("#E69F00", 0.5),alpha("#0072B2", 0.5)),
-                    labels = c(expression(paste("k"["cl"])), expression(paste("k"["tis"])))) +
-  theme(plot.title = element_text(size = 12, hjust = 0.5),
-        panel.grid.major = element_line(size = 0.75),
-        panel.grid.minor = element_line(),
-        legend.position = c(0.8, 0.8),
-        legend.spacing.y = unit(0, "mm"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 8),
-        legend.key.size = unit(0.75,"line"),
-        legend.background = element_blank(),
-        legend.box.background = element_rect(colour = "black"))
-```
-
-**Supplementary Figure SM3: Priors for the tissue and class coefficients.** The tissue coefficient
-is chosen to admit parameter values across a range from near 0 to 20+
-in the high density region, reflecting the wide variety of severities
-across tissue type. Within a given tissue, the class k parameter
-multiplies the tissue k and is given a peak density at 1, and a
-credible range from near 0 to 5, reflecting our expectation of a
-moderate amount of variation across the classes.
-
-```{r, results='asis'}
-cat("\\newpage")
-```
+tissue types (**SM3 Fig**).
 
 The $k$ in our model can be taken as, roughly, the aging rate relative to the
 baseline rates. Thus, a value of $k=2$ means that a given cancer causes you to
@@ -309,4 +228,79 @@ between stage and advancement of disease is (for example some sub-stage 4 tumors
 are metastatic). To compound this latter issue, our tumor set is vastly
 under-powered given the uneven representation of stage across cancer types.
 
+```{r, results='asis'}
+cat("\\newpage")
+```
+
 ### References
+
+<div id="refs"></div>
+
+```{r, results='asis'}
+cat("\\newpage")
+```
+
+#### Fig SM1
+```{r child='../code/figureSM1.Rmd'}
+```
+
+**Fig SM1. Method for tumor classification using pathway aberration data** 
+A) MCA analysis was performed to determine the eigenvalue with the most
+explanatory power from the categorical data. Average of 100 permutations of the
+data was used as a baseline. B) The p-value of each eigenvalue was plotted and
+the max eigenvalue with a pvalue < 0.05 was selected. C) The resulting MCA was
+projected down to 3 dimensions for the purpose of density based clustering (only
+the first 2 dimensions are shown). Each dot represents a tumor D) HDBSCAN was
+used to perform hierarchical density based clustering tuned to minimize the
+fraction of unassigned tumors. E) HDBSCAN clustered tumors were visualized on
+the UMAP projection; tumors are colored by cluster membership (see legend). This
+results in some tumors remaining unclassified (grey points). F) kNN was used to
+assign membership to the remaining tumors.
+
+```{r, results='asis'}
+cat("\\newpage")
+```
+
+#### Fig SM2
+
+```{r child='../code/figureSM2.Rmd'}
+```
+
+**Fig SM2. Comparison between CDC data and ODE model fit for
+males and females of European descent.** This comparison does not distinguish on
+ethnicity for simplicity in visualization.
+
+```{r, results='asis'}
+cat("\\newpage")
+```
+
+#### Fig SM3
+
+```{r sm3, fig.height=3, fig.width=3}
+ggplot(data.frame(x=0:30),aes(x)) + 
+  stat_function(fun=function(x) dgamma(x,1.2,.2),geom="area", aes(fill = "ktis"))+ 
+  stat_function(fun=function(x) dgamma(x,3.5,2.5),geom="area", aes(fill = "kcl"))+ 
+  labs(title=expression(paste("Prior for k"["tis"], "and k"["cl"])),x= "k value", y = "Probability Density") +
+  theme_classic() + scale_x_continuous(limits = c(0, 20), breaks = c(seq(0,20, by =5))) +
+  scale_y_continuous(limits = c(0,0.75), breaks = c(seq(0,0.75, by = 0.25))) +
+  scale_fill_manual(values = c(alpha("#E69F00", 0.5),alpha("#0072B2", 0.5)),
+                    labels = c(expression(paste("k"["cl"])), expression(paste("k"["tis"])))) +
+  theme(plot.title = element_text(size = 12, hjust = 0.5),
+        panel.grid.major = element_line(size = 0.75),
+        panel.grid.minor = element_line(),
+        legend.position = c(0.8, 0.8),
+        legend.spacing.y = unit(0, "mm"),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 8),
+        legend.key.size = unit(0.75,"line"),
+        legend.background = element_blank(),
+        legend.box.background = element_rect(colour = "black"))
+```
+
+**Fig SM3. Priors for the tissue and class coefficients.** The tissue coefficient
+is chosen to admit parameter values across a range from near 0 to 20+
+in the high density region, reflecting the wide variety of severities
+across tissue type. Within a given tissue, the class k parameter
+multiplies the tissue k and is given a peak density at 1, and a
+credible range from near 0 to 5, reflecting our expectation of a
+moderate amount of variation across the classes.

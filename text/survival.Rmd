@@ -3,11 +3,11 @@ may have different prognoses within cancer types or across all cancers. These
 analyses are limited by confounding factors of age, stage at diagnosis, sex,
 ethnicity, and tissue-specific disease progression. To explore these ideas, we
 used Bayesian inference to test models of survival using public longevity data
-from the CDC. The estimates the effect of cancer type and cluster-specific
+from the CDC. The model estimates the effect of cancer type and cluster-specific
 cancer effects independently, resulting in a cancer and cluster-specific
 estimate of the aging rate multiplier, $k$.
 
-To illustrate the model, we simulate survival four related groups (**figure
+To illustrate the model, we simulate survival for four related groups (**Fig
 5A**). We start with a cohort of women aged 30 and show expected survival (light
 blue). By setting cancer rate multiplier to $k=2$ we simulate the effect of a
 moderately deadly cancer (yellow). Compare this to randomly selected women
@@ -18,34 +18,8 @@ age-at-diagnosis, we expect equally deadly cancers to have *different* survival
 curves. The model takes this into account and cancer aggressiveness is estimated
 accurately without the confounding effect of age.
 
-```{r, results='asis'}
-cat("\\newpage")
-```
-
-#### Figure 5
-```{r child='../code/survival/figure5.Rmd'}
-```
-
-**Figure 5: Comparison of different cancers, simulated and actual results.**
-Comparison of survival in four simulated cohorts. A) A group consisting of
-randomly selected 30 year old women, unaffected (light blue) _vs._ cancer, 
-($k = 2$, light orange), another group consisting of random 30-70 year-old
-women, unaffecteds (dark blue) and cancer $k = 2$ (dark orange). B,C,D,E)
-Compare random group with correct age distribution for the given cancer
-(turqoise) to the model predicted survival for the given average k (blue) and
-the actual survival for the patients in our dataset (orange). Differences with
-actual data are likely due to a mixture of cluster identities which we exclude
-from these simulations for simplicity. F) Effects are compared between cancer
-type by showing the probability density for the posterior value of the $k_{tis}$
-multiplier. Larger values correspond to decreased age-independent life
-expectancy.
-
-```{r, results='asis'}
-cat("\\newpage")
-```
-
 We found that cancer types, as expected, have a range of prognoses relative to
-the general population. In **figure 5B-E** we see three particularly deadly
+the general population. In **Fig 5B-E** we see three particularly deadly
 cancers (Stomach:STAD, Glioblastoma:GBM, and Pancreatic:PAAD), and one cancer
 where diagnosis decreases risk relative to background (Thyroid: THCA). Cancers
 with posterior probability for relative risk of less than 1 such as THCA should
@@ -63,7 +37,7 @@ the expectation of life of the individual relative to the counterfactual where
 they did not have cancer.
 
 The degree to which cancer accelerates aging can be determined by the $k_{tis}$
-multiplier (**figure 5F**) multiplied by the cluster modifier $k_{cl}$ (**figure
+multiplier (**Fig 5F**) multiplied by the cluster modifier $k_{cl}$ (**Fig
 6**). Looking at the tissue specific multiplier, the least deadly was prostate
 cancer (PRAD), and the most deadly was glioblastoma (GBM) which has a risk
 multiplier of between 15 and 22 relative to the background risk of death in the
@@ -74,36 +48,15 @@ pancreatic (PAAD) cancers. Apart from these top 4 cancers which ranged from 6-22
 in relative risk of age-adjusted death, the remaining cancer types ranged from
 about 1 to 5 in magnitude.
 
-```{r, results='asis'}
-cat("\\newpage")
-```
-
-#### Figure 6
-
-```{r child='../code/figure6.Rmd'}
-```
-
-**Figure 6 Cluster specific $k_{cl}$ values for each cancer type.** The overall
-$k$ value is the product of $k_{tis} \times k_{cl}$. The cluster-specific $k$
-represents relative aggressiveness of each cluster within cancer type. Alpha
-transparency (α) is set to reflect varying confidence in the posterior
-distribution when the number of observations is N<10, α = 0.1; N<25, α = 0.5; N
-≥ 25 α = 1.0.
-
-
-```{r, results='asis'}
-cat("\\newpage")
-```
-
 Our estimates of tissue-specific cluster effects, in contrast, ranged from less
 than 1 up to about 3 or 4, reflecting that some clusters are either less deadly
-or more deadly than other clusters within each cancer type (**figure 6**). A
+or more deadly than other clusters within each cancer type (**Fig 6**). A
 cluster-specific rate of 1 represents the typical rate for this tissue type. For
 several cancers (_e.g._ PRAD, kidney chromophobe (KICH), diffuse large B-cell
 lymphoma (DBLC), thyroid cancer (THCA)) the posterior estimates are largely
 indistinguishable from the prior, reflecting that either there were too few
 mortalities in the data to make an estimate (as expected for PRAD and THCA) or
-two few samples, period. We did not observe cluster-specific trends that held
+too few samples, period. We did not observe cluster-specific trends that held
 true across cancer types, which could result from different cancers having
 different standards of care for example. In support of this interpretation, we
 also tested a factored model which considered both cancer type cluster

@@ -90,27 +90,6 @@ explained by less common genes complementing the unique combination of driver
 genes in each tumor, and we speculate that many of these less common genes are
 sensitive to increased mutation frequency in different tissues.
 
-### Incompleteness of the pathway disruption data 
-
-Finally, we must remark on the limitations of our work exemplified in 
-clusters 1 and 10, for which we did not find many distinctive associations with
-pathways. Cluster 1 had a relatively low proportion of mutated pathways,
-although it is broadly enriched in many of the same tumor-promoting pathways
-common to other clusters. In addition, our data show clearly that this cluster
-is as likely to contain stage IV metastatic tumors as it is to contain those of
-stage I. This cluster likely represents a group of tumors with aberrations in
-methylation, copy number, or other structural variants. Consistent with this,
-kidney chromophobe and thyroid cancers have high proportions of structural
-variations _vs._ other variant types [@PCAWG-MAIN] and are heavily skewed to
-cluster 1 membership. Likewise, cluster 10 represents a group of hyper-mutated
-tumors that harbor so many mutations that virtually no pathway is unaffected. It
-seems likely that a significant fraction of the “mutant” samples for each
-pathway are burdened with excess passenger mutations. This could be addressed
-with more sophisticated filtering of likely passenger mutations [_e.g._
-@spliceAI; @deep-learning-clinical-variants]. In the future, we hope to
-incorporate these other data into a comprehensive pathway-centric analysis as we
-have done here for point mutations and indels.
-
 ### Estimates of survival reveal pathway-dependent differences 
 
 By modeling CDC longevity data as a baseline risk function we showed that each

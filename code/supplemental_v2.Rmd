@@ -1,9 +1,8 @@
 ---
+title: "Supplementary figures"
 output:
-  bookdown::pdf_book:
-    number_sections: FALSE
-    toc: FALSE
-    keep_tex: yes
+  word_document:
+    reference_docx: "../text/word-style-reference-ttmanu-iscb-iscience-v2.docx"
 always_allow_html: TRUE
 editor_options:
   chunk_output_type: console
@@ -50,9 +49,9 @@ legend("bottom", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2, adj = 
 }
 ```
 
-**Supplementary figure S1. Distribution of cancer type on UMAP clusters.** Each panel shows the identity of 
+**S1 Fig. Distribution of cancer type on UMAP clusters.** Each panel shows the identity of 
 individual tumors by one of 23 cancer types projected onto the cluster UMAP identified 
-in **Figure 1B of the main text**. The colors indicate the tumor's cluster identity.
+in **Fig 1B of the main text**. The colors indicate the tumor's cluster identity.
 
 \newpage
 
@@ -101,8 +100,8 @@ for(n in cancer_w_subtypes[1:19]) {
 }
 ```
 
-**Supplementary Figure S2. Histological subtypes.** Each panel shows the histological subtypes of one of the 23 
-cancers projected onto the tumors of the UMAP from **Figure 1B of the main text**. The colors indicate the tumor's histological subtype identity.
+**S2 Fig. Histological subtypes.** Each panel shows the histological subtypes of one of the 23 
+cancers projected onto the tumors of the UMAP from **Fig 1B of the main text**. The colors indicate the tumor's histological subtype identity.
 
 \newpage
 
@@ -166,8 +165,8 @@ legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
 }
 ```
 
-**Supplementary Figure S3. Distribution of mismatch repair genes on UMAP clusters.** Each panel shows one of 15 
-genes involved in genome stability projected on the UMAP from **Figure 1B of the main text**. The colors indicate the tumor's cluster identity.
+**S3 Fig. Distribution of mismatch repair genes on UMAP clusters.** Each panel shows one of 15 
+genes involved in genome stability projected on the UMAP from **Fig 1B of the main text**. The colors indicate the tumor's cluster identity.
 
 \newpage
 
@@ -246,7 +245,7 @@ legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
 
 ```
 
-**Supplementary Figure S4. Distribution of oncogenes/tumor suppressors on UMAP clusters.** Each panel shows shows one of the twelve oncogenes/tumor suppressors projected onto the tumors of the UMAP from **Figure 1B of the main text**. The colors indicate the tumor's cluster identity.
+**S4 Fig. Distribution of oncogenes/tumor suppressors on UMAP clusters.** Each panel shows shows one of the twelve oncogenes/tumor suppressors projected onto the tumors of the UMAP from **Fig 1B of the main text**. The colors indicate the tumor's cluster identity.
 
 \newpage 
 
