@@ -19,7 +19,6 @@ data{
   int Nt;
   int Nc;
   int age[Np];
-  int patient[Np];
   int tissue[Np];
   int tclass[Np];
   real tevent[Np];
@@ -43,7 +42,7 @@ model{
   agerate ~ gamma(2.0,1.0/1.0);
   r20 ~ gamma(1.5,0.5/1.0);
   for(tis in 1:Nt){
-    ktis[tis] ~ gamma(1.2,0.2/1.0);
+    ktis[tis] ~ gamma(6.0,1.0);
     for( cl in 1:Nc){
       k[tis,cl] ~ gamma(3.5,2.5/1.0);
     }
@@ -83,5 +82,21 @@ model{
   }
 }
 
-
+generated quantities{
+  real<lower=0.0> tdeath[Np];
+  
+  for (i in 1:Np) {
+    int tis = tissue[i];
+    int cl = tclass[i];
+    real effage;
+    real p = uniform_rng(0,1);
+    
+    effage = effage0[tis] + effagert[tis]*(age[i] - 20.0);
+    
+    tdeath[i] = -((365 * effage-7300) * agerate[gender[i]] * 0.05  
+      - 365 * log(exp(effage * agerate[gender[i]] * 0.05 - 20 * agerate[gender[i]] * 0.05) 
+      - (agerate[gender[i]] * ktis[tis] * k[tis,cl] * log1m(p)) / (365 * r20[gender[i]] * 1e-5)))
+      / (agerate[gender[i]] * ktis[tis] * k[tis,cl]);
+  }
+}
 
