@@ -39,6 +39,7 @@ parameters{
 }
 
 model{
+
   agerate ~ gamma(2.0,1.0/1.0);
   r20 ~ gamma(1.5,0.5/1.0);
   for(tis in 1:Nt){
@@ -70,10 +71,14 @@ model{
   for(i in 1:Np){
     int tis = tissue[i];
     int cl = tclass[i];
+    real effage;
+
+    effage = effage0[tis] + effagert[tis]*(age[i] - 20.0);
+    
     if(eventtype[i] == 1){
-      target += ourmodel_lpdf(tevent[i]| effage0[tis]+effagert[tis] * (age[i]-20.0),agerate[gender[i]] * 0.05 ,ktis[tis]*k[tis,cl],r20[gender[i]] * 1e-5);
+      target += ourmodel_lpdf(tevent[i]| effage,agerate[gender[i]] * 0.05 ,ktis[tis]*k[tis,cl],r20[gender[i]] * 1e-5);
     }else{
-      target += ourmodel_lccdf(tevent[i]| effage0[tis] + effagert[tis]* (age[i] - 20.0),agerate[gender[i]] * 0.05 ,ktis[tis]*k[tis,cl],r20[gender[i]] * 1e-5);
+      target += ourmodel_lccdf(tevent[i]| effage,agerate[gender[i]] * 0.05 ,ktis[tis]*k[tis,cl],r20[gender[i]] * 1e-5);
     }
   }
 }
