@@ -34,6 +34,8 @@ parameters{
   real<lower=0.0> k[Nt,Nc];
   real<lower=0.0> ktis[Nt];
   real<lower=0.0> agerate[2];
+  real<lower=20.0> effage0[Nt];
+  real<lower=0.0> effagert[Nt];
 }
 
 model{
@@ -46,6 +48,10 @@ model{
     }
   }
 
+  effage0 ~ gamma(70.0,69.0/80);
+  effagert ~ gamma(2.0,1.0/2.0);
+  
+  
   // calibrate the age specific risk rate to CDC published life tables
   log(womccdf[71]) ~ normal(ourmodel_lccdf(70*365 | 0,agerate[1]*.05,1,r20[1]*1e-5),log(1.01));
   log(menccdf[71]) ~ normal(ourmodel_lccdf(70*365 | 0,agerate[2]*.05,1,r20[2]*1e-5),log(1.01));
@@ -65,9 +71,9 @@ model{
     int tis = tissue[i];
     int cl = tclass[i];
     if(eventtype[i] == 1){
-      target += ourmodel_lpdf(tevent[i]| age[i],agerate[gender[i]] * 0.05 ,ktis[tis]*k[tis,cl],r20[gender[i]] * 1e-5);
+      target += ourmodel_lpdf(tevent[i]| effage0[tis]+effagert[tis] * (age[i]-20.0),agerate[gender[i]] * 0.05 ,ktis[tis]*k[tis,cl],r20[gender[i]] * 1e-5);
     }else{
-      target += ourmodel_lccdf(tevent[i]| age[i],agerate[gender[i]] * 0.05 ,ktis[tis]*k[tis,cl],r20[gender[i]] * 1e-5);
+      target += ourmodel_lccdf(tevent[i]| effage0[tis] + effagert[tis]* (age[i] - 20.0),agerate[gender[i]] * 0.05 ,ktis[tis]*k[tis,cl],r20[gender[i]] * 1e-5);
     }
   }
 }
