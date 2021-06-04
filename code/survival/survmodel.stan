@@ -33,7 +33,7 @@ parameters{
   real<lower=0.0> k[Nt,Nc];
   real<lower=0.0> ktis[Nt];
   real<lower=0.0> agerate[2];
-  real<lower=20.0> effage0[Nt];
+  real<lower=20.0> effage0[Nt,Nc];
   real<lower=0.0> effagert[Nt];
 }
 
@@ -91,7 +91,7 @@ generated quantities{
     real effage;
     real p = uniform_rng(0,1);
     
-    effage = effage0[tis] + effagert[tis]*(age[i] - 20.0);
+    effage = effage0[tis,cl] + effagert[tis]*(age[i] - 20.0);
     
     tdeath[i] = -((365 * effage-7300) * agerate[gender[i]] * 0.05  
       - 365 * log(exp(effage * agerate[gender[i]] * 0.05 - 20 * agerate[gender[i]] * 0.05) 
