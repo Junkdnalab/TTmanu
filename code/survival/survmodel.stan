@@ -45,10 +45,11 @@ model{
     ktis[tis] ~ gamma(3.5,2.5/1.0);
     for( cl in 1:Nc){
       k[tis,cl] ~ gamma(3.5,2.5/1.0);
+      effage0[tis,cl] ~ gamma(70.0,69.0/80);
     }
   }
 
-  effage0 ~ gamma(70.0,69.0/80);
+
   effagert ~ gamma(2.0,1.0/2.0);
   
   
