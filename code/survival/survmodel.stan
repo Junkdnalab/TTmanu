@@ -42,7 +42,7 @@ model{
   agerate ~ gamma(2.0,1.0/1.0);
   r20 ~ gamma(1.5,0.5/1.0);
   for(tis in 1:Nt){
-    ktis[tis] ~ gamma(6.0,1.0);
+    ktis[tis] ~ gamma(3.5,2.5/1.0);
     for( cl in 1:Nc){
       k[tis,cl] ~ gamma(3.5,2.5/1.0);
     }
@@ -83,7 +83,7 @@ model{
 }
 
 generated quantities{
-  real<lower=0.0> tdeath[Np];
+  real<lower=-1.0> tdeath[Np];
   
   for (i in 1:Np) {
     int tis = tissue[i];
