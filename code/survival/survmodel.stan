@@ -72,7 +72,7 @@ model{
     int cl = tclass[i];
     real effage;
 
-    effage = effage0[tis] + effagert[tis]*(age[i] - 20.0);
+    effage = effage0[tis,cl] + effagert[tis]*(age[i] - 20.0);
     
     if(eventtype[i] == 1){
       target += ourmodel_lpdf(tevent[i]| effage,agerate[gender[i]] * 0.05 ,ktis[tis]*k[tis,cl],r20[gender[i]] * 1e-5);
