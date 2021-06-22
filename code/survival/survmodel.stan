@@ -30,7 +30,6 @@ data{
 
 parameters{
   real<lower=0.0> r20[2];
-  real<lower=0.0> k[Nt,Nc];
   real<lower=0.0> ktis[Nt];
   real<lower=0.0> agerate[2];
   real<lower=20.0> effage0[Nt,Nc];
@@ -42,9 +41,8 @@ model{
   agerate ~ gamma(2.0,1.0/1.0);
   r20 ~ gamma(1.5,0.5/1.0);
   for(tis in 1:Nt){
-    ktis[tis] ~ gamma(3.5,2.5/1.0);
+    ktis[tis] ~ gamma(1.5,0.5/1.0);
     for( cl in 1:Nc){
-      k[tis,cl] ~ gamma(3.5,2.5/1.0);
       effage0[tis,cl] ~ gamma(30.0,29.0/80);
     }
   }
@@ -76,15 +74,16 @@ model{
     effage = effage0[tis,cl] + effagert[tis]*(age[i] - 20.0);
     
     if(eventtype[i] == 1){
-      target += ourmodel_lpdf(tevent[i]| effage,agerate[gender[i]] * 0.05 ,ktis[tis]*k[tis,cl],r20[gender[i]] * 1e-5);
+      target += ourmodel_lpdf(tevent[i]| effage,agerate[gender[i]] * 0.05 ,ktis[tis],r20[gender[i]] * 1e-5);
     }else{
-      target += ourmodel_lccdf(tevent[i]| effage,agerate[gender[i]] * 0.05 ,ktis[tis]*k[tis,cl],r20[gender[i]] * 1e-5);
+      target += ourmodel_lccdf(tevent[i]| effage,agerate[gender[i]] * 0.05 ,ktis[tis],r20[gender[i]] * 1e-5);
     }
   }
 }
 
 generated quantities{
   real<lower=-1.0> tdeath[Np];
+  real<lower=-1.0> tdeathnorm[Np];
   
   for (i in 1:Np) {
     int tis = tissue[i];
@@ -96,8 +95,12 @@ generated quantities{
     
     tdeath[i] = -((365 * effage-7300) * agerate[gender[i]] * 0.05  
       - 365 * log(exp(effage * agerate[gender[i]] * 0.05 - 20 * agerate[gender[i]] * 0.05) 
-      - (agerate[gender[i]] * ktis[tis] * k[tis,cl] * log1m(p)) / (365 * r20[gender[i]] * 1e-5)))
-      / (agerate[gender[i]] * ktis[tis] * k[tis,cl]);
+      - (agerate[gender[i]] * ktis[tis] * log1m(p)) / (365 * r20[gender[i]] * 1e-5)))
+      / (agerate[gender[i]] * ktis[tis]);
+    tdeathnorm[i] = -((365 * age[i]-7300) * agerate[gender[i]] * 0.05  
+      - 365 * log(exp(age[i] * agerate[gender[i]] * 0.05 - 20 * agerate[gender[i]] * 0.05) 
+      - (agerate[gender[i]] * log1m(p)) / (365 * r20[gender[i]] * 1e-5)))
+      / (agerate[gender[i]]);
   }
 }
 
