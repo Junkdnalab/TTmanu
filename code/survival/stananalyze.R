@@ -349,3 +349,123 @@ tisplot <- ggplot(dsamps, aes(y=cancer_type, x=ktis)) +
 
 ggsave(filename = "tissue_effects.pdf", plot = tisplot, height = 6, width = 4)
 ggsave(filename = "tissue_effects.png", plot = tisplot, height = 6, width = 4, dpi = 300)
+
+
+
+
+
+#### debugging fits
+
+load("survmodel_effcl30.stansave")
+
+df = as.data.frame(samps)
+dfs = stack(df)
+
+comp = sqldf("select a.rowid,patient_id,age,gender,type,clust,tevent,eventtype,b.`values` as tdeath from deadpat a join dfs b on b.ind == 'tdeath[' || a.rowid || ']'");
+
+
+myplot = ggplot(comp) + facet_wrap(~type) + stat_ecdf(aes(x=tdeath),color="blue") + stat_ecdf(aes(x=tevent),data=subset(comp,eventtype=="adeath"),col="green") + stat_ecdf(aes(x=tevent),data=subset(comp,eventtype=="bfollow"),col="orange")+coord_cartesian(xlim=c(0,365*20))+labs(title="New Model ECDF Comparisons")
+
+ggsave("newmodel.png",myplot,width=10,height=10)
+
+
+
+ggplot(comp) + geom_density(aes(x=tdeath,fill=type),alpha=.2)+coord_cartesian(xlim=c(0,365*20))
+
+
+
+
+
+myplot = ggplot(comp) + facet_wrap(~type) + geom_density(aes(x=tdeath,fill="Predicted"),alpha=.5) + geom_density(aes(x=tevent,fill="Actual"),alpha=.5)+coord_cartesian(xlim=c(0,365*20))
+
+
+
+ggsave("/tmp/densities.png",myplot)
+system("gthumb /tmp/densities.png")
+
+
+
+
+## ecdfs:
+
+ggplot(comp) + stat_ecdf(aes(x=tdeath)) + stat_ecdf(aes(x=tevent))+coord_cartesian(xlim=c(0,365*20))+facet_wrap(~type)
+
+ggplot(comp) + stat_ecdf(aes(x=tdeath)) + stat_ecdf(aes(x=tevent),data=comp[comp$eventtype=="bfollow",])+coord_cartesian(xlim=c(0,365*20))+facet_wrap(~type)
+
+ggplot(comp) + stat_ecdf(aes(x=tdeath)) + stat_ecdf(aes(x=tevent),data=comp[comp$eventtype=="adeath",])+coord_cartesian(xlim=c(0,365*20))+facet_wrap(~type)
+
+
+
+
+
+
+
+
+
+### simon's suggested plots
+
+
+library(bayesplot)
+library(patchwork)
+
+load("tissue_key.rda")
+
+outdata <- tibble(as.data.frame(standata[c("age","tissue","gender","tclass","tevent","eventtype")]))
+y <- outdata$tevent
+
+
+
+yrep <- (as.data.frame(samps)) %>% select(starts_with("tdeath"))
+yrep <- janitor::clean_names(yrep)
+yrep <- as.matrix(yrep)
+subset = sample(1:NROW(yrep),25)
+plotlist_dead <- list()
+for(tumortissue in tissue_key$tissue_num) {
+    samples <- which(outdata$tissue == tumortissue & outdata$eventtype == 1)
+    mysubplt <- ppc_dens_overlay(y[samples], yrep[subset,samples],n_dens=128) + coord_cartesian(xlim=c(0,9000)) + ggtitle(paste(tissue_key %>% filter(tissue_num == tumortissue) %>% pull(tissue), "n", "=", length(samples)))
+                                                                               plotlist_dead <- c(plotlist_dead, list(mysubplt))
+    }
+myplt1 = wrap_plots(plotlist_dead)
+    
+plotlist_alive <- list()
+for(tumortissue in tissue_key$tissue_num) {
+  samples <- which(outdata$tissue == tumortissue & outdata$eventtype != 1)
+  mysubplt <- ppc_dens_overlay(y[samples], yrep[subset,samples],n_dens=128) + coord_cartesian(xlim=c(0,9000)) + ggtitle(paste(tissue_key %>% filter(tissue_num == tumortissue) %>% pull(tissue),
+                                                                           "n", "=", length(samples)))
+  plotlist_alive <- c(plotlist_alive, list(mysubplt))
+}
+myplt2 = wrap_plots(plotlist_alive)
+
+pdf("comparison.pdf",10,10)
+print(myplt1)
+print(myplt2)
+dev.off()
+
+#### KM tests
+
+
+testdf = data.frame(t=rgamma(1000,3,2/1000),ID=1:1000,eventtype=c(rep("adeath",times=200),rep("bfollow",times=800)))
+testdf[testdf$eventtype == "bfollow","t"] = testdf[testdf$eventtype == "bfollow","t"] - rexp(800,1/10)
+testdf$isdeath = sapply(testdf$eventtype,FUN=function(x) if(x == "bfollow"){return(0)}else{return(1)})
+
+dp = ggplot(testdf[testdf$eventtype == "adeath",])+geom_km(aes(time=t,status=isdeath))+labs(title="Deaths Only")+coord_cartesian(xlim=c(0,10000))
+
+ap = ggplot(testdf) + geom_km(aes(time=t,status=isdeath))+labs(title="Deaths and Followups")+coord_cartesian(xlim=c(0,10000))
+
+wrap_plots(dp,ap)
+
+
+
+### check out the older model:
+
+load("survmodel_knn3525_old.stansave")
+ls()
+df=as.data.frame(samps)
+dfs = stack(df)
+
+comp = sqldf("select a.rowid,patient_id,age,gender,type,clust,tevent,eventtype,b.`values` as tdeath from deadpat a join dfs b on b.ind == 'tdeath[' || a.rowid || ']'");
+
+
+myplot = ggplot(comp) + facet_wrap(~type) + stat_ecdf(aes(x=tdeath),color="blue") + stat_ecdf(aes(x=tevent),data=subset(comp,eventtype=="adeath"),col="green") + stat_ecdf(aes(x=tevent),data=subset(comp,eventtype=="bfollow"),col="orange")+coord_cartesian(xlim=c(0,365*20))+labs(title="Old Model ECDF Comparisons")
+
+ggsave("oldmodel.png",myplot,width=10,height=10)

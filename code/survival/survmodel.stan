@@ -32,8 +32,8 @@ parameters{
   real<lower=0.0> r20[2];
   real<lower=0.0> ktis[Nt];
   real<lower=0.0> agerate[2];
-  real<lower=20.0> effage0tiss[Nt];
-  real<lower=20.0> effage0[Nt,Nc];
+  real<lower=0.0> effage0tiss[Nt];
+  real<lower=0.0> effage0[Nt,Nc];
   real<lower=0.0> effagert[Nt];
 }
 
