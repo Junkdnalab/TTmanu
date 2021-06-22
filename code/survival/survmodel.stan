@@ -73,7 +73,7 @@ model{
     int cl = tclass[i];
     real effage;
 
-    effage = effage0tis[tis]*effage0[tis,cl] + effagert[tis]*(age[i] - 20.0);
+    effage = effage0tiss[tis]*effage0[tis,cl] + effagert[tis]*(age[i] - 20.0);
     
     if(eventtype[i] == 1){
       target += ourmodel_lpdf(tevent[i]| effage,agerate[gender[i]] * 0.05 ,ktis[tis],r20[gender[i]] * 1e-5);
@@ -93,7 +93,7 @@ generated quantities{
     real effage;
     real p = uniform_rng(0,1);
     
-    effage = effage0tis[tis]*effage0[tis,cl] + effagert[tis]*(age[i] - 20.0);
+    effage = effage0tiss[tis]*effage0[tis,cl] + effagert[tis]*(age[i] - 20.0);
     
     tdeath[i] = -((365 * effage-7300) * agerate[gender[i]] * 0.05  
       - 365 * log(exp(effage * agerate[gender[i]] * 0.05 - 20 * agerate[gender[i]] * 0.05) 
