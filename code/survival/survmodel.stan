@@ -32,6 +32,7 @@ parameters{
   real<lower=0.0> r20[2];
   real<lower=0.0> ktis[Nt];
   real<lower=0.0> agerate[2];
+  real<lower=20.0> effage0tiss[Nt];
   real<lower=20.0> effage0[Nt,Nc];
   real<lower=0.0> effagert[Nt];
 }
@@ -42,8 +43,9 @@ model{
   r20 ~ gamma(1.5,0.5/1.0);
   for(tis in 1:Nt){
     ktis[tis] ~ gamma(1.5,0.5/1.0);
+    effage0tiss[tis] ~ gamma(30.0,29.0/80);
     for( cl in 1:Nc){
-      effage0[tis,cl] ~ gamma(30.0,29.0/80);
+      effage0[tis,cl] ~ gamma(50.0,40.0/1.0); // within the range about .8 to 1.4 or so
     }
   }
 
@@ -71,7 +73,7 @@ model{
     int cl = tclass[i];
     real effage;
 
-    effage = effage0[tis,cl] + effagert[tis]*(age[i] - 20.0);
+    effage = effage0tis[tis]*effage0[tis,cl] + effagert[tis]*(age[i] - 20.0);
     
     if(eventtype[i] == 1){
       target += ourmodel_lpdf(tevent[i]| effage,agerate[gender[i]] * 0.05 ,ktis[tis],r20[gender[i]] * 1e-5);
@@ -91,7 +93,7 @@ generated quantities{
     real effage;
     real p = uniform_rng(0,1);
     
-    effage = effage0[tis,cl] + effagert[tis]*(age[i] - 20.0);
+    effage = effage0tis[tis]*effage0[tis,cl] + effagert[tis]*(age[i] - 20.0);
     
     tdeath[i] = -((365 * effage-7300) * agerate[gender[i]] * 0.05  
       - 365 * log(exp(effage * agerate[gender[i]] * 0.05 - 20 * agerate[gender[i]] * 0.05) 
