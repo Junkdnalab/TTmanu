@@ -43,9 +43,9 @@ model{
   r20 ~ gamma(1.5,0.5/1.0);
   for(tis in 1:Nt){
     ktis[tis] ~ gamma(1.5,0.5/1.0);
-    effage0tiss[tis] ~ gamma(30.0,29.0/80);
+    effage0tiss[tis] ~ gamma(30.0,29.0/65);
     for( cl in 1:Nc){
-      effage0[tis,cl] ~ gamma(50.0,40.0/1.0); // within the range about .8 to 1.4 or so
+      effage0[tis,cl] ~ gamma(50.0,49.0/1.0); // within the range about .8 to 1.4 or so
     }
   }
 
