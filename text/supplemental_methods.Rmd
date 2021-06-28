@@ -144,29 +144,32 @@ We used Bayesian inference to explore the relative impact of cancer diagnosis on
 survival at the time of diagnosis. Our model assumes that at birth each person
 has a small initial probability per unit time to die, and that this probability
 grows exponentially in time at some baseline rate that matches the observed CDC
-data. The rate of growth in risk is assumed to jump to a higher level at
-diagnosis, which we take as a proxy for onset. This represents an accelerated
-aging type model. To fit the model, we constrain the baseline risks using the
-available CDC life tables (ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Publications/NVSR/68_07/). We also constrain the cancer specific multiplier
-using the longevity data within the cancer tumor dataset. Our model estimates
-the effect of cancer type and class-specific cancer effects independently,
-resulting in a cancer and class specific estimate of the aging rate multiplier.
+data. We assume that at diagnosis this information will allow us to treat
+patients as if they were a different age, and with further time passing at a
+different rate, a self-similarity based model. The effective age at diagnosis is
+based on a baseline age for that tissue/class combination, plus a perturbation
+for each year over 20 years old at diagnosis. To fit the model, we constrain the
+baseline risks using the available CDC life tables
+(ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Publications/NVSR/68_07/). We also
+constrain the cancer specific parameters using the longevity data within the
+cancer tumor dataset. Our model estimates the effect of cancer type and
+class-specific cancer effects independently, resulting in a cancer and class
+specific estimate of the effective age.
 
 Most TCGA cases are diagnosed late in life, so we fit a model that emphasizes
 accuracy in the right tail of the distribution. We modeled baseline longevity
-using a risk rate function:
+using a risk rate function. The risk rate of death at a time $t$ days after the
+$A$ birthday is given as:
 
 $$R(t) = R_{20}\exp(a(A-20) + D(t) k a (\frac{t}{365}))$$ 
 
-Time is split into two components. $A$ going from 0 up to the age of the patient
-at diagnosis and then remaining fixed, whereas $t$ starts at 0 upon diagnosis
-and represents the days since diagnosis, a field recorded in the dataset. $D(t)$
+Time is split into two components. $A$ represents the "effective age" of the
+patient at diagnosis, whereas $t$ starts at 0 upon diagnosis and represents the
+days since diagnosis, a field recorded in the dataset. $D(t)$
 is an indicator for whether diagnosis has occurred or not (before diagnosis
 $D(t) = 0$, after $D(t) = 1$). The model assumes that the risk of death is
 $R_{20}$ at age 20 years and increases exponentially with a constant rate $a$ up
 to the age at diagnosis. Risk of death assumes a new rate $ka$ thereafter.
-Though the model extends to earlier ages, relatively few patients were under age
-20 (**SM2 Fig**).
 
 Given this risk per unit time, the probability of death at time $T+dT$ is the
 probability to survive to time $T$ which is $(1-P(T))$ and then die in the
@@ -187,24 +190,27 @@ And the density of deaths per unit time is the derivative with respect to T:
 
 $$p(T) = R(T) \exp(-\int_0^T R(t)dt)$$
 
+However, to model the risk of cancer effectively we found that it was necessary
+not to use the actual age $\A'$ but instead the "effective age" for that
+tissue/class type. Our effective age is calculated as:
+
+$$A = A_{0} A_{cl} + A_r (A'-20)$$ Where $A_0$ is the tissue specific effective age
+parameter (expressed in years), $A_{cl}$ is a dimensionless multiplier for the
+given class, and $A_r$ is the dimensionless age rate which determines how actual
+age $A'$ affects effective age A using a linear perturbation.
+
 The $R(T)$ function has two important parameters, the $a$ value which represents
-the background risk rates, and the $k$ value, which is a function of both cancer
-tissue type, and the cancer cluster identity.
+the background risk rates, and the $k$ value, which is a function of cancer
+tissue type.
 
-$$k = k_{tis} k_{cl}$$
+$$k = k_{tis}$$
 
-The product $k_{tis}k_{cl}$ is obviously symmetric between the two factors. To
-disambiguate the meaning of the two, the prior distribution of $k_{cl}$ has peak
+The product $A_0 A_{cl}$ is obviously symmetric between the two factors. To
+disambiguate the meaning of the two, the prior for $A_0$ ranges from about 40 to
+100 years, whereas the prior distribution of $A_{cl}$ has peak
 probability at 1 and a relatively narrow width, due to the fact that it is a
-tissue specific multiplicative modifying factor. This allows the overall
-magnitude of $k$ to be primarily determined by the $k_{tis}$ value whose prior
-is significantly less constrained so that there is a wider range of risk across
-tissue types (**SM3 Fig**).
-
-The $k$ in our model can be taken as, roughly, the aging rate relative to the
-baseline rates. Thus, a value of $k=2$ means that a given cancer causes you to
-experience the same risk in time $dt$ as a non-cancer patient would experience
-at the same age, in time $2dt$.
+tissue specific multiplicative modifying factor. To understand the roles of
+these priors refer to (**SM3 Fig**).
 
 Using this model, we split the data by Male/Female sex, and by White _vs._
 Black race as these were the main well-identified categories available to us in
@@ -219,7 +225,8 @@ we excluded them from our analysis.
 
 As an aside, we did not explicitly account for stage at diagnosis in our model
 for the following reasons. In the tumor sample data, stage at diagnosis is
-confounded with cancer type because some cancers are screened aggressively (_e.g._ colorectal and prostate cancers) while others are diagnosed typically
+confounded with cancer type because some cancers are screened aggressively
+(_e.g._ colorectal and prostate cancers) while others are diagnosed typically
 after they become problematic for the patient's lifestyle (_e.g._ ovarian and
 pancreatic cancers). Secondly, such a model specification would suffer from
 added noise because the staging data are not well standardized across cancer
@@ -297,10 +304,9 @@ ggplot(data.frame(x=0:30),aes(x)) +
         legend.box.background = element_rect(colour = "black"))
 ```
 
-**Fig SM3. Priors for the tissue and class coefficients.** The tissue coefficient
-is chosen to admit parameter values across a range from near 0 to 20+
-in the high density region, reflecting the wide variety of severities
-across tissue type. Within a given tissue, the class k parameter
-multiplies the tissue k and is given a peak density at 1, and a
-credible range from near 0 to 5, reflecting our expectation of a
-moderate amount of variation across the classes.
+**Fig SM3. Priors for the tissue and class coefficients.** The tissue
+coefficient is chosen to admit ages between 40 and 100 years old as a baseline
+age. Within a given tissue, the class parameter multiplies the tissue value and
+is given a peak density at 1, and a credible range from near 0.6 to 1.4,
+reflecting our expectation of a moderate multiplicative perturbation of
+variation across the classes.
