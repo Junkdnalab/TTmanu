@@ -284,29 +284,35 @@ cat("\\newpage")
 #### Fig SM3
 
 ```{r sm3, fig.height=3, fig.width=3}
-ggplot(data.frame(x=0:30),aes(x)) + 
-  stat_function(fun=function(x) dgamma(x,1.2,.2),geom="area", aes(fill = "ktis"))+ 
-  stat_function(fun=function(x) dgamma(x,3.5,2.5),geom="area", aes(fill = "kcl"))+ 
-  labs(title=expression(paste("Prior for k"["tis"], "and k"["cl"])),x= "k value", y = "Probability Density") +
-  theme_classic() + scale_x_continuous(limits = c(0, 20), breaks = c(seq(0,20, by =5))) +
-  scale_y_continuous(limits = c(0,0.75), breaks = c(seq(0,0.75, by = 0.25))) +
-  scale_fill_manual(values = c(alpha("#E69F00", 0.5),alpha("#0072B2", 0.5)),
-                    labels = c(expression(paste("k"["cl"])), expression(paste("k"["tis"])))) +
+sm3.1 <- ggplot(data.frame(x=0:110),aes(x)) + 
+  stat_function(fun=function(x) dgamma(x,30.0,29.0/65),geom="area", fill = alpha("black", 0.5)) +
+  theme_classic() + 
+  scale_x_continuous(limits = c(30, 110), breaks = c(seq(30,110, by =10))) +
   theme(plot.title = element_text(size = 12, hjust = 0.5),
         panel.grid.major = element_line(size = 0.75),
-        panel.grid.minor = element_line(),
-        legend.position = c(0.8, 0.8),
-        legend.spacing.y = unit(0, "mm"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 8),
-        legend.key.size = unit(0.75,"line"),
-        legend.background = element_blank(),
-        legend.box.background = element_rect(colour = "black"))
+        panel.grid.minor = element_line()) +
+  labs(x= expression(paste("Prior for Effage"["tis"])), y = "Probability Density")
+
+sm3.2 <- ggplot(data.frame(x=0:3),aes(x)) + 
+  stat_function(fun=function(x) dgamma(x,50.0,49.0/1.0),geom="area", fill = alpha("black", 0.5)) +
+  theme_classic() + 
+  scale_x_continuous(limits = c(0.5, 1.6), breaks = c(seq(0.6, 1.5, by = 0.2))) +
+  theme(plot.title = element_text(size = 12, hjust = 0.5),
+        panel.grid.major = element_line(size = 0.75),
+        panel.grid.minor = element_line()) +
+  labs(x= expression(paste("Prior for Effage"["cl"])), y = "Probability Density")
+
+layout = "
+AABB
+AABB
+"
+
+sm3.1 + sm3.2 + plot_annotation(tag_levels = "A") + plot_layout(design = layout)
 ```
 
-**Fig SM3. Priors for the tissue and class coefficients.** The tissue
+**Fig SM3. Priors for the tissue and class coefficients.** A) The tissue
 coefficient is chosen to admit ages between 40 and 100 years old as a baseline
-age. Within a given tissue, the class parameter multiplies the tissue value and
+age. B) Within a given tissue, the class parameter multiplies the tissue value and
 is given a peak density at 1, and a credible range from near 0.6 to 1.4,
 reflecting our expectation of a moderate multiplicative perturbation of
 variation across the classes.
