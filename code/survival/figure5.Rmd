@@ -6,141 +6,169 @@ library(patchwork)
 
 source("./kmcurve.R")
 
-## create example data for a fixed 30 year old without vs with a k=2
+## create example data for a fixed 30 year old without vs with cancer (effective age)
 ## cancer
 
+## Effective age calc for typical BRCA
+effage0tiss <- 62
+effage0 <- 1.1
+effagert <- 0.35
 
+patientsurvivalsbkd = replicate(1000,simdeath(r20wf,ageratewf,30,1))/365 ## Typical survival for 30yr with k = 1
+## Stimulating survival for white female with cancer - effective age for 30 yr old
+effage <- effage0tiss * effage0 + effagert * (30 - 20)
+patientsurvivalseffk1 <- replicate(1000,simdeath(r20wf,ageratewf,effage,1))/365 ## Typical survival for 30yr with effage due to cancer k=1
+patientsurvivalseff10k1 <- replicate(1000,simdeath(r20wf,ageratewf,effage+10,1))/365 ## effage + 10 but still k = 1
+## Mixed ages
+mixedages = runif(1000,30,70)
+mixedsurvwfk1 = sapply(mixedages, function(x) simdeath(r20wf,ageratewf,x,1)/365) ## Typical survival for mixed ages
+## Stimulating survival for white female with cancer - mixed age
+effage.mixed <- effage0tiss * effage0 + effagert * (mixedages - 20)
+mixedsurvwfeffk1 = sapply(effage.mixed, function(x) simdeath(r20wf,ageratewf,x,1)/365) ## Typical survival for mixed ages with effage due to k=1
+mixedsurvwfeff10k1 <- sapply(effage.mixed+10, function(x) simdeath(r20wf,ageratewf,x,1)/365)
 
-patientsurvivalsbkd = replicate(100,simdeath(r20wf,ageratewf,30,1))/365
-patientsurvivalsk2 = replicate(100,simdeath(r20wf,ageratewf,30,2))/365
-
-mixedages = runif(100,30,70)
-mixedsurvwfk1 = sapply(mixedages, function(x) simdeath(r20wf,ageratewf,x,1)/365)
-mixedsurvwfk2 = sapply(mixedages, function(x) simdeath(r20wf,ageratewf,x,2)/365)
-
-p1 = data.frame(
-    r = patientsurvivalsbkd,
-    c = patientsurvivalsk2,
-    rm = mixedsurvwfk1,
-    cm = mixedsurvwfk2,
-    status = rep(1, length(patientsurvivalsbkd))
+simdata = data.frame(
+  r = patientsurvivalsbkd,
+  ce = patientsurvivalseffk1,
+  ce10 = patientsurvivalseff10k1,
+  m = mixedsurvwfk1,
+  me = mixedsurvwfeffk1,
+  me10 = mixedsurvwfeff10k1,
+  status = rep(1, length(patientsurvivalsbkd))
 ) %>%
-    rownames_to_column(var = "index") %>%
-    pivot_longer(-c(index, status), values_to = "time", names_to = "condition") %>%
-    ggplot(aes(time = time, color = condition, status = status)) +
-    geom_km() +
-    scale_color_manual(
-        values = c(r = "#56b4e9", c = "#e69f00", rm = "#0072b2", cm = "#d55e00"),
-        breaks = c("r", "c", "rm", "cm"),
-        labels = c("Random 30 year old women", "Random 30 year old women cancer k=2", "Random uniform(30,70) year old women", "Random uniform(30,70) year old women k=2")
-    ) +
-    theme_classic() +
-    theme(legend.position = c(.8, .75))
+  rownames_to_column(var = "index") %>%
+  pivot_longer(-c(index, status), values_to = "time", names_to = "condition")
+p1 <- ggplot(simdata, aes(time = time, color = condition, status = status)) +
+  geom_km() +
+  labs(x = "Survival Time (years past diagnosis)", y = "Probability") +
+  scale_color_manual(
+    values = c(r = "#56b4e9", ce = "#e69f00", ce10 = "#0072b2", m = "#009E73", me = "#CC79A7", me10 = "#D55E00")
+  ) +
+  theme_classic() +
+  annotate("text", x = 44, y = .75, label = "30yo women", color = "#56b4e9", size = 3) +
+  annotate("text", x = 27, y = .70, label = "30yo women cancer BRCA typ", color = "#e69f00", size = 3) +
+  annotate("text", x = 25, y = .65, label = "30yo women cancer BRCA+10yr", color = "#0072b2", size = 3) +
+  annotate("text", x = 42, y = .45, label = "Mixed age women", color = "#009E73", size = 3) +
+  annotate("text", x = 29, y = .40, label = "Mixed age women BRCA typ", color = "#CC79A7", size = 3) +
+  annotate("text", x = 27, y = .35, label = "Mixed age women BRCA+10yr", color = "#D55E00", size = 3) +
+  theme(legend.position = "none") 
 
+load("./survmodel_effcl_knn_062821.stansave")
+cancerdat = read_csv("../../data/survival/clinical_plus_cluster.csv");
+cancerdat$type <- as.factor(cancerdat$type)
+tisnames <- levels(cancerdat$type)
+## tissue specific effective age
 
-pstad = plotcancertype(cancerdat,"STAD")
-pgbm = plotcancertype(cancerdat,"GBM")
-ppaad = plotcancertype(cancerdat,"PAAD")
-thca = plotcancertype(cancerdat,"THCA")
+effage0tiss <- as.data.frame(samps) %>% select(starts_with("effage0tiss[")) %>%
+  gather(data = ., key = "coefname", value = "effage0tiss") %>%
+  mutate(tiss = tisnames[as.numeric(gsub("effage0tiss\\[(.*)\\]","\\1",.$coefname))]) ## Replace with tumor type
 
+p2 <- ggplot(effage0tiss,aes(x = effage0tiss, y = tiss)) + geom_density_ridges() +
+  theme_minimal() +
+  scale_x_continuous(breaks=seq(20,100, by = 20), limits = c(20,100)) +
+  labs(x = "Effective Age", y = "Cancer Type") +
+  theme(legend.position = "none") +
+  geom_vline(aes(xintercept=20), linetype = "dashed", color = "red")
 
+## tissue specific effective age rate
 
+effagert <- as.data.frame(samps) %>% select(starts_with("effagert")) %>%
+  gather(data = ., key = "coefname", value = "effagert") %>%
+  mutate(tiss = tisnames[as.numeric(gsub("effagert\\[(.*)\\]","\\1",.$coefname))]) ## Replace with tumor type
 
-load("./survmodel-ethbkd.stansave")
+p3 <- ggplot(effagert,aes(x = effagert, y = tiss)) + geom_density_ridges() +
+  theme_minimal() +
+  labs(x = "Effective Age Rate", y = "") +
+  theme(legend.position = "none",
+        axis.text.y = element_blank(),
+        plot.title= element_text(hjust = 0.5)) +
+  geom_vline(aes(xintercept=1), linetype = "dashed", color = "red")
 
+ktis <- as.data.frame(samps) %>% select(starts_with("ktis")) %>%
+  gather(data = ., key = "coefname", value = "ktis") %>%
+  mutate(tiss = tisnames[as.numeric(gsub("ktis\\[(.*)\\]","\\1",.$coefname))]) ## Replace with tumor type
 
+p4 <- ggplot(ktis,aes(x = ktis, y = tiss)) + geom_density_ridges() +
+  theme_minimal() +
+  scale_x_continuous(breaks=seq(-1,3, by = 1), limits = c(-0.25,3)) +
+  labs(x = expression(paste("k"["tis"])), y = "") +
+  theme(legend.position = "none",
+        axis.text.y = element_blank(),
+        plot.title= element_text(hjust = 0.5)) +
+  geom_vline(aes(xintercept=1), linetype = "dashed", color = "red")
 
-dfsamps = as.data.frame(sampseth)
+## Plot survival by cancer type
+asamps <- as.array(samps)
 
-kcancplot = function(dfsamps,tisnames){
-	ktisnames = grep("ktis",names(dfsamps),value=TRUE)
-	dfktis = dfsamps[,ktisnames]
-	dfktis = stack(dfktis) ## convert to two column "values" and "ind" with "ind" being the name of the variable
-	names(dfktis) = c("value","parname")
-	
-	dim(tisnames) = c(length(tisnames),1)
+endpoints = sqldf("select case when death_days_to is NULL then last_contact_days_to else death_days_to end as finaltime, case when death_days_to is NULL then 0 else 1 end as finalstatus from cancerdat;")
 
-	dfktis$cancname = as.factor(sapply(dfktis$parname,function(x) tisnames[x]))
-	ggplot(dfktis,aes_(quote(value),quote(cancname))) + geom_density_ridges()+ theme_minimal() + scale_fill_brewer(palette="Paired") + xlim(0,22) + labs(x=expression(paste("k"["tis"], " multiplier")),y="Cancer Type",title="Tissue Specific Effects")
+cancerdat = cbind(cancerdat,endpoints);
+
+cancerdat = cancerdat[!is.na(cancerdat$finaltime),]
+
+cancertype <- c("GBM", "PAAD", "OV", "THCA")
+for(ct in cancertype) {
+  lev <- which(levels(cancerdat$type) == ct)[[1]] ## level of cancer type
+  women <- cancerdat[cancerdat$type == ct & cancerdat$gender == "FEMALE",]
+  agesw <- women$age
+  
+  ## Mean of various parameters
+  k = round(mean(asamps[,,sprintf("ktis[%d]",lev)]), digits = 2)
+  effage0tiss <- round(mean(asamps[,,sprintf("effage0tiss[%d]",lev)]), digits = 0)
+  effagert <- round(mean(asamps[,,sprintf("effagert[%d]",lev)]), digits = 2)
+  effage0 <- round(median(asamps[,,sprintf("effage0[%d,%d]",lev,1:10)]), digits = 2)
+  
+  ## Simulation of women no cancer
+  survyrswfref = sapply(agesw,function(a) tryCatch(simdeath(r20wf,ageratewf,a,1)/365,error= function(e) {0}))
+  ## Effective age due to cancer
+  effage.agesw <- effage0tiss * effage0 + effagert * (agesw - 20)
+  survyrswf = sapply(effage.agesw,function(a) tryCatch(simdeath(r20wf,ageratewf,a,kmean)/365,error= function(e) {0}))
+  
+  df.plot <- plotkmcomp(survyrswf, survyrswfref, women$finaltime / 365, women$finalstatus) +
+          coord_cartesian(xlim = c(0, 80)) +
+          labs(
+              x = "Survival Time (years past diagnosis)",
+              y = "Probability"
+          ) +
+          scale_color_manual(
+              values = c(
+                  rtime = "#66c2a5",
+                  stime = "#8da0cb",
+                  acttime = "#fc8d62"
+              ),
+              breaks = c("rtime", "stime", "acttime"),
+              labels = c(
+                  "Simulated General Population; k = 1",
+                  "Simulated Patient Population",
+                  "Actual Patient Population"
+              )
+          ) +
+    annotate(geom = "text", x = 50, y = 1.0, label = paste0(ct, " simulated")) +
+    theme(legend.position = "none")
+  if(ct == "GBM") {
+    df.plot <- df.plot + annotate(geom = "text", x = 40, y = 0.7, label = "Simulated General Population; k = 1", color = "#66c2a5", size = 3) +
+      annotate(geom = "text", x = 32, y = 0.5, label = "Simulated Patient Population", color = "#8da0cb", size = 3) +
+      annotate(geom = "text", x = 27, y = 0.3, label = "Actual Patient Population", color = "#fc8d62", size = 3)
+  }
+  assign(ct, df.plot, envir = .GlobalEnv)
 }
 
-
-kclassplot = function(dfsamps,tisnames){
-	kclnames = grep("k\\[",names(dfsamps), value=TRUE)
-	dfclas = dfsamps[,kclnames]
-	dfclas = stack(dfclas)
-	names(dfclas) = c("value","coefname")
-	dfclas$class = as.factor(as.numeric(gsub("k\\[(.*),(.*)\\]","\\2",dfclas$coefname)))
-	dfclas$tiss = tisnames[as.numeric(gsub("k\\[(.*),(.*)\\]","\\1",dfclas$coefname))]
-	ggplot(dfclas,aes_(quote(value),quote(class))) + geom_density_ridges() +
-		facet_wrap(. ~ tiss,nrow=3) + theme_minimal() + scale_fill_brewer(palette = "Paired") +
-		xlim(0,3) + theme(legend.position = "none") + ggtitle("Class Specific Coefficients")
-}
-
-
-pcanc = kcancplot(dfsamps,levels(cancerdat$type))
-pclass = kclassplot(dfsamps,levels(cancerdat$type))
-
-mytheme = theme(
-#    axis.text.x = element_blank(),
-#    axis.text.y = element_blank(),
-    axis.title.x = element_text(size = 10),
-    axis.title.y = element_text(size = 10),
-#    axis.ticks = element_blank(),
-#    axis.line = element_blank(),
-    strip.text.y.right = element_text(angle = 0),
-    strip.background = element_blank(),
-    legend.key.height = unit(0.4, "lines"),
-    legend.title = element_blank(),
-    legend.position = c(0.7, 0.8),
-    #legend.position = "none",
-    title = element_text(size=10)
-  )
-
-
-
-kmlayout = "
-AAFF
-AAFF
-AAFF
-BBFF
-BBFF
-BBFF
-CCFF
-CCFF
-CCFF
-DDFF
-DDFF
-DDFF
-EE##
-"
-
-BE_legend <- get_legend(thca[[1]] + theme(legend.direction = "horizontal"))
-kmlegend <- theme(legend.direction = "horizontal")
-
-
-  # ((p1+mytheme)/((pstad[[1]]+mytheme + kmlegend)+(pgbm[[1]]+mytheme + kmlegend) +
-  #                  (ppaad[[1]]+mytheme + kmlegend) + (thca[[1]] + mytheme) + (kmlegend) + (pcanc+mytheme) + guide_area() + plot_layout(design = kmlayout, guides = "collect"))) + plot_annotation(tag_levels = "A")
 layout = "
-AAAA
-AAAA
-AAAA
-AAAA
-AAAA
-AAAA
-BBFF
-BBFF
-CCFF
-CCFF
-DDFF
-DDFF
-EEFF
-EEFF
+AAAEE
+AAAEE
+AAAEE
+AAAFF
+AAAFF
+AAAFF
+BCDGG
+BCDGG
+BCDGG
+BCDHH
+BCDHH
+BCDHH
 "
 
-turn.off.legend <- theme(legend.position = "none")
-
-(p1+mytheme) + (pstad[[1]]+mytheme) + (pgbm[[1]]+mytheme + turn.off.legend) + (ppaad[[1]]+mytheme + turn.off.legend) + (thca[[1]] + mytheme + turn.off.legend) + (pcanc+mytheme) + plot_annotation(tag_levels = "A") + plot_layout(design = layout) 
+p1 + p2 + p3 + p4 + GBM + PAAD + OV + THCA + plot_spacer() + plot_annotation(tag_levels = "A") + plot_layout(design = layout) 
 
 ```
 
