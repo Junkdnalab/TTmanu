@@ -194,10 +194,12 @@ However, to model the risk of cancer effectively we found that it was necessary
 not to use the actual age $A'$ but instead the "effective age" for that
 tissue/class type. Our effective age is calculated as:
 
-$$A = A_{0} A_{cl} + A_r (A'-20)$$ Where $A_0$ is the tissue specific effective age
-parameter (expressed in years), $A_{cl}$ is a dimensionless multiplier for the
-given class, and $A_r$ is the dimensionless age rate which determines how actual
-age $A'$ affects effective age A using a linear perturbation.
+$$A = A_{0} A_{cl} + A_r (A'-20)$$ Where $A_0$ is the tissue specific effective
+age parameter (expressed in years), $A_{cl}$ is a dimensionless multiplier for
+the given class, and $A_r$ is the dimensionless age rate which determines how
+actual age $A'$ affects effective age A using a linear perturbation. For a
+non-cancer patient, $A_0=20$, $A_{cl}=1$, and $A_r=1$ are the relevant
+benchmarks.
 
 The $R(T)$ function has two important parameters, the $a$ value which represents
 the background risk rates, and the $k$ value, which is a function of cancer
@@ -206,22 +208,15 @@ tissue type.
 $$k = k_{tis}$$
 
 The product $A_0 A_{cl}$ is obviously symmetric between the two factors. To
-disambiguate the meaning of the two, the prior for $A_0$ ranges from about 40 to
-100 years, whereas the prior distribution of $A_{cl}$ has peak
-probability at 1 and a relatively narrow width, due to the fact that it is a
-tissue specific multiplicative modifying factor. To understand the roles of
+disambiguate the meaning of the two, the prior for $A_0$ has high probability
+range from about 40 to 100 years, whereas the prior distribution of $A_{cl}$ has
+peak probability at 1 and a relatively narrow width, due to the fact that it is
+a tissue specific multiplicative modifying factor. To understand the roles of
 these priors refer to (**SM3 Fig**).
 
-Using this model, we split the data by Male/Female sex, and by White _vs._
-Black race as these were the main well-identified categories available to us in
-the dataset. Sex is known to be a risk factor for death, with males dying at
-slightly higher rates for all ages of interest in our dataset. Black _vs._ White
-race is an important category due to differences in access to care and other
-socioeconomic and education related factors. However, due to the low number of
-Black patient tumors, we use ethnicity only to identify the baseline risk
-function, while the tissue- and cluster-specific multipliers are not ethnicity
-specific. There were too few tumors from other races to obtain good inference so
-we excluded them from our analysis.
+Using this model, we split the data by Male/Female sex. Sex is known to be a
+risk factor for death, with males dying at slightly higher rates for all ages of
+interest in our dataset.
 
 As an aside, we did not explicitly account for stage at diagnosis in our model
 for the following reasons. In the tumor sample data, stage at diagnosis is

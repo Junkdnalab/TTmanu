@@ -27,11 +27,11 @@ through the effective age and aging rate parameters.
 We found that cancer types, as expected, have a range of prognoses relative to
 the general population. In **Fig 5B-D** we show how effective age baseline, and
 effective age rate (which modifies the baseline based on your actual age) as
-well as the ktis which accelerates or decelerates further aging, varies
+well as the $k_{tis}$ which accelerates or decelerates further aging, varies
 considerably from cancer to cancer. For example a 20 year old diagnosed with
-THCA or PRAD would be threated similarly to a 40 year old based on teh Effective
+THCA or PRAD would be treated similarly to a 40 year old based on the Effective
 Age parameter. It's noticeable that for every year beyond 20 in the PRAD
-diagnosis we add only an extra ~ 0.2 years (Effective Age Rate). The ktis
+diagnosis we add only an extra ~ 0.2 years (Effective Age Rate). The $k_{tis}$
 parameter represents an acceleration (greater than 1) or deceleration (less) of
 the further aging beyond diagnosis. For example for BRCA patients each year past
 diagnosis adds about 1 year of risk, whereas for LGG patients it adds around 2,
