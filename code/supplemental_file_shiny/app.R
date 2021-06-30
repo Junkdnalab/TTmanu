@@ -1,7 +1,10 @@
 ## library
+#BiocManager::install(version = "3.12")
+
 suppressPackageStartupMessages(c(
     library(BiocManager),
     options(repos = BiocManager::repositories()),
+    library(devtools),
     library(shiny),
     library(shinyWidgets),
     library(tidyverse),
@@ -11,7 +14,6 @@ suppressPackageStartupMessages(c(
     library(rgl),
     library(htmltools),
     library(dplyr),
-    library(rgl),
     library(htmltools),
     library(grid),
     library(gridBase),
@@ -21,6 +23,10 @@ suppressPackageStartupMessages(c(
     library(autoimage)
 ))
 
+
+#devtools::install_github("michaelway/ggkm")
+#library(ggkm)
+
 ## Load data
 umap_cancertype <- fread("umap_3d_coors.tsv")
 load("kelly.colours.rda")
@@ -29,7 +35,8 @@ load("tumor_samples.Rda")
 load("supplemental_gene.Rda")
 load("gdc_reactome_path_analysis.Rda")
 load("cancerdat.rda")
-load("survmodel-ethbkd.stansave")
+load("survmodel_effcl_knn_062821.stansave")
+dfsamps <- as.data.frame(samps)
 load("dfclas.rda")
 
 cluster.colours <- c(kelly.colours[c(3:12)], "grey") ## Color scheme
@@ -97,9 +104,9 @@ ui <- (fluidPage(
                                          options = list(`actions-box` = TRUE)),
                              pickerInput("sim.sex", label = "Sex:", ## Sex
                                          choices = list("MALE", "FEMALE"), selected = "FEMALE"),
-                             pickerInput("sim.ethnic", label = "Ethnicity:", ## Ethnicity
-                                         choices = list("European descent" = "WHITE", 
-                                                        "African descent"= "BLACK OR AFRICAN AMERICAN"), selected = "European descent"),
+                             # pickerInput("sim.ethnic", label = "Ethnicity:", ## Ethnicity
+                             #             choices = list("European descent" = "WHITE", 
+                             #                            "African descent"= "BLACK OR AFRICAN AMERICAN"), selected = "European descent"),
                              sliderInput("sim.range", "Age range:", ## Age range
                                          min = 1, max = 100,
                                          value = c(30,70)),
@@ -372,11 +379,17 @@ server <- (function(input, output, session) {
         r20scale <- 1e-5
         ageratescale <- .05
 
-        r20 <- c(0.365209, 0.367732, 0.093299, 0.098039) * r20scale
-        names(r20) <- c("WF", "WM", "BF", "BM")
+        #r20 <- c(0.365209, 0.367732, 0.093299, 0.098039) * r20scale
+        #names(r20) <- c("WF", "WM", "BF", "BM")
 
-        agerate <- c(1.197896, 1.291932, 1.649803, 1.734934) * ageratescale
-        names(agerate) <- c("WF", "WM", "BF", "BM")
+        #agerate <- c(1.197896, 1.291932, 1.649803, 1.734934) * ageratescale
+        #names(agerate) <- c("WF", "WM", "BF", "BM")
+        
+        r20 <- c(mean(dfsamps$`r20[2]`), mean(dfsamps$`r20[1]`)) * r20scale
+        names(r20) <- c("M", "F")
+        
+        agerate <- c(mean(dfsamps$`agerate[2]`), mean(dfsamps$`agerate[1]`)) * ageratescale
+        names(agerate) <- c("M", "F")
 
         ## Model ##
         lccdf = function(r20,agerate,age,k,t){
@@ -407,17 +420,16 @@ server <- (function(input, output, session) {
         ## Remove data with NA's in finaltime column
         cancerdat <- cancerdat[!is.na(cancerdat$finaltime),]
 
-        #load("../code/survival/survmodel-ethbkd.stansave") ## loads a variable called "sampseth" which is a stanfit
-        #load("survmodel-ethbkd.stansave")
-        asampseth <- as.array(sampseth)
-        dfsamps = as.data.frame(sampseth)
         
         ## Data for kmeans tissue
-        tissue.kvalues <- dfsamps[,235:257] ## 
+        tissue.kvalues <- dfsamps %>% dplyr::select(starts_with("ktis[")) 
         names(tissue.kvalues) <- tisnames
-        #names(tissue.kvalues) <- gsub(pattern = ".*\\[", replacement = "", x = names(tissue.kvalues)) ## removing brackets from colnames because shiny doesn't like
-        #names(tissue.kvalues) <- gsub(pattern = "\\].*", replacement = "", x = names(tissue.kvalues))
-        
+        ## Data for effective age tissue
+        tissue.effage <- dfsamps %>% dplyr::select(starts_with("effage0tiss["))
+        names(tissue.effage) <- tisnames
+        ## Data for effective age rate tissue
+        tissue.effagert <- dfsamps %>% dplyr::select(starts_with("effagert["))
+        names(tissue.effagert) <- tisnames
 
         ## Reactive options
         sim.cancertype.selection <- as.character(input$sim.cancertype)
@@ -425,14 +437,12 @@ server <- (function(input, output, session) {
         sim.cluster.selection <- input$sim.cluster
         sim.sex.selection <- input$sim.sex
         #sim.sex.selection <- "FEMALE"
-        sim.ethnic.selection <- input$sim.ethnic
-        #sim.ethnic.selection <- "WHITE"
         
         if( any(sim.cancertype.selection %in% c("PRAD")) & sim.sex.selection == "FEMALE") { stop('invalid selection [incompatible sex and cancer type]')}
         if( any(sim.cancertype.selection %in% c("OV", "UCEC")) & sim.sex.selection == "MALE") {stop('invalid selection [incompatible sex and cancer type]')}
 
-        agemodel <- paste0(substring(text = sim.ethnic.selection, first = 1, last = 1),
-                           substring(text = sim.sex.selection, first = 1, last = 1))
+        agemodel <- paste0(substring(text = sim.sex.selection, first = 1, last = 1))
+        
         #################
         ## Actual data ##
         #################
@@ -444,23 +454,31 @@ server <- (function(input, output, session) {
         ####################
         ## Simulated data ##
         ####################
+        #mixedages = runif(1000,min(ages),max(ages))
         mixedages = runif(input$sim.population,input$sim.range[1],input$sim.range[2])
         simulated.model <- list()
         for(type in sim.cancertype.selection) {
           ## Getting the ktissue mean for specified cancer
           kmean.tis <- tissue.kvalues[, names(tissue.kvalues) == type]
           kmean.tis <- mean(kmean.tis)
-          # ## Getting the kclass means for specified cancer
-          # kclnames <- grep("k\\[",names(dfsamps), value=TRUE)
-          # dfclas <- dfsamps[,kclnames]
+          ## Getting the effective age for specified cancer
+          effagemean.tis <- tissue.effage[, names(tissue.effage) == type]
+          effagemean.tis <- mean(effagemean.tis)
+          ## Getting the effective age rate for specified cancer
+          effagertmean.tis <- tissue.effagert[, names(tissue.effagert) == type]
+          effagertmean.tis <- mean(effagertmean.tis)
+          
+          # ## Getting the effective age class means for specified cancer
+          # effageclnames <- grep("effage0\\[",names(dfsamps), value=TRUE)
+          # dfclas <- dfsamps[,effageclnames]
           # dfclas <- stack(dfclas)
           # names(dfclas) <- c("value","coefname")
           # ## Separate coefname to only include class
-          # dfclas$class <- gsub(pattern = ".*,", replacement = "", x = dfclas$coefname) 
+          # dfclas$class <- gsub(pattern = ".*,", replacement = "", x = dfclas$coefname)
           # dfclas$class <- gsub(pattern = "\\].*", replacement = "", x = dfclas$class)
           # ## Separate coefname to only include tissue
-          # dfclas$tiss <- gsub(pattern = ",.*", replacement = "", x = dfclas$coefname) 
-          # dfclas$tiss <- gsub(pattern = ".*\\[", replacement = "", x = dfclas$tiss) 
+          # dfclas$tiss <- gsub(pattern = ",.*", replacement = "", x = dfclas$coefname)
+          # dfclas$tiss <- gsub(pattern = ".*\\[", replacement = "", x = dfclas$tiss)
           # 
           # convert.tiss2names <- data.frame(tiss = as.character(1:23),
           #                                  tissnames = tisnames)
@@ -469,27 +487,26 @@ server <- (function(input, output, session) {
           #     dplyr::select(-tiss) ## Remove tissue number system
           # rm(convert.tiss2names)
           # save(dfclas, file = "~/TTmanu/code/supplemental_file_shiny/dfclas.rda")
-          #load("dfclas.rmd")
-          #load("~/TTmanu/code/supplemental_file_shiny/dfclas.rmd")
+
           ## Getting the kclass mean for specified cluster
           for(tumorclass in sim.cluster.selection) {
             if(tumorclass == "All") {
-              kcl <- dfclas[which(dfclas$tissnames %in% type),]
-              kmean.cl <- mean(kcl$value)
+              effagecl <- dfclas[which(dfclas$tissnames %in% type),]
+              effagemean.cl <- mean(effagecl$value)
             } else{
-              kcl <- dfclas[which(dfclas$tissnames %in% type &
+                effagecl <- dfclas[which(dfclas$tissnames %in% type &
                                     dfclas$class %in% tumorclass),]
-              kmean.cl <- mean(kcl$value)
+                effagemean.cl <- mean(effagecl$value)
             }
             
-            ## Getting kmean value ##
-            kmean <- kmean.tis * kmean.cl
+            ## Calculate effective age
+            effage.mixed <- effagemean.tis * effagemean.cl + effagertmean.tis * (mixedages - 20)
             ## Getting age info
             
             ##Name for cancer type and cluster
-            listname <- paste0(type, " Cluster ", tumorclass, "; k = ", round(kmean, digits = 1))
-            
-            simulated.model[[listname]] <- sapply(mixedages,function(a) tryCatch(simdeath(r20[agemodel],agerate[agemodel],a,kmean)/365,error= function(e) {0}))
+            listname <- paste0(type, " Cluster ", tumorclass)
+            #listname <- paste0(type, " Cluster ", tumorclass, "; A0 = ", round(effagemean.tis, digits = 1), "; Acl = ", round(effagemean.cl, digits = 2))
+            simulated.model[[listname]] <- sapply(effage.mixed,function(a) tryCatch(simdeath(r20[agemodel],agerate[agemodel],a,kmean.tis)/365,error= function(e) {0}))
           }
         }
         
@@ -515,12 +532,6 @@ server <- (function(input, output, session) {
           max.x <- max(simulated.model$time) + 5
         }
         
-        if(input$sim.ethnic == "WHITE") {
-            ethnic.group <- "European descent"
-        } else {
-            ethnic.group <- "African descent"
-        }
-        
         ggplot(simulated.model, aes(time = time, color = condition, status = status)) +
           geom_km() +
           theme_classic() +
@@ -530,7 +541,7 @@ server <- (function(input, output, session) {
           labs(x = "Survival Time (years past diagnosis)",
                y = "Probabilty",
                colour = "",
-               title = sprintf("Survival for simulated %s %s patients", ethnic.group, tolower(sim.sex.selection))) +
+               title = sprintf("Survival for simulated %s patients", tolower(sim.sex.selection))) +
           theme(axis.text = element_text(size = 12),
                 axis.title = element_text(size = 14))
     })
