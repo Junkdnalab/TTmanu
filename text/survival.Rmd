@@ -7,14 +7,14 @@ from the CDC. The model estimates the effect of cancer type and cluster-specific
 cancer effects independently, resulting in a cancer and cluster-specific
 estimate of an effective age function and the aging rate multiplier, $k$.
 
-To illustrate the model, we simulate survival for four related groups (**Fig
+To illustrate the model, we simulate survival for six related groups (**Fig
 5A**). We start with a cohort of women aged 30 randomly selected from the US
 population, and show expected survival (light blue). We then use typical values
 from the posterior samples to set the effective age of that cohort to the
 effective age of a BRCA patient (yellow). Finally to illustrate how the model
 varies by effective age we add an additional artificial 10 years to the BRCA
-effective age (dark blue). Compare these results to a randomly selected group of
-women ranging from 30 to 70 years old (green). Immediately, survival changes due
+effective age (dark blue). Compare these results to a uniformly selected group of
+women ranging from 30 to 70 years old at random (green). Immediately, survival changes due
 to the mixture of ages, without malignancy. By computing the effective ages for
 this mixture of patients, we see that malignancy further reduces expected
 lifespan (pink). Adding an additional 10 years to effective age would reduce the

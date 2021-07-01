@@ -13,7 +13,12 @@ identify hundreds of global and tissue-specific cancer driver genes
 @lawrenceDiscoverySaturationAnalysis2014;
 @kumarStatisticallyIdentifyingTumor2015; @tokheimEvaluatingEvaluationCancer2016;
 @jiangWITER2019; @zhaoModelingPositive2019] using approaches aimed at detecting
-genes mutated at a greater rate than expected due to chance. It has been
+genes mutated at a greater rate than expected due to chance. Dees et al. [@deesMuSiC2012]
+developed a pipline to separate driver mutations from passenger mutations. 
+Tamborero et al. [@tamboreroOncodriveCLUST2013] expanded on this idea to identify 
+tumor mutation biases towards specific regions of a protein sequence. Lawrence et 
+al. [@lawrenceDiscoverySaturationAnalysis2014] focused on identifying cancer driver 
+genes with intermediate mutation frequencies using tumor-normal pairs. It has been
 estimated that fewer than five mutations in key oncogenes and/or tumor
 suppressors would be sufficient to transform a normal cell to a cancerous state
 [@vogelsteinPathCancerThree2015; @Iranzo-Network]. Mutations in cancer driver
@@ -37,8 +42,18 @@ pan-gynecological/squamous and pan-kidney
 [@hoadleyCellofOriginPatternsDominate2018].
 
 More recently, pan-cancer mutations and other data have been looked at as
-disruptions of normal pathway activity. Sanchez-Vega et al. [@PCAWG-PATH] carried out exhaustive
-analysis of pathway enrichment using whole genome data. Network approaches
+disruptions of normal pathway activity. Pathway-centric analysis of tumors
+provides additional benefits over gene-centric analysis: (1) It is significantly 
+less noisy because it aggregates molecular events across multiple genes in the 
+same pathway and (2) the identification of a potential casual mechanism is easier 
+to interpret as genetic aberrations are linked to molecular pathways. In a perspective, 
+Creixell et al. [@Creixell-pathwaynetworkanalysis] described approaches of pathway 
+and network analysis applicable to next-generation sequencing data. The most common 
+approach being fixed-gene enrichment analysis to identify over-represented pathways. 
+Sanchez-Vega et al. [@PCAWG-PATH] carried out an exhaustive
+analysis of pathway enrichment using whole genome data. Focusing on ten frequently 
+altered canonical signaling pathways in cancer, they explored the mutation frequencies 
+of coding regions of genes in these pathways for each cancer type. Network approaches
 address the sparseness of mutations, allowing genes to be influenced by
 mutations in nearest network neighbors [@hotnet2;@hornNetSigNetworkbasedDiscovery2018;
 @Iranzo-Network]. These methods are powerful especially when applied to smaller

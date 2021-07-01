@@ -426,23 +426,31 @@ cancer type mutated for each gene. Depleted significant genes (left). Enriched
 significant genes (right).
 
 **Fig 5. Comparison of different cancers, simulated and actual results.**
-Comparison of survival in four simulated cohorts. A) A group consisting of
-randomly selected 30 year old women, unaffected (light blue) _vs._ cancer, 
-($k = 2$, light orange), another group consisting of random 30-70 year-old
-women, unaffecteds (dark blue) and cancer $k = 2$ (dark orange). B,C,D,E)
-Compare random group with correct age distribution for the given cancer
-(turqoise) to the model predicted survival for the given average k (blue) and
-the actual survival for the patients in our dataset (orange). Differences with
-actual data are likely due to a mixture of cluster identities which we exclude
-from these simulations for simplicity. F) Effects are compared between cancer
-type by showing the probability density for the posterior value of the $k_{tis}$
-multiplier. Larger values correspond to decreased age-independent life
-expectancy.
+Comparison of survival in six simulated cohorts. A) A group consisting of
+randomly selected 30 year old women, unaffected (light blue) _vs._ cancer 
+using the typical values from the posterior samples for a BRCA patient (yellow) 
+and an artificial 10 years added to the effective age for a BRCA patient 
+(dark blue), another group consisting of uniformly selected 30-70 year-old
+women at random, unaffected (green) and cancer without (pink) and with (dark orange) 
+the artificial 10 years. B) Posterior probability density of a 20 year old 
+accelerated aging by cancer type (effective age). Red dashed line represents
+age for unaffected individual, C) Posterior probability density of effective 
+age rate for every additional year past 20 year old by cancer type. Red 
+dashed line represents effective age rate for unaffected individual, D) 
+Posterior probability density of the $k_{tis}$ multiplier. Values greater 
+than 1 correspond to decreased age-independent life expectancy. Red dashed 
+line represents $k_{tis}$ for unaffected individual. E,F,G,H) Comparison 
+of our model to the actual survival for the patients in our dataset. We 
+compare random group with correct age distribution for the given cancer 
+(turqoise) to the model predicted survival for the given average effective 
+age (blue) and the actual survival for the patients in our dataset (orange). 
+Differences with actual data are likely due to a mixture of cluster 
+identities which we exclude from these simulations for simplicity.
 
-**Fig 6. Cluster specific $k_{cl}$ values for each cancer type.** The overall
-$k$ value is the product of $k_{tis} \times k_{cl}$. The cluster-specific $k$
-represents relative aggressiveness of each cluster within cancer type. Alpha
-transparency (α) is set to reflect varying confidence in the posterior
+**Fig 6. Cluster specific $A_{cl}$ values for each cancer type.** The overall
+effective age value is the product of $A_{0} x A_{cl} + A_{r} x (A^1 – 20)$. 
+The cluster-specific A represents relative aggressiveness of each cluster within 
+cancer type. Alpha transparency (α) is set to reflect varying confidence in the posterior
 distribution when the number of observations is N<10, α = 0.1; N<25, α = 0.5; N
 ≥ 25 α = 1.0.
 
