@@ -354,6 +354,17 @@ with more sophisticated filtering of likely passenger mutations [_e.g._
 incorporate these other data into a comprehensive pathway-centric analysis as we
 have done here for point mutations and indels.
 
+The outcome of our model comparison with other published classification models 
+in predicting tdeath showed kNN performing slightly better. However, for the 
+purpose of predicting lifetime, all models are practically equivalent. One 
+explanation for this is the cluster identity does not provide much new information 
+from tissue-of-origin. Most of the cluster-specific rate ($A_{cl}$) peaked around 1 for 
+all models – leaving the remaining variables ($A_{0}$, $A_{r}$, and $k_{tis}$), which are 
+tissue-specific, to compute tdeath. While our study focused on somatic mutations, 
+the incorporation of other types of omics data may help differentiate the classes 
+within cancer type. Additionally, more work in solidifying the pathway model into 
+cancer hallmarks could provide biologically meaningful distinction of the clusters.
+
 ## Resource Availability
 
 Further information and requests for resources should be directed to and will
