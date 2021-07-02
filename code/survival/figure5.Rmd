@@ -53,7 +53,7 @@ p1 <- ggplot(simdata, aes(time = time, color = condition, status = status)) +
   annotate("text", x = 27, y = .35, label = "Mixed age women BRCA+10yr", color = "#D55E00", size = 3) +
   theme(legend.position = "none") 
 
-load("./survmodel_effcl_knn_062821.stansave")
+load("./survmodel_effcl_knn_070121.stansave")
 cancerdat = read_csv("../../data/survival/clinical_plus_cluster.csv");
 cancerdat$type <- as.factor(cancerdat$type)
 tisnames <- levels(cancerdat$type)

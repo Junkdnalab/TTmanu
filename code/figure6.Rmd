@@ -40,7 +40,7 @@ tisnames <- levels(cancerdat$type) ## getting cancer type names
 
 
 ## Processing data
-load("../data/survival/survmodel_effcl_knn_062521.stansave")
+load("./survival/survmodel_effcl_knn_070121.stansave")
 dfsamps <- as.data.frame(samps)
 clnames = grep("effage0\\[",names(dfsamps), value=TRUE)
 dfclas = dfsamps[,clnames]

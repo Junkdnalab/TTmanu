@@ -30,7 +30,7 @@ data{
 
 parameters{
   real<lower=0.0> r20[2];
-  real<lower=0.0> ktis[Nt];
+  real<lower=0.05> ktis[Nt];
   real<lower=0.0> agerate[2];
   real<lower=0.0> effage0tiss[Nt];
   real<lower=0.0> effage0[Nt,Nc];
