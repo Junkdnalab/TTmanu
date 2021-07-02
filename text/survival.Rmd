@@ -73,16 +73,16 @@ other forms, as does LGG group 7, whereas BRCA group 5, COAD group 8, and LGG
 group 5 all seem somewhat lower risk than the other classes within those
 tissues.
 
-To determine the significance of our pathway-based clustering, we evaluated the 
-performance in predicting time to death (tdeath) with other published classification 
-models. We downloaded cluster membership form two studies conducted within the TCGA 
-consortium [@hoadleyMultiplatformAnalysis2014; @hoadleyCellofOriginPatternsDominate2018]. 
-We generated tdeath predictions from uniform random p, by inverting the cumulative 
-distribution function of our death probability function. Using the actual tdeath 
-from TCGA as the reference, we show that our pathway-based clustering (referred to as 
-kNN) had better performance compared to COCA [@hoadleyMultiplatformAnalysis2014], 
-iCluster [@hoadleyCellofOriginPatternsDominate2018] and tissue-of-origin (tis) - 
-although not statistically significant (**S5A Fig**). Additionally, we computed the
-tdeath error using matched sample tdeath from the prediction model and actual (**S5B Fig**). 
-Again, all models had similar performance with kNN performing slightly better as 
-indicated by a smaller error entropy.
+To compare our pathway-based clustering to other published methods, we evaluated
+the performance in predicting time to death (tdeath) with other published
+classification models. We downloaded cluster membership from two studies
+conducted within the TCGA consortium [@hoadleyMultiplatformAnalysis2014;
+@hoadleyCellofOriginPatternsDominate2018].  We generated tdeath predictions from
+uniform random p, by inverting the cumulative distribution function of our death
+probability function. Using the actual tdeath from TCGA as the reference, we
+show that our pathway-based clustering (referred to as kNN) had slightly better
+performance compared to COCA [@hoadleyMultiplatformAnalysis2014], iCluster
+[@hoadleyCellofOriginPatternsDominate2018] and tissue-of-origin (tis). (**S5A
+Fig**). Additionally, we computed the entropy of the error distribution in
+predictions (**S5B Fig**).  All models had similar performance with kNN
+performing slightly better as indicated by a slightly smaller error entropy.
