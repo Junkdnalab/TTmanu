@@ -284,13 +284,13 @@ entropy <- list()
 for(n in model) {
   ## Load correct model
   if(n == "knn") {
-    load("./survival/survmodel_effcl_knn_062821.stansave")
+    load("./survival/survmodel_effcl_knn_070121.stansave")
   } else if(n == "icluster") {
-    load("./survival/survmodel_effcl_icluster_062821.stansave")
+    load("./survival/survmodel_effcl_icluster_070121.stansave")
   } else if (n == "coca") {
-    load("./survival/survmodel_effcl_coca_062821.stansave")
+    load("./survival/survmodel_effcl_coca_070121.stansave")
   } else if (n == "tis") {
-    load("./survival/survmodel_effcl_tis_062821.stansave")
+    load("./survival/survmodel_effcl_tis_070121.stansave")
   } else {
     print("Model does not exist")
   }
@@ -332,13 +332,13 @@ model <- c("knn", "icluster", "coca", "tis")
 for(n in model) {
    ## Load correct model
   if(n == "knn") {
-    load("./survival/survmodel_effcl_knn_062821.stansave")
+    load("./survival/survmodel_effcl_knn_070121.stansave")
   } else if(n == "icluster") {
-    load("./survival/survmodel_effcl_icluster_062821.stansave")
+    load("./survival/survmodel_effcl_icluster_070121.stansave")
   } else if (n == "coca") {
-    load("./survival/survmodel_effcl_coca_062821.stansave")
+    load("./survival/survmodel_effcl_coca_070121.stansave")
   } else if (n == "tis") {
-    load("./survival/survmodel_effcl_tis_062821.stansave")
+    load("./survival/survmodel_effcl_tis_070121.stansave")
   }
   else {
     print("Model does not exist")
@@ -371,7 +371,7 @@ s5.1 <- ggplot(knn) + stat_ecdf(aes(x=tdeath),color="#00BFC4", size = 1) +
 s5.2 <- ggplot(data = tdeath.error, aes(x = error, group = model, fill = model)) +
   geom_density(alpha = 0.5) +
   theme_minimal() +
-  scale_x_continuous(breaks=seq(-4000, 4000, by = 2000), limits = c(-3650,3650)) +
+  #scale_x_continuous(breaks=seq(-4000, 4000, by = 2000), limits = c(-3650,3650)) +
   labs(x = "Error (Predicted - Actual)", y = "Density")#, 
        #subtitle = paste0("Entropy - knn: ", entropy$knn, " ; icluster: ", entropy$icluster, "\ncoca: ", entropy$coca, " ; tis: ", entropy$tis))
 
