@@ -197,7 +197,7 @@ loss of the wildtype, functional allele [@brca-loh], so we projected somatic
 mutations for _BRCA1_ and _BRCA2_ genes onto the UMAP. We did not observe
 segregation of these mutations into specific clusters (**Fig 2C** and see
 interactive media from **S1 File**). We also projected
-mismatch repair (MMR) genes _MSH2_, _MSH6_, _MLH1_, _MLH3_, _PMS1_ and _PMS2_;
+mismatch repair (MMR) genes _MSH2_, _MSH6_, _MLH1_, _MLH3_, _PMS1_ and _PMS2_,
 _BRIP1_, _RAD51_, _CHEK2_ and _APC_. None of these genes except for _APC_
 exhibited remarkable specificity with respect to cluster assignment
 (**S3 Fig**). To look at other risk factors such as maintenance

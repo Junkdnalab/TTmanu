@@ -33,7 +33,7 @@ THCA or PRAD would be treated similarly to a 40 year old based on the Effective
 Age parameter. It's noticeable that for every year beyond 20 in the PRAD
 diagnosis we add only an extra ~ 0.2 years (Effective Age Rate). The $k_{tis}$
 parameter represents an acceleration (greater than 1) or deceleration (less) of
-the further aging beyond diagnosis. For example for BRCA patients each year past
+the further aging beyond diagnosis. For example, for BRCA patients each year past
 diagnosis adds about 1 year of risk, whereas for LGG patients it adds around 2,
 and for SARC patients it adds only 0.25 or so.
 
