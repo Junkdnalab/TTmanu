@@ -14,7 +14,7 @@ identify hundreds of global and tissue-specific cancer driver genes
 @kumarStatisticallyIdentifyingTumor2015; @tokheimEvaluatingEvaluationCancer2016;
 @jiangWITER2019; @zhaoModelingPositive2019] using approaches aimed at detecting
 genes mutated at a greater rate than expected due to chance. Dees et al. [@deesMuSiC2012]
-developed a pipline to separate driver mutations from passenger mutations. 
+developed a pipeline to separate driver mutations from passenger mutations. 
 Tamborero et al. [@tamboreroOncodriveCLUST2013] expanded on this idea to identify 
 tumor mutation biases towards specific regions of a protein sequence. Lawrence et 
 al. [@lawrenceDiscoverySaturationAnalysis2014] focused on identifying cancer driver 
@@ -28,7 +28,7 @@ exposures [@mutations-healthy-tissues].
 Other studies provide a comprehensive view of mutations, gene expression and
 genomic signatures, with the goal of understanding common themes of all cancer
 independent of tissue of origin. Understanding cancer as a disease of the cell
-has long been a goal of the field as characterized in essays by
+has long been a goal of the field as characterized in essays by Hanahan and Weinberg
 [@weinberg2000; @hallmarks_II]. The first of these studies in genomics identified
 11 subtypes from 12 cancer types, using integrative analysis with co-equal
 weighting of gene expression, methylation, copy number and proteomics data

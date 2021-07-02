@@ -432,10 +432,10 @@ using the typical values from the posterior samples for a BRCA patient (yellow)
 and an artificial 10 years added to the effective age for a BRCA patient 
 (dark blue), another group consisting of uniformly selected 30-70 year-old
 women at random, unaffected (green) and cancer without (pink) and with (dark orange) 
-the artificial 10 years. B) Posterior probability density of a 20 year old 
-accelerated aging by cancer type (effective age). Red dashed line represents
+the artificial 10 years. B) Posterior probability density of the effective age 
+baseline ($A_{0}$) by cancer type. Red dashed line represents
 age for unaffected individual, C) Posterior probability density of effective 
-age rate for every additional year past 20 year old by cancer type. Red 
+age rate ($A_{r}$) by cancer type. Red 
 dashed line represents effective age rate for unaffected individual, D) 
 Posterior probability density of the $k_{tis}$ multiplier. Values greater 
 than 1 correspond to decreased age-independent life expectancy. Red dashed 
