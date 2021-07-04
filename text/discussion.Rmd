@@ -113,10 +113,12 @@ pathway enrichment in DNA methylation and DNA double-strand break repair pathway
 Cluster 4 was also enriched for “telomere maintenance”, a mechanism contributing to 
 cancer progression by counteracting telomere shortening. Mutations in the 
 nucleosome as found in cluster 4 have been proposed to hit all attributes of hallmarks of cancer. Cluster 
-7 and 8 shared multiple enrichment in signaling pathways related to the hallmarks: 
+7 and 8 shared multiple enrichment in signaling pathways related to the hallmarks, 
+showing that some clusters share common driver mechanisms: 
 “sustaining proliferative signaling”, “evading tumor suppressors”, “resisting cell 
 death”, and “inducing angiogenesis”. These clusters were strongly defined by 
-mutations in _PI3K_ or _RAS_, respectively. Taken together, our clusters highlight 
+mutations in _PI3K_ or _RAS_, respectively, suggesting a shared etiology in the EGFR 
+pathway for which these genes represent alternative intracellular signaling mechanisms.Taken together, our clusters highlight 
 the similarities and differences at a gene and pathway level between and within 
 different cancer types – uncovering the molecular mechanism in cancer. In the future,
 we hope to explore the defining features of the clusters by connecting the pathway 
