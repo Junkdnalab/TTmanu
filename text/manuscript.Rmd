@@ -3,7 +3,7 @@ title: "A molecular taxonomy of tumors independent of tissue-of-origin"
 author: Peter T. Nguyen$^{1,¶}$, Simon G. Coetzee$^{1,¶}$, Daniel L. Lakeland$^{2}$, and
   Dennis J. Hazelett$^{1,3,*}$
 bibliography: references.bib
-csl: plos-computational-biology.csl
+csl: iscience.csl
 output:
   word_document:
     reference_docx: "../text/word-style-reference-ttmanu-iscb-iscience-v2.docx"
@@ -109,7 +109,7 @@ patient metadata for survival and staging. We chose to analyze exome sequencing
 data because the affected target gene is known unambiguously. Therefore, we
 selected all missense, nonsense, frameshift, stop-loss, untranslated region, and
 splicing mutations. To minimize bias from well-studied diseases and processes,
-we selected 377 Reactome pathways (reactome.org) (see S1 Table) of interest 
+we selected 377 Reactome pathways (reactome.org) (see **Table S1**) of interest 
 corresponding to basic cellular processes and biochemical
 pathways, excluding those corresponding to catalytic categories (_e.g._
 “transcription factors”) or disease associations (_e.g._ “mutated in colon
@@ -137,11 +137,11 @@ cell-type-specific biases that might result in predisposition to different
 classes of cancer however, and we therefore did not exclude these genes from our
 analysis. After selecting pathways and genes, we compiled a matrix of pathways,
 assigning a Boolean value of 1 to each pathway with one or more genes mutated
-and 0 for all others (**Fig 1A**).
+and 0 for all others (**Figure 1A**).
 
 We investigated this dataset using multiple correspondence analysis (MCA)
-[@JSSv025i01], and visually summarized the analysis with UMAP (**Fig 1B** and
-see interactive media from **S1 File** (junkdnalab.shinyapps.io/PANCAN_supplemental/)) [@McInnes2018]. We
+[@JSSv025i01], and visually summarized the analysis with UMAP (**Figure 1B** and
+see interactive media from **File S1** (junkdnalab.shinyapps.io/PANCAN_supplemental/)) [@McInnes2018]. We
 used the resulting graph coordinates to perform density based clustering
 with HDBSCAN [@hdbscan], which resulted in identification of 10 well-defined
 clusters capturing about 80% of the tumor samples. To capture the remaining
@@ -154,12 +154,12 @@ Having defined tumors in terms of pathway disruption profile, we sought to
 understand whether different cancer types segregate into one or more predominant
 clusters. To our surprise, most cancer types were _not_ heavily biased in one
 cluster, and all well-represented cancer types had tumors in every cluster (see
-**Fig 2A** and full tumor profiles in **S1 Fig**,
-interactive media **S1 File**), suggesting that these clusters
+**Figure 2A** and full tumor profiles in **Figure S1**,
+interactive media **File S1**), suggesting that these clusters
 indicate molecular pathology largely independent of tissue-of-origin. As an
 example of one cancer that does have a biased pathway profile, pancreatic
-adenocarcinoma (PAAD) was predominantly found in cluster 8 (**Fig 2A** and
-**S1 Fig** and **S1 File**), but even PAAD
+adenocarcinoma (PAAD) was predominantly found in cluster 8 (**Figure 2A** and
+**Figure S1** and **File S1**), but even PAAD
 comprises tumors from the nine remaining classes. Thus, patients with these
 tumors have potentially different underlying molecular pathologies.
 
@@ -177,9 +177,9 @@ subtypes, composed of Triple-negative/Basal-like, Her2 positive, normal-like,
 and luminal A and B subtypes onto the UMAP. These are among the most heavily
 studied molecular subtypes in cancer, each with different prognoses and
 standards of care. We did not observe exclusive segregation by cluster for these
-subtypes (**Fig 2B**). We also projected histological subtype data for the
-remaining cancers (see **S2 Fig** and see interactive media from 
-**S1 File**); we find that
+subtypes (**Figure 2B**). We also projected histological subtype data for the
+remaining cancers (see **Figure S2** and see interactive media from 
+**File S1**); we find that
 the subtypes, though often biased to one or more clusters, are almost never
 exclusive. We interpret these data to mean that the clusters do not correspond
 to previously identified molecular subtypes within the parent cancer types.
@@ -195,15 +195,15 @@ these genes confer elevated risk for breast, prostate and ovarian cancers. The
 mechanism of risk is thought to involve loss of heterozygosity, resulting in
 loss of the wildtype, functional allele [@brca-loh], so we projected somatic
 mutations for _BRCA1_ and _BRCA2_ genes onto the UMAP. We did not observe
-segregation of these mutations into specific clusters (**Fig 2C** and see
-interactive media from **S1 File**). We also projected
+segregation of these mutations into specific clusters (**Figure 2C** and see
+interactive media from **File S1**). We also projected
 mismatch repair (MMR) genes _MSH2_, _MSH6_, _MLH1_, _MLH3_, _PMS1_ and _PMS2_,
 _BRIP1_, _RAD51_, _CHEK2_ and _APC_. None of these genes except for _APC_
 exhibited remarkable specificity with respect to cluster assignment
-(**S3 Fig**). To look at other risk factors such as maintenance
+(**Figure S3**). To look at other risk factors such as maintenance
 of DNA methylation levels and telomere length, we projected somatic mutations of
 the _TET2_ and _TET3_ genes, plus _TERT_, _TEP1_, and _DKC1_, and observed
-similar lack of cluster bias (**S3 Fig**).
+similar lack of cluster bias (**Figure S3**).
 
 ### Independence of stage, mutation count and mutation profile.
 
@@ -215,12 +215,12 @@ profiles. The UMAP, which features a series of lobe-like structures on a common
 backbone of tumor samples could reflect progression through a series of stages.
 The backbone starts with a cluster of tumors (class 1) that has the fewest point
 mutations and culminates in a cluster (class 10) which has nearly every pathway
-disrupted (**Fig 2F**). However, we don't observe a trend in the overall
+disrupted (**Figure 2F**). However, we don't observe a trend in the overall
 mutation burden across the backbone of the UMAP. Nonetheless, to test the
 hypothesis that the molecular-pathway disruption clusters represent advancement
 through stages, we projected staging data onto the UMAP. Similar to tissue of
 origin and other categories of tumor, we do not observe any bias among the
-stages to specific clusters (**Fig 2D**), suggesting that stage does not
+stages to specific clusters (**Figure 2D**), suggesting that stage does not
 contribute to cluster identity.
 
 Finally, as a measure of tumor advancement, metastasis is the condition in which
@@ -229,7 +229,7 @@ contacts, epithelial to mesenchyme transition, immune system evasion and tissue
 invasiveness [@hallmarks_II]. To determine whether any clusters correspond to an
 especially advanced stage of cancer across tissue types, we projected the
 metastases onto our UMAP, and surprisingly we observed even distribution of the
-samples across clusters (**Fig 2E**). This final observation suggests that
+samples across clusters (**Figure 2E**). This final observation suggests that
 our pathway-disruption clustering is dependent on particular combinations of
 gene mutations affecting different pathways that can each give rise to advanced
 stages of disease and metastasis, regardless and independent of overall
@@ -238,7 +238,7 @@ mutational burden.
 ### Tissue specific genes define cluster membership
 
 In order to identify pathway enrichment across all cancers, we created a list of
-pathway disruptions with percent mutated samples and top genes (**S1 Table**). 
+pathway disruptions with percent mutated samples and top genes (**Table S1**). 
 As expected, these analyses reveal the broad importance of many
 well known pathways that are disrupted in cancer, including "PIP3 activates Akt
 signaling" (77% of samples), "MAP1K/MAP3K signaling" (70% of samples), "Mitotic
@@ -248,19 +248,18 @@ Checkpoints" (62% of samples), _etc._
 To discover what pathways are most important for clustering, we calculated
 percent enrichment _within cluster_ relative to all other clusters and ranked
 pathways from highest to lowest enrichment. We visualized enrichment as a
-heatmap (**Fig 3A**). Using this approach, we identified about fourteen
+heatmap (**Figure 3A**). Using this approach, we identified about fourteen
 pathways per cluster (enrichment score ≥ 0.3, 95% confidence; see methods)
-(**S2 Table**). Clusters 7, 8, and 9 had several pathways in
+(**Table S2**). Clusters 7, 8, and 9 had several pathways in
 common. To explore the specific pathways marking each cluster, we projected
-disruptions for each of the 377 pathways onto the UMAP (**supplementary table
-ST2** and see interactive media from **supplemental file
-1**). Clusters 3 and 5
+disruptions for each of the 377 pathways onto the UMAP (**Table S2** 
+and see interactive media from **File S1**). Clusters 3 and 5
 were distinguished by metabolic pathways including RNA and protein biosynthesis
-(**S2 Table**). Similarly, cluster 4 was distinguished by
+(**Table S2**). Similarly, cluster 4 was distinguished by
 mutations affecting regulation of DNA and histone methylation ("DNA
 methylation", "PRC2 methylates histones and DNA", and "Nucleosome assembly").
 Clusters 7-9 have in common mutations in extracellular, intracellular, and
-immune-related signaling pathways (see **Fig 3B** and **S2 Table**). 
+immune-related signaling pathways (see **Figure 3B** and **Table S2**). 
 Cluster 2 had the highest pathway enrichment levels of the three, having
 mutations in hedgehog signaling, "β-catenin degradation", "cellular response to
 hypoxia", "regulation of cell cycle" and "apoptosis" among others.
@@ -273,11 +272,11 @@ effectors (_i.e._ too few samples to detect above statistical significance
 thresholds), or a combination of both? To answer this question, we compared top
 pathway genes for each cluster relative to TCGA background to find
 differentially mutated genes. We ranked odds ratios and selected the top ten
-enriched and depleted genes (pvalue < 0.01) for each cluster (**Fig 4**; odds
+enriched and depleted genes (pvalue < 0.01) for each cluster (**Figure 4**; odds
 ratios plot). Clusters 7 and 8, which shared multiple enrichment in signaling
 pathways, are largely driven by mutations in _PI3K_ and its orthologs and _Ras_
-genes, respectively (compare _PIK3CA_ and _KRAS_ panels of **S4 Fig** and see 
-interactive media from **S1 File**. Interestingly,
+genes, respectively (compare _PIK3CA_ and _KRAS_ panels of **Figure S4** and see 
+interactive media from **File S1**. Interestingly,
 cluster 9, which also shared multiple enrichment in signaling pathways with
 clusters 7 and 8, is enriched for both _PIK3CA_ and _KRAS_. Clusters 3 and 5,
 defined by enrichment in metabolic pathways, had mutations in ribosomal proteins
@@ -287,7 +286,7 @@ involved in protein degradation. We also observed that genes enriched for one
 cluster are depleted from others (_i.e._ _TP53_ is enriched in cluster 6, but depleted
 in cluster 7; _PIK3CA_ is enriched in cluster 7, but depleted in clusters 3 and
 8). Next, we investigated the proportion of samples per cancer type for the
-significant genes within a cluster (**Fig 4**; heatmap). Surprisingly,
+significant genes within a cluster (**Figure 4**; heatmap). Surprisingly,
 clusters were not predominated by one or more highly mutated genes across all
 cancers. Instead, when observing the mutation rate for these genes within
 samples that belong to a cluster, the mutation rate is heterogeneous across
@@ -313,10 +312,10 @@ found a total of 31 enriched pathways (significant with enrichment score ≥ 0.3
 across all clusters (**Table 1**). A number of enrichments represented pathways
 that were already shown to be enriched in non-metastatic samples of other
 clusters. For example, “Signaling by _PTK6_” is enriched in non-metastatic
-samples of cluster 8 (**S2 Table**) but not in 7 and 9. This
+samples of cluster 8 (**Table S2**) but not in 7 and 9. This
 pathway is enriched in metastatic tumors of clusters 7 and 9 ($p < 10^{-3}$,
 **Table 1**). This is also true of “Erythropoietin activates _RAS_”, which is
-enriched in non-metastatic tumors of cluster 8 (**S2 Table**) and
+enriched in non-metastatic tumors of cluster 8 (**Table S2**) and
 also in metastatic tumors of clusters 7 and 9. Cluster 4 metastases were
 enriched for “Fc epsilon receptor (FCERI) signaling”, a key neutrophil pathway,
 which is also specific to clusters 2, 7 and 8 non-metastatic tumors. Thus,
@@ -371,21 +370,8 @@ biologically meaningful distinction of the clusters. Finally, if treatments can
 be specialized to biological information encoded in cluster, perhaps this could
 drive dramatic improvements in survival among some clusters in the future.
 
-## Resource Availability
-
-Further information and requests for resources should be directed to and will
-be fulfilled by the Lead Contact, Dennis Hazelett (Dennis.Hazelett@cshs.org). Data
-generated in this study have been deposited to Zenodo (https://doi.org/10.5281/zenodo.4011291).
-All code for producing the analyses and figures herein are included in this fully reproducible 
-manuscript in R markdown format. R markdown files and all other models are available from our 
-repositories (https://github.com/dennishazelett/TTmanu) on the distributed
-version control site, GitHub. An interactive media of the results is available on https://junkdnalab.shinyapps.io/PANCAN_supplemental/.
-
-## Methods
-
-Extended descriptions of clustering, models,
-formulae, pathway selection, and gene filtering are provided in supplementary
-methods. 
+## Author Contributions
+P.N., S.G. and D.L. conducted the experiments. D.H. designed the experiments and wrote the paper.
 
 ## Acknowledgements
 
@@ -395,19 +381,12 @@ suggested improvements to the preprint. We also thank Ivetth Corona for early
 discussions and feedback. This work was supported by a grant from the 
 Cedars-Sinai Precision Health Initiative.
 
-## Author Contributions
-P.N., S.G. and D.L. conducted the experiments. D.H. designed the experiments and wrote the paper.
-
 ## Declaration of Interests
 
 The authors declare no competing interests.
 
-## References
-
-<div id="refs"></div>
-
 ## Figure and Table Legend
-**Fig 1. Clustering pathways of tumor samples.** A) Each of 377 selected
+**Figure 1. Clustering pathways of tumor samples.** A) Each of 377 selected
 Reactome pathways (rows) is classified as disrupted if one or more genes is
 mutated in the tumor sample (columns). Red cells denote pathway disruption.
 Tumors types reflect standardized abbreviations from the TCGA project. B)
@@ -415,7 +394,7 @@ Different rotational perspectives of the same MCA-based UMAP projection in
 three-dimensional space. Each dot corresponds to a tumor sample. The same colors
 indicate the tumor's cluster identity throughout this manuscript.
 
-**Fig 2. Pathway-based clustering independent of tissue-of-origin** 
+**Figure 2. Pathway-based clustering independent of tissue-of-origin** 
 A) Sankey plot of correspondence between cancer type and cluster identity.
 B) Projection of breast cancer subtypes onto the UMAP. C) Projection of BRCA1/2
 somatic mutation onto the UMAP. D) Projection of tumor stage onto the UMAP,
@@ -426,13 +405,13 @@ axis is cluster identity. Each dot represents an individual tumor sample, ranked
 lowest to highest by mutation count. The median mutation count in each cluster is 
 indicated by the horizontal line.
 
-**Fig 3. Pan-cancer enrichment of pathway disruptions.** A) Heatmap shows
+**Figure 3. Pan-cancer enrichment of pathway disruptions.** A) Heatmap shows
 relative enrichment of each pathway (rows) within numbered cluster (columns).
 Color represents effect size as percent enrichment. B) Proportion of mutated
 samples in the each significant pathway (columns; union set of pathways with
 effect size ≥ 0.30 in each cluster) within cluster (rows).
 
-**Fig 4. Gene level analysis reveals tissue-specific class signatures.** 
+**Figure 4. Gene level analysis reveals tissue-specific class signatures.** 
 Odds ratio plot; Column uses a logarithmic axis to represent odds ratio with a
 95% confidence interval. Rows: significant genes from each cluster. Each cluster
 was compared against the background (all other clusters) to find differentially
@@ -442,7 +421,7 @@ significant genes. The heatmap shows proportion of samples per cluster and
 cancer type mutated for each gene. Depleted significant genes (left). Enriched
 significant genes (right).
 
-**Fig 5. Comparison of different cancers, simulated and actual results.**
+**Figure 5. Comparison of different cancers, simulated and actual results.**
 Comparison of survival in six simulated cohorts. A) A group consisting of
 randomly selected 30 year old women, unaffected (light blue) _vs._ cancer 
 using the typical values from the posterior samples for a BRCA patient (yellow) 
@@ -464,7 +443,7 @@ age (blue) and the actual survival for the patients in our dataset (orange).
 Differences with actual data are likely due to a mixture of cluster 
 identities which we exclude from these simulations for simplicity.
 
-**Fig 6. Cluster specific $A_{cl}$ values for each cancer type.** The overall
+**Figure 6. Cluster specific $A_{cl}$ values for each cancer type.** The overall
 effective age value is the product of $A_{0} x A_{cl} + A_{r} x (A^1 – 20)$. 
 The cluster-specific A represents relative aggressiveness of each cluster within 
 cancer type. Alpha transparency (α) is set to reflect varying confidence in the posterior
@@ -472,6 +451,26 @@ distribution when the number of observations is N<10, α = 0.1; N<25, α = 0.5; 
 ≥ 25 α = 1.0.
 
 **Table 1: Cluster-specific enriched pathways (effect size ≥ 0.30) in metastasis.**
+
+## Resource Availability
+
+Further information and requests for resources should be directed to and will
+be fulfilled by the Lead Contact, Dennis Hazelett (Dennis.Hazelett@cshs.org). Data
+generated in this study have been deposited to Zenodo (https://doi.org/10.5281/zenodo.4011291).
+All code for producing the analyses and figures herein are included in this fully reproducible 
+manuscript in R markdown format. R markdown files and all other models are available from our 
+repositories (https://github.com/dennishazelett/TTmanu) on the distributed
+version control site, GitHub. An interactive media of the results is available on https://junkdnalab.shinyapps.io/PANCAN_supplemental/.
+
+## Methods
+
+Extended descriptions of clustering, models,
+formulae, pathway selection, and gene filtering are provided in supplementary
+methods. 
+
+## References
+
+<div id="refs"></div>
 
 ```{r, results='asis'}
 cat("\\newpage")

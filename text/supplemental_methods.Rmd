@@ -1,7 +1,7 @@
 ---
 title: "Supplementary methods"
 bibliography: references.bib
-csl: plos-computational-biology.csl
+csl: iscience.csl
 output:
   word_document:
     reference_docx: "../text/word-style-reference-ttmanu-iscb-iscience-v2.docx"
@@ -59,13 +59,13 @@ In order to classify tumors using this dataset, we used multiple correspondence
 analysis (MCA) [@JSSv025i01]. First, we determined the number of dimensions
 containing useful information by selecting the eigenvalue with the most
 explanatory power, using the average of 100 permutations of the data as baseline
-(**SM1A Fig**). We then chose the maximum eigenvalue for which the p-value
-remained ≤ 0.05 (see cutoff in **SM1B Fig**). Then we performed a UMAP
+(**Figure SM1A**). We then chose the maximum eigenvalue for which the p-value
+remained ≤ 0.05 (see cutoff in **Figure SM1B**). Then we performed a UMAP
 analysis [@McInnes2018], both in order to summarize the MCA graphically, and as
 a preprocessing step to boost the performance of density based clustering. The
 resulting map was notable for its lobed structure, with several reproducible
 projections regardless of random seed setting. A representative version of this
-3D UMAP is shown in **SM1C Fig**, rotated to enhance the visibility of the
+3D UMAP is shown in **Figure SM1C**, rotated to enhance the visibility of the
 major features. Following this spatial mapping we attempted to define groupings
 of similar tumors within the spatial map using HDBSCAN, which performs
 hierarchical clustering and provides metrics of cluster stability and
@@ -75,8 +75,8 @@ of tumor samples in a cluster that capture the maximum number of tumor samples,
 measured by probability of membership of ≥ 5% in at least one cluster. Thus, we
 created a score metric as the fraction of classified tumors with max probability
 < 5% in one cluster and chose a cluster size of 92 to minimize the score
-function (**SM1D Fig**). HDBSCAN with these settings resulted in ten distinct
-high-density clusters which we then projected onto the UMAP (**SM1E Fig**).
+function (**Figure SM1D**). HDBSCAN with these settings resulted in ten distinct
+high-density clusters which we then projected onto the UMAP (**Figure SM1E**).
 This classified 6,038 out of 7,607 tumors but still resulted in a significant
 fraction of unclassified tumor samples. Since we ultimately wish to be able to
 classify any tumor using this scheme, we performed k Nearest Neighbors (kNN)
@@ -84,7 +84,7 @@ analysis, which computes a similarity metric to every tumor in the set and then
 lets the _k_ most similar tumors "vote" as to the identity of the query tumor
 sample based on their cluster labels. We set _k_ to be the square root of the
 number of tumor samples (87). Using this method, we assigned cluster membership
-to the remaining tumors (**SM1F Fig** and see interactive media from **S1 File** (junkdnalab.shinyapps.io/PANCAN_supplemental/)).
+to the remaining tumors (**Figure SM1F** and see interactive media from **File S1** (junkdnalab.shinyapps.io/PANCAN_supplemental/)).
 
 ### Selection of pathways
 
@@ -212,7 +212,7 @@ disambiguate the meaning of the two, the prior for $A_0$ has high probability
 range from about 40 to 100 years, whereas the prior distribution of $A_{cl}$ has
 peak probability at 1 and a relatively narrow width, due to the fact that it is
 a tissue specific multiplicative modifying factor. To understand the roles of
-these priors refer to (**SM3 Fig**).
+these priors refer to (**Figure SM3**).
 
 Using this model, we split the data by Male/Female sex. Sex is known to be a
 risk factor for death, with males dying at slightly higher rates for all ages of
@@ -242,11 +242,11 @@ cat("\\newpage")
 cat("\\newpage")
 ```
 
-#### Fig SM1
+#### Figure SM1
 ```{r child='../code/figureSM1.Rmd'}
 ```
 
-**Fig SM1. Method for tumor classification using pathway aberration data** 
+**Figure SM1. Method for tumor classification using pathway aberration data** 
 A) MCA analysis was performed to determine the eigenvalue with the most
 explanatory power from the categorical data. Average of 100 permutations of the
 data was used as a baseline. B) The p-value of each eigenvalue was plotted and
@@ -263,12 +263,12 @@ assign membership to the remaining tumors.
 cat("\\newpage")
 ```
 
-#### Fig SM2
+#### Figure SM2
 
 ```{r child='../code/figureSM2.Rmd'}
 ```
 
-**Fig SM2. Comparison between CDC data and ODE model fit for
+**Figure SM2. Comparison between CDC data and ODE model fit for
 males and females of European descent.** This comparison does not distinguish on
 ethnicity for simplicity in visualization.
 
@@ -276,7 +276,7 @@ ethnicity for simplicity in visualization.
 cat("\\newpage")
 ```
 
-#### Fig SM3
+#### Figure SM3
 
 ```{r sm3, fig.height=3, fig.width=6}
 sm3.1 <- ggplot(data.frame(x=0:110),aes(x)) + 
@@ -305,7 +305,7 @@ AABB
 sm3.1 + sm3.2 + plot_annotation(tag_levels = "A") + plot_layout(design = layout)
 ```
 
-**Fig SM3. Priors for the tissue and class coefficients.** A) The tissue
+**Figure SM3. Priors for the tissue and class coefficients.** A) The tissue
 coefficient is chosen to admit ages between 40 and 100 years old as a baseline
 age. B) Within a given tissue, the class parameter multiplies the tissue value and
 is given a peak density at 1, and a credible range from near 0.6 to 1.4,
