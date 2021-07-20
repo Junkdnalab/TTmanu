@@ -2,7 +2,7 @@ Cancer is an organism-level disease, impacting processes from cellular
 metabolism and the microenvironment to systemic immune response. Nevertheless,
 efforts to distinguish overarching mutational processes from interactions with
 the cell of origin for a tumor have seen limited success, presenting a barrier
-to individualized medicine. Here we present a novel, pathway-centric approach,
+to individualized medicine. Here we present a pathway-centric approach,
 extracting somatic mutational profiles within and between tissues, largely
 orthogonal to cell of origin, mutational burden, or stage. Known predisposition
 variants are equally distributed among clusters, and largely independent of

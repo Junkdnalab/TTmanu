@@ -5,12 +5,11 @@ names(cluster.colours) <- c(0:10)
 
 ## Getting n_race for white and black
 cancerinfo <- read_csv("../data/survival/clinical_plus_cluster.csv")
-cancer.clusttype <- cancerinfo %>% dplyr::select(type, race, clust_knn) %>% ## select relevant columns
-  filter(race %in% c("WHITE", "BLACK OR AFRICAN AMERICAN")) ## filter black and white only
-cancer.race <- as.data.frame(table(cancer.clusttype$type)) ## table cancer type
-cancer.race$facetname <- paste0(cancer.race$Var1, " (N = ", cancer.race$Freq, (")")) ## Create a new col with type and freq together
-cancer.race$Freq <- NULL ## Remove Freq Column
-names(cancer.race) <- c("tiss", "facetname") ## rename cols for left join in kclassplot below
+cancer.clusttype <- cancerinfo %>% dplyr::select(type, race, clust_knn) ## select relevant columns
+n_cancer <- as.data.frame(table(cancer.clusttype$type)) ## table cancer type
+n_cancer$facetname <- paste0(n_cancer$Var1, " (N = ", n_cancer$Freq, (")")) ## Create a new col with type and freq together
+n_cancer$Freq <- NULL ## Remove Freq Column
+names(n_cancer) <- c("tiss", "facetname") ## rename cols for left join in kclassplot below
 
 
 ## Getting n_cluster within cancer.type to calculate alpha
@@ -41,16 +40,18 @@ tisnames <- levels(cancerdat$type) ## getting cancer type names
 
 
 ## Processing data
-kclnames = grep("k\\[",names(dfsamps), value=TRUE)
-dfclas = dfsamps[,kclnames]
+load("./survival/survmodel_effcl_knn_070121.stansave")
+dfsamps <- as.data.frame(samps)
+clnames = grep("effage0\\[",names(dfsamps), value=TRUE)
+dfclas = dfsamps[,clnames]
 dfclas = stack(dfclas)
 names(dfclas) = c("value","coefname")
-dfclas$class = as.factor(as.numeric(gsub("k\\[(.*),(.*)\\]","\\2",dfclas$coefname)))
-dfclas$tiss = tisnames[as.numeric(gsub("k\\[(.*),(.*)\\]","\\1",dfclas$coefname))]
+dfclas$class = as.factor(as.numeric(gsub("effage0\\[(.*),(.*)\\]","\\2",dfclas$coefname)))
+dfclas$tiss = tisnames[as.numeric(gsub("effage0\\[(.*),(.*)\\]","\\1",dfclas$coefname))]
 dfclas$class <- fct_rev(dfclas$class)
 	
 ## Left joining data created above
-dfclas <- left_join(dfclas, cancer.race, by = "tiss") ## add facet names
+dfclas <- left_join(dfclas, n_cancer, by = "tiss") ## add facet names
 	
 # ## Code for adding alpha level text
 # 	dfclas <- left_join(dfclas, textlist, by = "tiss")
@@ -67,13 +68,17 @@ alpha.setup <- c() ## create empty vector for loop
 	    alpha.setup <- c(alpha.setup, rep(df[p, "alpha"], 512)) ## Get the alpha value for each cluster in each cancer type and rep 512 (necessary for geom ridges)
 	  }
 	}
+
+normal_lines <- data.frame(facetname = unique(dfclas$facetname),
+                         x0 = 1) ## Add dashed line at x = 1
 	
 	## Plotting
 	ggplot(dfclas,aes_(x = quote(value),y = quote(class), fill = quote(class))) + geom_density_ridges(alpha = alpha.setup) +
 		facet_wrap(. ~ facetname,nrow=3) + theme_minimal() + scale_fill_brewer(palette = "Paired") +
-		xlim(0,3) + theme(legend.position = "none") + ggtitle("Class Specific Coefficients") +
-	  labs(x = expression(paste("k"["cl"])), y = "Cluster Identity") +
-	  #geom_text(data = dfclas, aes(label = lab), x = 2.5, y = 6) +
-	  mytheme + theme(plot.title= element_text(hjust = 0.5))+ turn.off.legend +
-	  scale_fill_manual(values = cluster.colours)
+	  theme(legend.position = "none") +
+	  labs(x = expression(paste("A"["cl"])), y = "Cluster Identity") +
+	  theme(plot.title= element_text(hjust = 0.5)) +
+	  scale_fill_manual(values = cluster.colours) +
+	  scale_x_continuous(breaks=seq(0.5,1.5, by = 0.5), limits = c(0.5,1.5)) +
+    geom_vline(aes(xintercept=1), linetype = "dashed", color = "red")
 ```

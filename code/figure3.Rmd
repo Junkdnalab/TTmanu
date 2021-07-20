@@ -235,7 +235,7 @@ fig5A <- ggplot(data = effect_heatmap, aes(x = cluster, y = path_name)) +
     n.breaks = 12,
     limits = c(-1, 1), ## Set scale range
     name = "Effect Size",
-    labels = c(-1, "", 0.5, "", "", 0, "", "", 0.5, "", 1)
+    labels = c(-0.8, "", -0.4, "", 0, "", 0.4, "", 0.8)
   ) +
   #facet_wrap(cluster~., ncol = 1, strip.position = "right", scales = "free_y") + ## facet by cluster
   facet_grid(.~cluster, scales = "free", space = "free", switch = "x") +

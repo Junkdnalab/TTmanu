@@ -19,7 +19,6 @@ data{
   int Nt;
   int Nc;
   int age[Np];
-  int patient[Np];
   int tissue[Np];
   int tclass[Np];
   real tevent[Np];
@@ -31,21 +30,29 @@ data{
 
 parameters{
   real<lower=0.0> r20[2];
-  real<lower=0.0> k[Nt,Nc];
-  real<lower=0.0> ktis[Nt];
+  real<lower=0.05> ktis[Nt];
   real<lower=0.0> agerate[2];
+  real<lower=0.0> effage0tiss[Nt];
+  real<lower=0.0> effage0[Nt,Nc];
+  real<lower=0.0> effagert[Nt];
 }
 
 model{
+
   agerate ~ gamma(2.0,1.0/1.0);
   r20 ~ gamma(1.5,0.5/1.0);
   for(tis in 1:Nt){
-    ktis[tis] ~ gamma(1.2,0.2/1.0);
+    ktis[tis] ~ gamma(1.5,0.5/1.0);
+    effage0tiss[tis] ~ gamma(30.0,29.0/65);
     for( cl in 1:Nc){
-      k[tis,cl] ~ gamma(3.5,2.5/1.0);
+      effage0[tis,cl] ~ gamma(50.0,49.0/1.0); // within the range about .8 to 1.4 or so
     }
   }
 
+
+  effagert ~ gamma(2.0,1.0/2.0);
+  
+  
   // calibrate the age specific risk rate to CDC published life tables
   log(womccdf[71]) ~ normal(ourmodel_lccdf(70*365 | 0,agerate[1]*.05,1,r20[1]*1e-5),log(1.01));
   log(menccdf[71]) ~ normal(ourmodel_lccdf(70*365 | 0,agerate[2]*.05,1,r20[2]*1e-5),log(1.01));
@@ -64,13 +71,38 @@ model{
   for(i in 1:Np){
     int tis = tissue[i];
     int cl = tclass[i];
+    real effage;
+
+    effage = effage0tiss[tis]*effage0[tis,cl] + effagert[tis]*(age[i] - 20.0);
+    
     if(eventtype[i] == 1){
-      target += ourmodel_lpdf(tevent[i]| age[i],agerate[gender[i]] * 0.05 ,ktis[tis]*k[tis,cl],r20[gender[i]] * 1e-5);
+      target += ourmodel_lpdf(tevent[i]| effage,agerate[gender[i]] * 0.05 ,ktis[tis],r20[gender[i]] * 1e-5);
     }else{
-      target += ourmodel_lccdf(tevent[i]| age[i],agerate[gender[i]] * 0.05 ,ktis[tis]*k[tis,cl],r20[gender[i]] * 1e-5);
+      target += ourmodel_lccdf(tevent[i]| effage,agerate[gender[i]] * 0.05 ,ktis[tis],r20[gender[i]] * 1e-5);
     }
   }
 }
 
-
+generated quantities{
+  real<lower=-1.0> tdeath[Np];
+  real<lower=-1.0> tdeathnorm[Np];
+  
+  for (i in 1:Np) {
+    int tis = tissue[i];
+    int cl = tclass[i];
+    real effage;
+    real p = uniform_rng(0,1);
+    
+    effage = effage0tiss[tis]*effage0[tis,cl] + effagert[tis]*(age[i] - 20.0);
+    
+    tdeath[i] = -((365 * effage-7300) * agerate[gender[i]] * 0.05  
+      - 365 * log(exp(effage * agerate[gender[i]] * 0.05 - 20 * agerate[gender[i]] * 0.05) 
+      - (agerate[gender[i]] * ktis[tis] * log1m(p)) / (365 * r20[gender[i]] * 1e-5)))
+      / (agerate[gender[i]] * ktis[tis]);
+    tdeathnorm[i] = -((365 * age[i]-7300) * agerate[gender[i]] * 0.05  
+      - 365 * log(exp(age[i] * agerate[gender[i]] * 0.05 - 20 * agerate[gender[i]] * 0.05) 
+      - (agerate[gender[i]] * log1m(p)) / (365 * r20[gender[i]] * 1e-5)))
+      / (agerate[gender[i]]);
+  }
+}
 

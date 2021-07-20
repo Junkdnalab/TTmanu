@@ -1,10 +1,10 @@
 ---
 title: "Supplementary methods"
-author: "Peter T. Nguyen, Simon G. Coetzee, Daniel L. Lakeland, and Dennis J. Hazelett"
 bibliography: references.bib
+csl: iscience.csl
 output:
   word_document:
-    reference_docx: "../text/word-style-reference-ttmanu.docx"
+    reference_docx: "../text/word-style-reference-ttmanu-iscb-iscience-v2.docx"
 always_allow_html: TRUE
 editor_options:
   chunk_output_type: console
@@ -53,21 +53,19 @@ library(ggalluvial)
 ```
 
 
-## Supplementary Methods
-
 ### Clustering
 
 In order to classify tumors using this dataset, we used multiple correspondence
 analysis (MCA) [@JSSv025i01]. First, we determined the number of dimensions
 containing useful information by selecting the eigenvalue with the most
 explanatory power, using the average of 100 permutations of the data as baseline
-(**figure SM1A**). We then chose the maximum eigenvalue for which the p-value
-remained ≤ 0.05 (see cutoff in **figure SM1B**). Then we performed a UMAP
+(**Figure SM1A**). We then chose the maximum eigenvalue for which the p-value
+remained ≤ 0.05 (see cutoff in **Figure SM1B**). Then we performed a UMAP
 analysis [@McInnes2018], both in order to summarize the MCA graphically, and as
 a preprocessing step to boost the performance of density based clustering. The
 resulting map was notable for its lobed structure, with several reproducible
 projections regardless of random seed setting. A representative version of this
-3D UMAP is shown in **figure SM1C**, rotated to enhance the visibility of the
+3D UMAP is shown in **Figure SM1C**, rotated to enhance the visibility of the
 major features. Following this spatial mapping we attempted to define groupings
 of similar tumors within the spatial map using HDBSCAN, which performs
 hierarchical clustering and provides metrics of cluster stability and
@@ -77,8 +75,8 @@ of tumor samples in a cluster that capture the maximum number of tumor samples,
 measured by probability of membership of ≥ 5% in at least one cluster. Thus, we
 created a score metric as the fraction of classified tumors with max probability
 < 5% in one cluster and chose a cluster size of 92 to minimize the score
-function (**figure SM1D**). HDBSCAN with these settings resulted in ten distinct
-high-density clusters which we then projected onto the UMAP (**figure SM1E**).
+function (**Figure SM1D**). HDBSCAN with these settings resulted in ten distinct
+high-density clusters which we then projected onto the UMAP (**Figure SM1E**).
 This classified 6,038 out of 7,607 tumors but still resulted in a significant
 fraction of unclassified tumor samples. Since we ultimately wish to be able to
 classify any tumor using this scheme, we performed k Nearest Neighbors (kNN)
@@ -86,33 +84,7 @@ analysis, which computes a similarity metric to every tumor in the set and then
 lets the _k_ most similar tumors "vote" as to the identity of the query tumor
 sample based on their cluster labels. We set _k_ to be the square root of the
 number of tumor samples (87). Using this method, we assigned cluster membership
-to the remaining tumors (**figure SM1F** and see interactive media from **supplemental file
-1** (junkdnalab.shinyapps.io/PANCAN_supplemental/)).
-
-```{r, results='asis'}
-cat("\\newpage")
-```
-
-#### Figure SM1
-```{r child='../code/figureSM1.Rmd'}
-```
-
-**Figure SM1: Method for tumor classification using pathway aberration data** 
-A) MCA analysis was performed to determine the eigenvalue with the most
-explanatory power from the categorical data. Average of 100 permutations of the
-data was used as a baseline. B) The p-value of each eigenvalue was plotted and
-the max eigenvalue with a pvalue < 0.05 was selected. C) The resulting MCA was
-projected down to 3 dimensions for the purpose of density based clustering (only
-the first 2 dimensions are shown). Each dot represents a tumor D) HDBSCAN was
-used to perform hierarchical density based clustering tuned to minimize the
-fraction of unassigned tumors. E) HDBSCAN clustered tumors were visualized on
-the UMAP projection; tumors are colored by cluster membership (see legend). This
-results in some tumors remaining unclassified (grey points). F) kNN was used to
-assign membership to the remaining tumors.
-
-```{r, results='asis'}
-cat("\\newpage")
-```
+to the remaining tumors (**Figure SM1F** and see interactive media from **File S1** (junkdnalab.shinyapps.io/PANCAN_supplemental/)).
 
 ### Selection of pathways
 
@@ -122,7 +94,7 @@ mapping files of ENSEMBL genes to pathways, pathway hierarchy relationships, and
 complexes to top pathways were downloaded from
 https://reactome.org/download-data. Using these data, we imposed pathway
 criteria to define basic cellular processes and biochemical pathways: (1)
-human-derived pathways (\it{“HSA”}) (2) limited to grandchild node for each
+human-derived pathways ( _“HSA"_ ) (2) limited to grandchild node for each
 parent pathway (_e.g._ ‘Beta-catenin independent WNT signaling’ in ‘Signal
 Transduction’) (3) exclusion of pathways in the parent pathway: "Disease",
 "Muscle contraction", and "Reproduction" or pathway names that include any of
@@ -140,8 +112,8 @@ genes.
 
 We filtered likely erroneous mutations due to transcription coupled repair. Our
 approach was to determine the status of each gene (_i.e._ expressed or not
-expressed) in each tissue type in order to exclude gene mutations low expressed
-enes. To do this, we obtained the TCGA RNA sequencing data adjusted for batch
+expressed) in each tissue type in order to exclude lowly expressed
+genes. To do this, we obtained the TCGA RNA sequencing data adjusted for batch
 effect dataset (https://pancanatlas.xenahubs.net). Using the data, we removed
 the genes and tumor samples that were not included in our analysis, grouped the
 tumor samples by tissue type and computed the mean expression value for each
@@ -172,43 +144,32 @@ We used Bayesian inference to explore the relative impact of cancer diagnosis on
 survival at the time of diagnosis. Our model assumes that at birth each person
 has a small initial probability per unit time to die, and that this probability
 grows exponentially in time at some baseline rate that matches the observed CDC
-data. The rate of growth in risk is assumed to jump to a higher level at
-diagnosis, which we take as a proxy for onset. This represents an accelerated
-aging type model. To fit the model, we constrain the baseline risks using the
-available CDC life tables (ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Publications/NVSR/68_07/). We also constrain the cancer specific multiplier
-using the longevity data within the cancer tumor dataset. Our model estimates
-the effect of cancer type and class-specific cancer effects independently,
-resulting in a cancer and class specific estimate of the aging rate multiplier.
+data. We assume that at diagnosis this information will allow us to treat
+patients as if they were a different age, and with further time passing at a
+different rate, a self-similarity based model. The effective age at diagnosis is
+based on a baseline age for that tissue/class combination, plus a perturbation
+for each year over 20 years old at diagnosis. To fit the model, we constrain the
+baseline risks using the available CDC life tables
+(ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Publications/NVSR/68_07/). We also
+constrain the cancer specific parameters using the longevity data within the
+cancer tumor dataset. Our model estimates the effect of cancer type and
+class-specific cancer effects independently, resulting in a cancer and class
+specific estimate of the effective age.
 
 Most TCGA cases are diagnosed late in life, so we fit a model that emphasizes
 accuracy in the right tail of the distribution. We modeled baseline longevity
-using a risk rate function:
+using a risk rate function. The risk rate of death at a time $t$ days after the
+$A$ birthday is given as:
 
 $$R(t) = R_{20}\exp(a(A-20) + D(t) k a (\frac{t}{365}))$$ 
 
-Time is split into two components. $A$ going from 0 up to the age of the patient
-at diagnosis and then remaining fixed, whereas $t$ starts at 0 upon diagnosis
-and represents the days since diagnosis, a field recorded in the dataset. $D(t)$
+Time is split into two components. $A$ represents the "effective age" of the
+patient at diagnosis, whereas $t$ starts at 0 upon diagnosis and represents the
+days since diagnosis, a field recorded in the dataset. $D(t)$
 is an indicator for whether diagnosis has occurred or not (before diagnosis
 $D(t) = 0$, after $D(t) = 1$). The model assumes that the risk of death is
 $R_{20}$ at age 20 years and increases exponentially with a constant rate $a$ up
 to the age at diagnosis. Risk of death assumes a new rate $ka$ thereafter.
-Though the model extends to earlier ages, relatively few patients were under age
-20 (**supplementary figure SM2**).
-
-
-#### Figure SM2
-
-```{r child='../code/figureSM2.Rmd'}
-```
-
-**Supplementary Figure SM2** Comparison between CDC data and ODE model fit for
-males and females of European descent. This comparison does not distinguish on
-ethnicity for simplicity in visualization.
-
-```{r, results='asis'}
-cat("\\newpage")
-```
 
 Given this risk per unit time, the probability of death at time $T+dT$ is the
 probability to survive to time $T$ which is $(1-P(T))$ and then die in the
@@ -229,78 +190,38 @@ And the density of deaths per unit time is the derivative with respect to T:
 
 $$p(T) = R(T) \exp(-\int_0^T R(t)dt)$$
 
+However, to model the risk of cancer effectively we found that it was necessary
+not to use the actual age $A'$ but instead the "effective age" for that
+tissue/class type. Our effective age is calculated as:
+
+$$A = A_{0} A_{cl} + A_r (A'-20)$$ Where $A_0$ is the tissue specific effective
+age parameter (expressed in years), $A_{cl}$ is a dimensionless multiplier for
+the given class, and $A_r$ is the dimensionless age rate which determines how
+actual age $A'$ affects effective age A using a linear perturbation. For a
+non-cancer patient, $A_0=20$, $A_{cl}=1$, and $A_r=1$ are the relevant
+benchmarks.
+
 The $R(T)$ function has two important parameters, the $a$ value which represents
-the background risk rates, and the $k$ value, which is a function of both cancer
-tissue type, and the cancer cluster identity.
+the background risk rates, and the $k$ value, which is a function of cancer
+tissue type.
 
-$$k = k_{tis} k_{cl}$$
+$$k = k_{tis}$$
 
-The product $k_{tis}k_{cl}$ is obviously symmetric between the two factors. To
-disambiguate the meaning of the two, the prior distribution of $k_{cl}$ has peak
-probability at 1 and a relatively narrow width, due to the fact that it is a
-tissue specific multiplicative modifying factor. This allows the overall
-magnitude of $k$ to be primarily determined by the $k_{tis}$ value whose prior
-is significantly less constrained so that there is a wider range of risk across
-tissue types (**supplementary figure SM3**).
+The product $A_0 A_{cl}$ is obviously symmetric between the two factors. To
+disambiguate the meaning of the two, the prior for $A_0$ has high probability
+range from about 40 to 100 years, whereas the prior distribution of $A_{cl}$ has
+peak probability at 1 and a relatively narrow width, due to the fact that it is
+a tissue specific multiplicative modifying factor. To understand the roles of
+these priors refer to (**Figure SM3**).
 
-```{r, results='asis'}
-cat("\\newpage")
-```
-
-#### Figure SM3
-
-```{r sm3, fig.height=3, fig.width=3}
-ggplot(data.frame(x=0:30),aes(x)) + 
-  stat_function(fun=function(x) dgamma(x,1.2,.2),geom="area", aes(fill = "ktis"))+ 
-  stat_function(fun=function(x) dgamma(x,3.5,2.5),geom="area", aes(fill = "kcl"))+ 
-  labs(title=expression(paste("Prior for k"["tis"], "and k"["cl"])),x= "k value", y = "Probability Density") +
-  theme_classic() + scale_x_continuous(limits = c(0, 20), breaks = c(seq(0,20, by =5))) +
-  scale_y_continuous(limits = c(0,0.75), breaks = c(seq(0,0.75, by = 0.25))) +
-  scale_fill_manual(values = c(alpha("#E69F00", 0.5),alpha("#0072B2", 0.5)),
-                    labels = c(expression(paste("k"["cl"])), expression(paste("k"["tis"])))) +
-  theme(plot.title = element_text(size = 12, hjust = 0.5),
-        panel.grid.major = element_line(size = 0.75),
-        panel.grid.minor = element_line(),
-        legend.position = c(0.8, 0.8),
-        legend.spacing.y = unit(0, "mm"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 8),
-        legend.key.size = unit(0.75,"line"),
-        legend.background = element_blank(),
-        legend.box.background = element_rect(colour = "black"))
-```
-
-**Supplementary Figure SM3: Priors for the tissue and class coefficients.** The tissue coefficient
-is chosen to admit parameter values across a range from near 0 to 20+
-in the high density region, reflecting the wide variety of severities
-across tissue type. Within a given tissue, the class k parameter
-multiplies the tissue k and is given a peak density at 1, and a
-credible range from near 0 to 5, reflecting our expectation of a
-moderate amount of variation across the classes.
-
-```{r, results='asis'}
-cat("\\newpage")
-```
-
-The $k$ in our model can be taken as, roughly, the aging rate relative to the
-baseline rates. Thus, a value of $k=2$ means that a given cancer causes you to
-experience the same risk in time $dt$ as a non-cancer patient would experience
-at the same age, in time $2dt$.
-
-Using this model, we split the data by Male/Female sex, and by White _vs._
-Black race as these were the main well-identified categories available to us in
-the dataset. Sex is known to be a risk factor for death, with males dying at
-slightly higher rates for all ages of interest in our dataset. Black _vs._ White
-race is an important category due to differences in access to care and other
-socioeconomic and education related factors. However, due to the low number of
-Black patient tumors, we use ethnicity only to identify the baseline risk
-function, while the tissue- and cluster-specific multipliers are not ethnicity
-specific. There were too few tumors from other races to obtain good inference so
-we excluded them from our analysis.
+Using this model, we split the data by Male/Female sex. Sex is known to be a
+risk factor for death, with males dying at slightly higher rates for all ages of
+interest in our dataset.
 
 As an aside, we did not explicitly account for stage at diagnosis in our model
 for the following reasons. In the tumor sample data, stage at diagnosis is
-confounded with cancer type because some cancers are screened aggressively (_e.g._ colorectal and prostate cancers) while others are diagnosed typically
+confounded with cancer type because some cancers are screened aggressively
+(_e.g._ colorectal and prostate cancers) while others are diagnosed typically
 after they become problematic for the patient's lifestyle (_e.g._ ovarian and
 pancreatic cancers). Secondly, such a model specification would suffer from
 added noise because the staging data are not well standardized across cancer
@@ -309,4 +230,84 @@ between stage and advancement of disease is (for example some sub-stage 4 tumors
 are metastatic). To compound this latter issue, our tumor set is vastly
 under-powered given the uneven representation of stage across cancer types.
 
+```{r, results='asis'}
+cat("\\newpage")
+```
+
 ### References
+
+<div id="refs"></div>
+
+```{r, results='asis'}
+cat("\\newpage")
+```
+
+#### Figure SM1
+```{r child='../code/figureSM1.Rmd'}
+```
+
+**Figure SM1. Method for tumor classification using pathway aberration data** 
+A) MCA analysis was performed to determine the eigenvalue with the most
+explanatory power from the categorical data. Average of 100 permutations of the
+data was used as a baseline. B) The p-value of each eigenvalue was plotted and
+the max eigenvalue with a pvalue < 0.05 was selected. C) The resulting MCA was
+projected down to 3 dimensions for the purpose of density based clustering (only
+the first 2 dimensions are shown). Each dot represents a tumor D) HDBSCAN was
+used to perform hierarchical density based clustering tuned to minimize the
+fraction of unassigned tumors. E) HDBSCAN clustered tumors were visualized on
+the UMAP projection; tumors are colored by cluster membership (see legend). This
+results in some tumors remaining unclassified (grey points). F) kNN was used to
+assign membership to the remaining tumors.
+
+```{r, results='asis'}
+cat("\\newpage")
+```
+
+#### Figure SM2
+
+```{r child='../code/figureSM2.Rmd'}
+```
+
+**Figure SM2. Comparison between CDC data and ODE model fit for
+males and females of European descent.** This comparison does not distinguish on
+ethnicity for simplicity in visualization.
+
+```{r, results='asis'}
+cat("\\newpage")
+```
+
+#### Figure SM3
+
+```{r sm3, fig.height=3, fig.width=6}
+sm3.1 <- ggplot(data.frame(x=0:110),aes(x)) + 
+  stat_function(fun=function(x) dgamma(x,30.0,29.0/65),geom="area", fill = alpha("black", 0.5)) +
+  theme_classic() + 
+  scale_x_continuous(limits = c(30, 110), breaks = c(seq(30,110, by =10))) +
+  theme(plot.title = element_text(size = 12, hjust = 0.5),
+        panel.grid.major = element_line(size = 0.75),
+        panel.grid.minor = element_line()) +
+  labs(x= expression(paste("Prior for A"["0"])), y = "Probability Density")
+
+sm3.2 <- ggplot(data.frame(x=0:3),aes(x)) + 
+  stat_function(fun=function(x) dgamma(x,50.0,49.0/1.0),geom="area", fill = alpha("black", 0.5)) +
+  theme_classic() + 
+  scale_x_continuous(limits = c(0.5, 1.6), breaks = c(seq(0.6, 1.5, by = 0.2))) +
+  theme(plot.title = element_text(size = 12, hjust = 0.5),
+        panel.grid.major = element_line(size = 0.75),
+        panel.grid.minor = element_line()) +
+  labs(x= expression(paste("Prior for A"["cl"])), y = "Probability Density")
+
+layout = "
+AABB
+AABB
+"
+
+sm3.1 + sm3.2 + plot_annotation(tag_levels = "A") + plot_layout(design = layout)
+```
+
+**Figure SM3. Priors for the tissue and class coefficients.** A) The tissue
+coefficient is chosen to admit ages between 40 and 100 years old as a baseline
+age. B) Within a given tissue, the class parameter multiplies the tissue value and
+is given a peak density at 1, and a credible range from near 0.6 to 1.4,
+reflecting our expectation of a moderate multiplicative perturbation of
+variation across the classes.
