@@ -47,7 +47,7 @@ provides additional benefits over gene-centric analysis: (1) It is significantly
 less noisy because it aggregates molecular events across multiple genes in the 
 same pathway and (2) the identification of a potential casual mechanism is easier 
 to interpret as genetic aberrations are linked to molecular pathways. In a perspective, 
-Creixell et al. [@Creixell-pathwaynetworkanalysis] described approaches of pathway 
+Creixell et al. [@PATHNET] described approaches of pathway 
 and network analysis applicable to next-generation sequencing data, the most common 
 approach being fixed-gene enrichment analysis to identify over-represented pathways. 
 Sanchez-Vega et al. [@PCAWG-PATH] carried out an exhaustive

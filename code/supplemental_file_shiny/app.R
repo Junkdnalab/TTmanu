@@ -35,7 +35,7 @@ load("tumor_samples.Rda")
 load("supplemental_gene.Rda")
 load("gdc_reactome_path_analysis.Rda")
 load("cancerdat.rda")
-load("survmodel_effcl_knn_062821.stansave")
+load("survmodel_effcl_knn_070121.stansave")
 dfsamps <- as.data.frame(samps)
 load("dfclas.rda")
 

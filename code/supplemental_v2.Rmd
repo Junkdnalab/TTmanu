@@ -1,5 +1,4 @@
 ---
-title: "Supplementary figures"
 output:
   word_document:
     reference_docx: "../text/word-style-reference-ttmanu-iscb-iscience-v2.docx"
@@ -50,7 +49,7 @@ legend("bottom", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2, adj = 
 }
 ```
 
-**Figure S1. Distribution of cancer type on UMAP clusters.** Each panel shows the identity of 
+**Figure S1. Distribution of cancer type on UMAP clusters, Related to Figure 2.** Each panel shows the identity of 
 individual tumors by one of 23 cancer types projected onto the cluster UMAP identified 
 in **Figure 1B of the main text**. The colors indicate the tumor's cluster identity.
 
@@ -101,7 +100,7 @@ for(n in cancer_w_subtypes[1:19]) {
 }
 ```
 
-**Figure S2. Histological subtypes.** Each panel shows the histological subtypes of one of the 23 
+**Figure S2. Histological subtypes, Related to Figure 2.** Each panel shows the histological subtypes of one of the 23 
 cancers projected onto the tumors of the UMAP from **Figure 1B of the main text**. The colors indicate the tumor's histological subtype identity.
 
 \newpage
@@ -166,7 +165,7 @@ legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
 }
 ```
 
-**Figure S3. Distribution of mismatch repair genes on UMAP clusters.** Each panel shows one of 15 
+**Figure S3. Distribution of mismatch repair genes on UMAP clusters, Related to Figure 2.** Each panel shows one of 15 
 genes involved in genome stability projected on the UMAP from **Figure 1B of the main text**. The colors indicate the tumor's cluster identity.
 
 \newpage
@@ -246,7 +245,7 @@ legend("top", inset = c(0), legend=n, bty = "n", horiz = T, cex = 1.2)
 
 ```
 
-**Figure S4. Distribution of oncogenes/tumor suppressors on UMAP clusters.** Each panel shows shows one of the twelve oncogenes/tumor suppressors projected onto the tumors of the UMAP from **Figure 1B of the main text**. The colors indicate the tumor's cluster identity.
+**Figure S4. Distribution of oncogenes/tumor suppressors on UMAP clusters, Related to Figure 2.** Each panel shows shows one of the twelve oncogenes/tumor suppressors projected onto the tumors of the UMAP from **Figure 1B of the main text**. The colors indicate the tumor's cluster identity.
 
 \newpage 
 
@@ -385,4 +384,67 @@ AABB
 s5.1 + s5.2 + plot_annotation(tag_levels = "A") + plot_layout(design = layout)
 ```
 
-**Figure S5. Performance comparison of different classification model - knn, COCA, iCluster, tissue-of-origin (tis).** A) Empirical cumulative distribution function comparing time of death prediction of all classification models with actual time of death (dark green). B) Error distribution plot of predicted and actual time of death.
+**Figure S5. Performance comparison of different classification model - knn, COCA, iCluster, tissue-of-origin (tis), Related to Figure 5.** A) Empirical cumulative distribution function comparing time of death prediction of all classification models with actual time of death (dark green). B) Error distribution plot of predicted and actual time of death.
+
+\newpage
+
+```{r child='../code/figureSM1.Rmd'}
+```
+
+**Figure S6. Method for tumor classification using pathway aberration data, Related to Figure 1.** 
+A) MCA analysis was performed to determine the eigenvalue with the most
+explanatory power from the categorical data. Average of 100 permutations of the
+data was used as a baseline. B) The p-value of each eigenvalue was plotted and
+the max eigenvalue with a pvalue < 0.05 was selected. C) The resulting MCA was
+projected down to 3 dimensions for the purpose of density based clustering (only
+the first 2 dimensions are shown). Each dot represents a tumor D) HDBSCAN was
+used to perform hierarchical density based clustering tuned to minimize the
+fraction of unassigned tumors. E) HDBSCAN clustered tumors were visualized on
+the UMAP projection; tumors are colored by cluster membership (see legend). This
+results in some tumors remaining unclassified (grey points). F) kNN was used to
+assign membership to the remaining tumors.
+
+\newpage
+
+```{r child='../code/figureSM2.Rmd'}
+```
+
+**Figure S7. Comparison between CDC data and ODE model fit for
+males and females of European descent, Related to Figure 5.** This comparison does not distinguish on
+ethnicity for simplicity in visualization.
+
+\newpage
+
+```{r sm3, fig.height=3, fig.width=6}
+sm3.1 <- ggplot(data.frame(x=0:110),aes(x)) + 
+  stat_function(fun=function(x) dgamma(x,30.0,29.0/65),geom="area", fill = alpha("black", 0.5)) +
+  theme_classic() + 
+  scale_x_continuous(limits = c(30, 110), breaks = c(seq(30,110, by =10))) +
+  theme(plot.title = element_text(size = 12, hjust = 0.5),
+        panel.grid.major = element_line(size = 0.75),
+        panel.grid.minor = element_line()) +
+  labs(x= expression(paste("Prior for A"["0"])), y = "Probability Density")
+
+sm3.2 <- ggplot(data.frame(x=0:3),aes(x)) + 
+  stat_function(fun=function(x) dgamma(x,50.0,49.0/1.0),geom="area", fill = alpha("black", 0.5)) +
+  theme_classic() + 
+  scale_x_continuous(limits = c(0.5, 1.6), breaks = c(seq(0.6, 1.5, by = 0.2))) +
+  theme(plot.title = element_text(size = 12, hjust = 0.5),
+        panel.grid.major = element_line(size = 0.75),
+        panel.grid.minor = element_line()) +
+  labs(x= expression(paste("Prior for A"["cl"])), y = "Probability Density")
+
+layout = "
+AABB
+AABB
+"
+
+sm3.1 + sm3.2 + plot_annotation(tag_levels = "A") + plot_layout(design = layout)
+```
+
+**Figure S8. Priors for the tissue and class coefficients, Related to Figure 5 and 6.** A) The tissue
+coefficient is chosen to admit ages between 40 and 100 years old as a baseline
+age. B) Within a given tissue, the class parameter multiplies the tissue value and
+is given a peak density at 1, and a credible range from near 0.6 to 1.4,
+reflecting our expectation of a moderate multiplicative perturbation of
+variation across the classes.

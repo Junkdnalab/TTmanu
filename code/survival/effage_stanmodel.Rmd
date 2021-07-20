@@ -1,0 +1,180 @@
+```{r load-libraries}
+library(sqldf)
+library(tidyverse)
+library(rstan)
+library(readxl)
+library(ggkm)
+library(gridExtra)
+library(PerformanceAnalytics)
+library(patchwork)
+```
+
+```{r add-other-classes}
+setwd("D:/repo/TTmanu/data/survival/")
+
+cancerdat = read_csv("clinical_plus_cluster.csv");
+treatdays = read_csv("tcga_clinical_data.csv")
+
+#####################################
+## Other TCGA paper classification ##
+#####################################
+## Hoadley et al. 2018 PMID: 29625048
+icluster <- read_excel(path = "NIHMS957746-supplement-6.xlsx", skip=1)
+icluster <- icluster %>% 'colnames<-' (c("sample_id", "icluster"))
+## Hoadley et al. 2015 PMID: 25109877
+coca <- read_excel(path = "mmc2.xlsx", skip=1)
+coca <- coca %>% dplyr::select(Sample, COCA) %>% 'colnames<-' (c("sample_id", "coca"))
+
+## Append additional classification model to cancer data
+cancerdat <- cancerdat %>% mutate(sample_id = substring(text = sample_id, first = 1, last = 12)) %>% 
+  left_join(x = ., y = icluster, by = "sample_id") %>% 
+  left_join(x = ., y = coca, by = "sample_id")
+
+## Assign unclassified tumor samples in icluster and coca to the next cluster assignment number
+cancerdat[which(is.na(cancerdat$icluster)), "icluster"] <- max(cancerdat$icluster, na.rm = TRUE) + 1
+cancerdat[which(is.na(cancerdat$coca)), "coca"] <- max(cancerdat$coca, na.rm = TRUE) + 1
+```
+
+```{r prep-for-stan}
+setwd("D:/repo/TTmanu/data/survival/")
+#####################
+## Processing Data ##
+#####################
+deadpat <- sqldf("select patient_id,
+                 age_at_initial_pathologic_diagnosis as age, 
+                 gender,
+                 race, 
+                 death_days_to,type,
+                 clust_knn as clust, 
+                 clust as origclust, 
+                 icluster, 
+                 coca,
+                 `ajcc_pathologic_tumor_stage.y` as stage, 
+                 last_contact_days_to as lastcont from cancerdat where (death_days_to is not null or lastcont is not null) and age is not null and age > 9")
+
+## Clean up data
+deadpat$patient_id <- as.factor(deadpat$patient_id)
+deadpat$type <- as.factor(deadpat$type)
+deadpat$tevent <- deadpat$death_days_to
+deadpat[is.na(deadpat$tevent),"tevent"] <- deadpat[is.na(deadpat$tevent),"lastcont"]
+deadpat[is.na(deadpat$death_days_to),"eventtype"] <- "bfollow"
+deadpat[!is.na(deadpat$death_days_to),"eventtype"] = "adeath"
+deadpat$eventtype = as.factor(deadpat$eventtype)
+deadpat$gender = as.factor(deadpat$gender)
+
+#############################
+## mortality data from CDC ##
+#############################
+namesmort = c("agerng","pdead","nsurv","ndie","pyrs","pyrsabove","expectedlife")
+menmort = read_csv("lifetables/Table02.csv",skip=2)
+## drop the final row, it's just a text info statement
+menmort = menmort[1:NROW(menmort)-1,] 
+wommort = read_csv("lifetables/Table03.csv",skip=2)
+wommort = wommort[1:NROW(wommort)-1,]
+
+names(menmort) = namesmort
+names(wommort) = namesmort
+yrs=seq(0,100,by=1);
+menmort$yrnum = yrs
+wommort$yrnum = yrs
+
+## Store original cancer data in new object for further analysis
+#save(deadpat, file = "D:/repo/TTmanu/data/survival/deadpat_all.rda")
+load("../../data/survival/deadpat_all.rda")
+standata <- deadpat 
+
+## convert negative tdeath to 0
+standata[which(standata$tevent < 0), "tevent"] <- 0
+## There are currently 3 types of classification model in this analysis:
+## knn (our classification), icluster, and coca
+
+model <- "tis" 
+
+if(model == "knn") {
+  standata$clust <- as.factor(standata$clust)
+  colnames(standata)[which(names(standata) == "clust")] <- "modelofinterest"
+} else if(model == "icluster") {
+  standata$icluster <- as.factor(standata$icluster)
+  colnames(standata)[which(names(standata) == "icluster")] <- "modelofinterest"
+} else if(model == "coca") {
+  standata$coca <- as.factor(standata$coca)
+  colnames(standata)[which(names(standata) == "coca")] <- "modelofinterest"
+} else if(model == "tis") {
+  standata$modelofinterest <- standata$type ## Convert tissue type to modelofinterest
+  standata$type <- "none" ## No tissue category
+  standata$type <- as.factor(standata$type) ## Factor the no tissue category
+} else {
+  print("Incorrect model selection")
+}
+
+if(model %in% c("knn", "icluster", "coca")) {
+  standata <- list(Np=NROW(standata), 
+                Nt=NROW(levels(standata$type)), 
+                Nc=NROW(levels(standata$modelofinterest)),
+                ##patient=as.numeric(deadpat$patient_id),
+                age=standata$age,
+                tissue=as.numeric(standata$type),
+                menccdf=menmort$nsurv/100000,
+                womccdf=wommort$nsurv/100000,
+                gender=as.numeric(standata$gender),
+                tclass=as.numeric(standata$modelofinterest),
+                tevent = standata$tevent,
+                eventtype=as.numeric(standata$eventtype))
+} 
+
+if(model == "tis") {
+  standata <- list(Np=NROW(standata), 
+                Nt=NROW(levels(standata$modelofinterest)), 
+                age=standata$age,
+                tissue=as.numeric(standata$modelofinterest),
+                menccdf=menmort$nsurv/100000,
+                womccdf=wommort$nsurv/100000,
+                gender=as.numeric(standata$gender),
+                tclass=as.numeric(standata$modelofinterest),
+                tevent = standata$tevent,
+                eventtype=as.numeric(standata$eventtype))
+}
+
+
+### Fit the survival model with one rate per tissue*class
+rm(smodel, start, start2, start3); gc()
+if(model %in% c("knn", "icluster", "coca") == TRUE) {
+  smodel = stan_model(file="../../code/survival/survmodel.stan")
+} else if(model %in% c("tis", "icluster.kcl", "coca.kcl") == TRUE) {
+  smodel = stan_model(file="../../code/survival/survmodel_tisonly.stan")
+} else {
+  print("Incorrect model selection")
+}
+
+## optimization for initialization doesn't always work... 
+start = optimizing(smodel,data=standata);
+start2 = optimizing(smodel,data=standata);
+start3 = optimizing(smodel,data=standata);
+
+if(model == "knn") {
+  tryCatch(load("survmodel_effcl_knn_070121.stansave"),error=function(e){
+    samps = sampling(smodel,data=standata,chains=4,warmup=1000,iter=2500,cores=4,control = list(max_treedepth=9)) #,init=list(start,start2,start3));
+    save("samps",file="survmodel_effcl_knn_070121.stansave")
+  })
+} else if(model == "tis") {
+  tryCatch(load("survmodel_effcl_tis_070121.stansave"),error=function(e){
+    samps = sampling(smodel,data=standata,chains=4,warmup=1000,iter=2500,cores=4,control=list(max_treedepth=9)) #,init=list(start,start2,start3));
+    save("samps",file="survmodel_effcl_tis_070121.stansave")
+  })
+} else if(model == "icluster") {
+  tryCatch(load("survmodel_effcl_icluster_070121.stansave"),error=function(e){
+    samps = sampling(smodel,data=standata,chains=4,warmup=1000,iter=2500,cores=4,control=list(max_treedepth=9)) #,init=list(start,start2,start3));
+    save("samps",file="survmodel_effcl_icluster_070121.stansave")
+  })
+} else if(model == "coca") {
+  tryCatch(load("survmodel_effcl_coca_070121.stansave"),error=function(e){
+    samps = sampling(smodel,data=standata,chains=4,warmup=1000,iter=2500,cores=4,control=list(max_treedepth=9)) #,init=list(start,start2,start3));
+    save("samps",file="survmodel_effcl_coca_070121.stansave")
+  })
+} else {
+  print("Incorrect model selection")
+}
+
+
+
+```

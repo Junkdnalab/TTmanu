@@ -122,7 +122,7 @@ for(ct in cancertype) {
   survyrswfref = sapply(agesw,function(a) tryCatch(simdeath(r20wf,ageratewf,a,1)/365,error= function(e) {0}))
   ## Effective age due to cancer
   effage.agesw <- effage0tiss * effage0 + effagert * (agesw - 20)
-  survyrswf = sapply(effage.agesw,function(a) tryCatch(simdeath(r20wf,ageratewf,a,kmean)/365,error= function(e) {0}))
+  survyrswf = sapply(effage.agesw,function(a) tryCatch(simdeath(r20wf,ageratewf,a,k)/365,error= function(e) {0}))
   
   df.plot <- plotkmcomp(survyrswf, survyrswfref, women$finaltime / 365, women$finalstatus) +
           coord_cartesian(xlim = c(0, 80)) +

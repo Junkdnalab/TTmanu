@@ -75,7 +75,7 @@ normal_lines <- data.frame(facetname = unique(dfclas$facetname),
 	## Plotting
 	ggplot(dfclas,aes_(x = quote(value),y = quote(class), fill = quote(class))) + geom_density_ridges(alpha = alpha.setup) +
 		facet_wrap(. ~ facetname,nrow=3) + theme_minimal() + scale_fill_brewer(palette = "Paired") +
-	  theme(legend.position = "none") + ggtitle("Class Specific Coefficients") +
+	  theme(legend.position = "none") +
 	  labs(x = expression(paste("A"["cl"])), y = "Cluster Identity") +
 	  theme(plot.title= element_text(hjust = 0.5)) +
 	  scale_fill_manual(values = cluster.colours) +
