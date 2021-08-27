@@ -374,9 +374,10 @@ drive dramatic improvements in survival among some clusters in the future.
 ## Acknowledgements
 
 We wish to thank David Van Valen, Kate Lawrenson, Simon Knott, and Megan
-Hitchens, for critical comments on this manuscript, and Tim Triche Jr for
+Hitchins, for critical comments on this manuscript, and Tim Triche Jr for
 suggested improvements to the preprint. We also thank Ivetth Corona for early
-discussions and feedback. Research reported in this publication was supported 
+discussions and feedback. The graphical abstract was created by BioRender.com. 
+Research reported in this publication was supported 
 in part by Graduate Research Education at Cedars-Sinai (P.N.), by a Cedars-Sinai 
 Precision Health award (D.H.), by institutional commitments to D.H., and by the
 Office of the Director, National Institutes of Health under Award Number 
@@ -661,51 +662,6 @@ greater than or equal to 30% enrichment, which excludes a large number of small
 differences that are not likely to be biologically relevant.
 
 ## Supplemental Figure and Table Legends
-
-**Figure S1. Distribution of cancer type on UMAP clusters, Related to Figure 2.** Each panel shows the identity of 
-individual tumors by one of 23 cancer types projected onto the cluster UMAP identified 
-in **Figure 1B of the main text**. The colors indicate the tumor's cluster identity.
-
-**Figure S2. Histological subtypes, Related to Figure 2.** Each panel shows the histological subtypes of one of the 23 
-cancers projected onto the tumors of the UMAP from **Figure 1B of the main text**. The colors 
-indicate the tumor's histological subtype identity.
-
-**Figure S3. Distribution of mismatch repair genes on UMAP clusters, Related to Figure 2.** Each panel shows one of 15 
-genes involved in genome stability projected on the UMAP from **Figure 1B of the main text**. 
-The colors indicate the tumor's cluster identity.
-
-**Figure S4. Distribution of oncogenes/tumor suppressors on UMAP clusters, Related to Figure 2.** Each panel shows 
-one of the twelve oncogenes/tumor suppressors projected onto the tumors of the UMAP from 
-**Figure 1B of the main text**. The colors indicate the tumor's cluster identity.
-
-**Figure S5. Performance comparison of different classification model - knn, COCA, iCluster, 
-tissue-of-origin (tis), Related to Figure 5.** A) Empirical cumulative distribution function comparing time of death 
-prediction of all classification models with actual time of death (dark green). B) Error 
-distribution plot of predicted and actual time of death.
-
-**Figure S6. Method for tumor classification using pathway aberration data, Related to Figure 1.** 
-A) MCA analysis was performed to determine the eigenvalue with the most
-explanatory power from the categorical data. Average of 100 permutations of the
-data was used as a baseline. B) The p-value of each eigenvalue was plotted and
-the max eigenvalue with a pvalue < 0.05 was selected. C) The resulting MCA was
-projected down to 3 dimensions for the purpose of density based clustering (only
-the first 2 dimensions are shown). Each dot represents a tumor D) HDBSCAN was
-used to perform hierarchical density based clustering tuned to minimize the
-fraction of unassigned tumors. E) HDBSCAN clustered tumors were visualized on
-the UMAP projection; tumors are colored by cluster membership (see legend). This
-results in some tumors remaining unclassified (grey points). F) kNN was used to
-assign membership to the remaining tumors.
-
-**Figure S7. Comparison between CDC data and ODE model fit for
-males and females of European descent, Related to Figure 5.** This comparison does not distinguish on
-ethnicity for simplicity in visualization.
-
-**Figure S8. Priors for the tissue and class coefficients, Related to Figure 5 and 6.** A) The tissue
-coefficient is chosen to admit ages between 40 and 100 years old as a baseline
-age. B) Within a given tissue, the class parameter multiplies the tissue value and
-is given a peak density at 1, and a credible range from near 0.6 to 1.4,
-reflecting our expectation of a moderate multiplicative perturbation of
-variation across the classes.
 
 **Table S1. Ranked pan-cancer reactome pathway mutation, Related to Figure 1.** 
 Pathways are ranked from highest to lowest percent mutated. Gene 1-3 are the top 3 
